@@ -1,9 +1,11 @@
 class Booking < ApplicationRecord
   belongs_to :listing
   belongs_to :tenant, class_name: 'User', foreign_key: 'tenant_id'
+  has_many :payments, dependent: :destroy
 
   # Enums
   enum :status, { pending: 0, confirmed: 1, cancelled: 2, completed: 3 }
+  enum :payment_status, { unpaid: 0, partially_paid: 1, paid: 2 }, prefix: true
 
   # Validations
   validates :check_in_date, presence: true
@@ -15,6 +17,19 @@ class Booking < ApplicationRecord
   scope :upcoming, -> { where('check_in_date > ?', Date.current) }
   scope :past, -> { where('check_out_date < ?', Date.current) }
   scope :current, -> { where('check_in_date <= ? AND check_out_date >= ?', Date.current, Date.current) }
+
+  # Instance methods
+  def total_paid
+    payments.successful.sum(:amount) - payments.successful.where(payment_type: 'refund').sum(:amount).abs
+  end
+
+  def completed?
+    status == 'completed'
+  end
+
+  def confirmed?
+    status == 'confirmed'
+  end
 
   private
 

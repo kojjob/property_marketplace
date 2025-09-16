@@ -1,10 +1,28 @@
 class Property < ApplicationRecord
+  include PgSearch::Model
+
   belongs_to :user
   has_many :property_images, dependent: :destroy
   has_many :favorites, dependent: :destroy
 
   PROPERTY_TYPES = ['House', 'Apartment', 'Condo', 'Townhouse', 'Land', 'Commercial'].freeze
   STATUSES = ['active', 'pending', 'sold', 'rented'].freeze
+
+  # PgSearch configuration for full-text search
+  pg_search_scope :search_full_text,
+                  against: {
+                    title: 'A',
+                    description: 'B',
+                    address: 'C',
+                    city: 'C',
+                    state: 'D'
+                  },
+                  using: {
+                    tsearch: {
+                      prefix: true,
+                      dictionary: 'english'
+                    }
+                  }
 
   validates :title, presence: true, length: { maximum: 200 }
   validates :description, presence: true

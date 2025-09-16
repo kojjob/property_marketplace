@@ -1,10 +1,38 @@
 class Listing < ApplicationRecord
+  include PgSearch::Model
+
   belongs_to :property
   belongs_to :user
   has_many :bookings, dependent: :destroy
   has_many :listing_amenities, dependent: :destroy
   has_many :amenities, through: :listing_amenities
   has_many :reviews, as: :reviewable, dependent: :destroy
+
+  # PgSearch configuration
+  pg_search_scope :search_full_text,
+                  against: {
+                    title: 'A',
+                    description: 'B',
+                    amenities_json: 'C'
+                  },
+                  associated_against: {
+                    property: {
+                      title: 'B',
+                      address: 'C',
+                      city: 'C',
+                      state: 'D'
+                    },
+                    amenities: {
+                      name: 'C',
+                      description: 'D'
+                    }
+                  },
+                  using: {
+                    tsearch: {
+                      prefix: true,
+                      dictionary: 'english'
+                    }
+                  }
 
   # Enums
   enum :listing_type, { rent: 0, sale: 1, short_term: 2, subscription: 3 }

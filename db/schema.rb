@@ -10,9 +10,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_16_225417) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_16_234945) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
 
   create_table "amenities", force: :cascade do |t|
     t.string "name", null: false
@@ -35,10 +63,28 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_225417) do
     t.text "message"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "payment_status", default: 0, null: false
+    t.decimal "total_amount", precision: 12, scale: 2, default: "0.0", null: false
     t.index ["listing_id", "check_in_date", "check_out_date"], name: "index_bookings_on_listing_and_dates"
     t.index ["listing_id"], name: "index_bookings_on_listing_id"
+    t.index ["payment_status"], name: "index_bookings_on_payment_status"
     t.index ["status"], name: "index_bookings_on_status"
     t.index ["tenant_id"], name: "index_bookings_on_tenant_id"
+  end
+
+  create_table "conversations", force: :cascade do |t|
+    t.bigint "participant1_id", null: false
+    t.bigint "participant2_id", null: false
+    t.datetime "last_message_at"
+    t.boolean "archived", default: false
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["archived"], name: "index_conversations_on_archived"
+    t.index ["last_message_at"], name: "index_conversations_on_last_message_at"
+    t.index ["participant1_id", "participant2_id"], name: "index_conversations_on_participant1_id_and_participant2_id", unique: true
+    t.index ["participant1_id"], name: "index_conversations_on_participant1_id"
+    t.index ["participant2_id"], name: "index_conversations_on_participant2_id"
   end
 
   create_table "favorites", force: :cascade do |t|
@@ -90,6 +136,60 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_225417) do
     t.index ["status", "available_from"], name: "index_listings_on_status_and_available_from"
     t.index ["status"], name: "index_listings_on_status"
     t.index ["user_id"], name: "index_listings_on_user_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.bigint "sender_id", null: false
+    t.bigint "recipient_id", null: false
+    t.bigint "conversation_id", null: false
+    t.string "regarding_type"
+    t.bigint "regarding_id"
+    t.text "content", null: false
+    t.integer "status", default: 0, null: false
+    t.integer "message_type", default: 0, null: false
+    t.datetime "read_at"
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
+    t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.index ["created_at"], name: "index_messages_on_created_at"
+    t.index ["message_type"], name: "index_messages_on_message_type"
+    t.index ["recipient_id"], name: "index_messages_on_recipient_id"
+    t.index ["regarding_type", "regarding_id"], name: "index_messages_on_regarding"
+    t.index ["sender_id", "recipient_id"], name: "index_messages_on_sender_id_and_recipient_id"
+    t.index ["sender_id"], name: "index_messages_on_sender_id"
+    t.index ["status"], name: "index_messages_on_status"
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.bigint "booking_id", null: false
+    t.bigint "payer_id", null: false
+    t.bigint "payee_id", null: false
+    t.decimal "amount", precision: 12, scale: 2, null: false
+    t.string "currency", limit: 3, default: "USD", null: false
+    t.decimal "service_fee", precision: 10, scale: 2
+    t.integer "status", default: 0, null: false
+    t.integer "payment_type", null: false
+    t.integer "payment_method"
+    t.string "transaction_id", null: false
+    t.string "transaction_reference"
+    t.datetime "processed_at"
+    t.datetime "refunded_at"
+    t.string "failure_reason"
+    t.integer "lock_version", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["booking_id", "status"], name: "index_payments_on_booking_id_and_status"
+    t.index ["booking_id"], name: "index_payments_on_booking_id"
+    t.index ["payee_id", "created_at"], name: "index_payments_on_payee_id_and_created_at"
+    t.index ["payee_id"], name: "index_payments_on_payee_id"
+    t.index ["payer_id", "created_at"], name: "index_payments_on_payer_id_and_created_at"
+    t.index ["payer_id"], name: "index_payments_on_payer_id"
+    t.index ["payment_type"], name: "index_payments_on_payment_type"
+    t.index ["processed_at"], name: "index_payments_on_processed_at"
+    t.index ["status"], name: "index_payments_on_status"
+    t.index ["transaction_id"], name: "index_payments_on_transaction_id", unique: true
   end
 
   create_table "profiles", force: :cascade do |t|
@@ -176,21 +276,68 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_225417) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string "email_address", null: false
-    t.string "password_digest", null: false
+    t.string "email", null: false
+    t.string "encrypted_password", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.string "role"
+    t.string "reset_password_token"
+    t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
+    t.integer "sign_in_count", default: 0, null: false
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string "current_sign_in_ip"
+    t.string "last_sign_in_ip"
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.datetime "confirmation_sent_at"
+    t.string "unconfirmed_email"
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
+    t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "verifications", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "verified_by_id"
+    t.integer "verification_type", null: false
+    t.integer "status", default: 0, null: false
+    t.string "document_url"
+    t.text "rejection_reason"
+    t.datetime "verified_at"
+    t.datetime "expires_at"
+    t.datetime "expired_at"
+    t.json "metadata"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_verifications_on_created_at"
+    t.index ["expires_at"], name: "index_verifications_on_expires_at"
+    t.index ["status"], name: "index_verifications_on_status"
+    t.index ["user_id", "verification_type"], name: "index_verifications_on_user_id_and_verification_type"
+    t.index ["user_id"], name: "index_verifications_on_user_id"
+    t.index ["verification_type"], name: "index_verifications_on_verification_type"
+    t.index ["verified_by_id"], name: "index_verifications_on_verified_by_id"
+  end
+
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "bookings", "listings"
   add_foreign_key "bookings", "users", column: "tenant_id"
+  add_foreign_key "conversations", "users", column: "participant1_id"
+  add_foreign_key "conversations", "users", column: "participant2_id"
   add_foreign_key "favorites", "properties"
   add_foreign_key "favorites", "users"
   add_foreign_key "listing_amenities", "amenities"
   add_foreign_key "listing_amenities", "listings"
   add_foreign_key "listings", "properties"
   add_foreign_key "listings", "users"
+  add_foreign_key "messages", "conversations"
+  add_foreign_key "messages", "users", column: "recipient_id"
+  add_foreign_key "messages", "users", column: "sender_id"
+  add_foreign_key "payments", "bookings"
+  add_foreign_key "payments", "users", column: "payee_id"
+  add_foreign_key "payments", "users", column: "payer_id"
   add_foreign_key "profiles", "users"
   add_foreign_key "properties", "users"
   add_foreign_key "property_images", "properties"
@@ -198,4 +345,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_225417) do
   add_foreign_key "reviews", "users", column: "response_by_id"
   add_foreign_key "reviews", "users", column: "reviewer_id"
   add_foreign_key "sessions", "users"
+  add_foreign_key "verifications", "users"
+  add_foreign_key "verifications", "users", column: "verified_by_id"
 end
