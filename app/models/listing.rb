@@ -4,6 +4,7 @@ class Listing < ApplicationRecord
   has_many :bookings, dependent: :destroy
   has_many :listing_amenities, dependent: :destroy
   has_many :amenities, through: :listing_amenities
+  has_many :reviews, as: :reviewable, dependent: :destroy
 
   # Enums
   enum :listing_type, { rent: 0, sale: 1, short_term: 2, subscription: 3 }

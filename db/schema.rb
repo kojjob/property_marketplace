@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_16_223730) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_16_225417) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -81,6 +81,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_223730) do
     t.integer "views_count", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "average_rating", precision: 3, scale: 2, default: "0.0"
+    t.integer "reviews_count", default: 0
+    t.index ["average_rating"], name: "index_listings_on_average_rating"
     t.index ["listing_type"], name: "index_listings_on_listing_type"
     t.index ["price"], name: "index_listings_on_price"
     t.index ["property_id"], name: "index_listings_on_property_id"
@@ -136,6 +139,33 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_223730) do
     t.index ["property_id"], name: "index_property_images_on_property_id"
   end
 
+  create_table "reviews", force: :cascade do |t|
+    t.string "reviewable_type", null: false
+    t.bigint "reviewable_id", null: false
+    t.bigint "reviewer_id", null: false
+    t.bigint "booking_id"
+    t.integer "rating", null: false
+    t.string "title", limit: 100
+    t.text "content"
+    t.integer "review_type", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.integer "helpful_count", default: 0
+    t.text "response"
+    t.bigint "response_by_id"
+    t.datetime "response_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["booking_id", "review_type"], name: "index_reviews_on_booking_and_type", unique: true, where: "(booking_id IS NOT NULL)"
+    t.index ["booking_id"], name: "index_reviews_on_booking_id"
+    t.index ["created_at"], name: "index_reviews_on_created_at"
+    t.index ["rating"], name: "index_reviews_on_rating"
+    t.index ["review_type"], name: "index_reviews_on_review_type"
+    t.index ["reviewable_type", "reviewable_id", "status"], name: "index_reviews_on_reviewable_and_status"
+    t.index ["reviewable_type", "reviewable_id"], name: "index_reviews_on_reviewable"
+    t.index ["reviewer_id"], name: "index_reviews_on_reviewer_id"
+    t.index ["status"], name: "index_reviews_on_status"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "ip_address"
@@ -164,5 +194,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_223730) do
   add_foreign_key "profiles", "users"
   add_foreign_key "properties", "users"
   add_foreign_key "property_images", "properties"
+  add_foreign_key "reviews", "bookings"
+  add_foreign_key "reviews", "users", column: "response_by_id"
+  add_foreign_key "reviews", "users", column: "reviewer_id"
   add_foreign_key "sessions", "users"
 end
