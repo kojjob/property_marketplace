@@ -1,8 +1,17 @@
 FactoryBot.define do
   factory :review do
-    association :reviewable, factory: :listing
-    association :reviewer, factory: :user
+    reviewable { association :listing }
+    reviewer { association :user }
     booking { nil }
+
+    # Ensure reviewer doesn't own the listing
+    after(:build) do |review|
+      if review.reviewable_type == 'Listing' && review.reviewable && review.reviewer
+        if review.reviewable.user_id == review.reviewer.id
+          review.reviewer = create(:user)
+        end
+      end
+    end
     rating { 4 }
     title { "Great place to stay" }
     content { "The property was clean, well-maintained, and exactly as described in the listing." }

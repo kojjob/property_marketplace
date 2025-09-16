@@ -11,6 +11,9 @@ class Review < ApplicationRecord
   validates :title, length: { maximum: 100 }, allow_blank: true
   validates :content, length: { minimum: 10, maximum: 1000 }, allow_blank: true
 
+  # Custom validation for whitespace-only content - this runs after length validation
+  validate :content_not_just_whitespace
+
   # Custom validations
   validate :reviewer_cannot_review_own_property
   validate :one_review_per_booking
@@ -60,6 +63,13 @@ class Review < ApplicationRecord
   end
 
   private
+
+  def content_not_just_whitespace
+    # Check if content is only whitespace (including spaces, tabs, newlines)
+    if content.present? && content.match?(/\A\s+\z/)
+      errors.add(:content, "can't be just whitespace")
+    end
+  end
 
   def reviewer_cannot_review_own_property
     return unless reviewable_type == 'Listing' && reviewable && reviewer
