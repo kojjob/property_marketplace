@@ -23,29 +23,6 @@
     </div>
   </div>
 
-<<<<<<< HEAD
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <% @properties.each do |property| %>
-      <div class="bg-white rounded-lg shadow-md overflow-hidden">
-        <div class="p-6">
-          <h2 class="text-xl font-semibold mb-2">
-            <%= link_to property.title, property, class: "hover:text-blue-600" %>
-          </h2>
-          <p class="text-gray-600 mb-2"><%= property.property_type %></p>
-          <p class="text-gray-600 mb-2"><%= property.city %>, <%= property.state || property.region %></p>
-          <p class="text-2xl font-bold text-blue-600">$<%= number_with_delimiter(property.price) %></p>
-          <div class="mt-4 text-sm text-gray-500">
-            <% if property.bedrooms.present? %>
-              <span><%= property.bedrooms %> bed</span>
-            <% end %>
-            <% if property.bathrooms.present? %>
-              <span class="ml-4"><%= property.bathrooms %> bath</span>
-            <% end %>
-            <% if property.square_feet.present? %>
-              <span class="ml-4"><%= number_with_delimiter(property.square_feet) %> sqft</span>
-            <% end %>
-          </div>
-=======
   <!-- Main Content Area -->
   <div class="container mx-auto px-4 py-6">
     <div class="flex flex-col lg:flex-row gap-6 min-h-[calc(100vh-200px)]">
@@ -70,7 +47,6 @@
         <!-- Filters Container -->
         <div class="hidden lg:block" data-dropdown-target="menu">
           <%= render 'advanced_filters' %>
->>>>>>> fix/navbar-alignment
         </div>
       </div>
 
