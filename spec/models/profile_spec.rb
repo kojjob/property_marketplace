@@ -37,7 +37,7 @@ RSpec.describe Profile, type: :model do
       it 'returns email when name is missing' do
         profile.first_name = nil
         profile.last_name = nil
-        expect(profile.display_name).to eq(profile.user.email_address)
+        expect(profile.display_name).to eq(profile.user.email)
       end
     end
 

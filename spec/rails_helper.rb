@@ -9,6 +9,7 @@ require 'rspec/rails'
 require 'shoulda/matchers'
 require 'factory_bot_rails'
 require 'database_cleaner/active_record'
+require 'devise'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -45,6 +46,10 @@ RSpec.configure do |config|
 
   # Include FactoryBot methods
   config.include FactoryBot::Syntax::Methods
+
+  # Include Devise test helpers
+  config.include Devise::Test::ControllerHelpers, type: :controller
+  config.include Devise::Test::IntegrationHelpers, type: :request
 
   # Database Cleaner configuration
   config.before(:suite) do

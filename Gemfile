@@ -53,9 +53,9 @@ gem "pg_search", "~> 2.3"         # PostgreSQL full-text search
 # gem "neighbor", "~> 0.3"          # pgvector for AI embeddings - Add later when pgvector is installed
 
 # Analytics and Tracking
-gem "ahoy_matey", "~> 5.0"        # Event tracking
-gem "chartkick", "~> 5.0"         # Charts
-gem "groupdate", "~> 6.4"         # Time series data
+# gem "ahoy_matey", "~> 5.0"        # Event tracking - Commented out for now
+# gem "chartkick", "~> 5.0"         # Charts - Commented out for now
+# gem "groupdate", "~> 6.4"         # Time series data - Commented out for now
 
 # Payments
 gem "pay", "~> 7.0"               # Payment processing (Stripe, Paddle, etc.)

@@ -27,7 +27,7 @@ class Profile < ApplicationRecord
     if first_name.present? && last_name.present?
       full_name
     else
-      user&.email_address
+      user&.email
     end
   end
 

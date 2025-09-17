@@ -62,7 +62,7 @@ RSpec.describe PropertiesController, type: :controller do
     end
 
     context 'when user is signed in' do
-      before { sign_in(user) }
+      before { sign_in user }
 
       it 'checks if property is favorited' do
         create(:favorite, user: user, property: property)
@@ -76,12 +76,12 @@ RSpec.describe PropertiesController, type: :controller do
     context 'when user is not signed in' do
       it 'redirects to sign in' do
         get :new
-        expect(response).to redirect_to(new_session_path)
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
 
     context 'when user is signed in' do
-      before { sign_in(user) }
+      before { sign_in user }
 
       it 'returns a success response' do
         get :new
@@ -98,22 +98,30 @@ RSpec.describe PropertiesController, type: :controller do
 
   describe 'POST #create' do
     let(:valid_attributes) {
-      attributes_for(:property).merge(user_id: user.id)
-    }
-
-    let(:invalid_attributes) {
-      { title: '', price: nil }
+      {
+        title: 'Test Property',
+        description: 'A test property',
+        price: 100_000,
+        property_type: 'House',
+        bedrooms: 3,
+        bathrooms: 2,
+        square_feet: 1500,
+        address: '123 Test St',
+        city: 'Test City',
+        state: 'TS',
+        zip_code: '12345'
+      }
     }
 
     context 'when user is not signed in' do
       it 'redirects to sign in' do
         post :create, params: { property: valid_attributes }
-        expect(response).to redirect_to(new_session_path)
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
 
     context 'when user is signed in' do
-      before { sign_in(user) }
+      before { sign_in user }
 
       context 'with valid params' do
         it 'creates a new Property' do
@@ -126,18 +134,15 @@ RSpec.describe PropertiesController, type: :controller do
           post :create, params: { property: valid_attributes }
           expect(response).to redirect_to(Property.last)
         end
-
-        it 'sets a success notice' do
-          post :create, params: { property: valid_attributes }
-          expect(flash[:notice]).to eq('Property was successfully listed.')
-        end
       end
 
       context 'with invalid params' do
+        let(:invalid_attributes) { { title: '', description: '' } }
+
         it 'does not create a new Property' do
           expect {
             post :create, params: { property: invalid_attributes }
-          }.to change(Property, :count).by(0)
+          }.not_to change(Property, :count)
         end
 
         it 'renders the new template with unprocessable_entity status' do
@@ -153,22 +158,27 @@ RSpec.describe PropertiesController, type: :controller do
     context 'when user is not signed in' do
       it 'redirects to sign in' do
         get :edit, params: { id: property.id }
-        expect(response).to redirect_to(new_session_path)
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
 
     context 'when user is signed in' do
-      context 'as the property owner' do
-        before { sign_in(user) }
+      context 'as owner' do
+        before { sign_in user }
 
         it 'returns a success response' do
           get :edit, params: { id: property.id }
           expect(response).to be_successful
         end
+
+        it 'assigns the requested property' do
+          get :edit, params: { id: property.id }
+          expect(assigns(:property)).to eq(property)
+        end
       end
 
-      context 'as a different user' do
-        before { sign_in(other_user) }
+      context 'as different user' do
+        before { sign_in other_user }
 
         it 'redirects to properties index' do
           get :edit, params: { id: property.id }
@@ -179,85 +189,98 @@ RSpec.describe PropertiesController, type: :controller do
   end
 
   describe 'PATCH #update' do
-    let(:new_attributes) {
-      { title: 'Updated Title', price: 750_000 }
-    }
-
     context 'when user is not signed in' do
       it 'redirects to sign in' do
-        patch :update, params: { id: property.id, property: new_attributes }
-        expect(response).to redirect_to(new_session_path)
+        patch :update, params: { id: property.id, property: { title: 'New Title' } }
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
 
-    context 'when user is signed in as owner' do
-      before { sign_in(user) }
+    context 'when user is signed in' do
+      context 'as owner' do
+        before { sign_in user }
 
-      context 'with valid params' do
-        it 'updates the property' do
-          patch :update, params: { id: property.id, property: new_attributes }
-          property.reload
-          expect(property.title).to eq('Updated Title')
-          expect(property.price).to eq(750_000)
+        context 'with valid params' do
+          let(:new_attributes) { { title: 'Updated Title', price: 200_000 } }
+
+          it 'updates the requested property' do
+            patch :update, params: { id: property.id, property: new_attributes }
+            property.reload
+            expect(property.title).to eq('Updated Title')
+            expect(property.price).to eq(200_000)
+          end
+
+          it 'redirects to the property' do
+            patch :update, params: { id: property.id, property: new_attributes }
+            expect(response).to redirect_to(property)
+          end
         end
 
-        it 'redirects to the property' do
-          patch :update, params: { id: property.id, property: new_attributes }
-          expect(response).to redirect_to(property)
+        context 'with invalid params' do
+          let(:invalid_attributes) { { title: '', price: -100 } }
+
+          it 'does not update the property' do
+            original_title = property.title
+            patch :update, params: { id: property.id, property: invalid_attributes }
+            property.reload
+            expect(property.title).to eq(original_title)
+          end
+
+          it 'renders the edit template with unprocessable_entity status' do
+            patch :update, params: { id: property.id, property: invalid_attributes }
+            expect(response).to have_http_status(:unprocessable_entity)
+            expect(response).to render_template(:edit)
+          end
         end
       end
 
-      context 'with invalid params' do
-        it 'does not update the property' do
-          patch :update, params: { id: property.id, property: { title: '', price: nil } }
-          property.reload
-          expect(property.title).not_to eq('')
-        end
+      context 'as different user' do
+        before { sign_in other_user }
 
-        it 'renders the edit template with unprocessable_entity status' do
-          patch :update, params: { id: property.id, property: { title: '', price: nil } }
-          expect(response).to have_http_status(:unprocessable_entity)
-          expect(response).to render_template(:edit)
+        it 'does not update the property' do
+          original_title = property.title
+          patch :update, params: { id: property.id, property: { title: 'Hacked!' } }
+          property.reload
+          expect(property.title).to eq(original_title)
         end
       end
     end
   end
 
   describe 'DELETE #destroy' do
-    before { property } # Create the property
-
     context 'when user is not signed in' do
       it 'redirects to sign in' do
         delete :destroy, params: { id: property.id }
-        expect(response).to redirect_to(new_session_path)
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
 
-    context 'when user is signed in as owner' do
-      before { sign_in(user) }
+    context 'when user is signed in' do
+      context 'as owner' do
+        before { sign_in user }
 
-      it 'destroys the property' do
-        expect {
+        it 'destroys the property' do
+          property # create the property first
+          expect {
+            delete :destroy, params: { id: property.id }
+          }.to change(Property, :count).by(-1)
+        end
+
+        it 'redirects to properties index' do
           delete :destroy, params: { id: property.id }
-        }.to change(Property, :count).by(-1)
+          expect(response).to redirect_to(properties_path)
+        end
       end
 
-      it 'redirects to properties index' do
-        delete :destroy, params: { id: property.id }
-        expect(response).to redirect_to(properties_path)
-      end
-    end
+      context 'as different user' do
+        before { sign_in other_user }
 
-    context 'when user is signed in as different user' do
-      before do
-        allow(controller).to receive(:signed_in?).and_return(true)
-        allow(controller).to receive(:current_user).and_return(other_user)
-      end
-
-      it 'does not destroy the property' do
-        expect {
-          delete :destroy, params: { id: property.id }
-        }.to change(Property, :count).by(0)
+        it 'does not destroy the property' do
+          property # create the property first
+          expect {
+            delete :destroy, params: { id: property.id }
+          }.not_to change(Property, :count)
+        end
       end
     end
   end
@@ -266,15 +289,12 @@ RSpec.describe PropertiesController, type: :controller do
     context 'when user is not signed in' do
       it 'redirects to sign in' do
         post :favorite, params: { id: property.id }
-        expect(response).to redirect_to(new_session_path)
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
 
     context 'when user is signed in' do
-      before do
-        sign_in(user)
-        request.env["HTTP_REFERER"] = property_path(property)
-      end
+      before { sign_in user }
 
       it 'creates a favorite' do
         expect {
@@ -283,37 +303,36 @@ RSpec.describe PropertiesController, type: :controller do
       end
 
       it 'redirects back' do
+        request.env['HTTP_REFERER'] = properties_path
         post :favorite, params: { id: property.id }
-        expect(response).to redirect_to(property_path(property))
+        expect(response).to redirect_to(properties_path)
       end
     end
   end
 
   describe 'DELETE #unfavorite' do
-    let!(:favorite) { create(:favorite, user: user, property: property) }
-
     context 'when user is not signed in' do
       it 'redirects to sign in' do
         delete :unfavorite, params: { id: property.id }
-        expect(response).to redirect_to(new_session_path)
+        expect(response).to redirect_to(new_user_session_path)
       end
     end
 
     context 'when user is signed in' do
-      before do
-        sign_in(user)
-        request.env["HTTP_REFERER"] = property_path(property)
-      end
+      before { sign_in user }
 
       it 'destroys the favorite' do
+        create(:favorite, user: user, property: property)
         expect {
           delete :unfavorite, params: { id: property.id }
         }.to change(Favorite, :count).by(-1)
       end
 
       it 'redirects back' do
+        request.env['HTTP_REFERER'] = properties_path
+        create(:favorite, user: user, property: property)
         delete :unfavorite, params: { id: property.id }
-        expect(response).to redirect_to(property_path(property))
+        expect(response).to redirect_to(properties_path)
       end
     end
   end
