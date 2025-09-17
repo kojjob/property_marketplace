@@ -5,75 +5,18 @@ class PropertiesController < ApplicationController
   skip_before_action :authenticate_user!, only: [:index, :show]
 
   def index
-    @properties = Property.active
+    # Use the Property::SearchService for all filtering, searching, and pagination
+    search_params = normalize_search_params(params)
+    result = Property::SearchService.new(search_params).call
 
-    # Listing type filter (rent/sale)
-    if params[:listing_type].present?
-      @properties = @properties.where(listing_type: params[:listing_type])
-    end
-
-    # Property type filter (multi-select)
-    if params[:property_types].present? && params[:property_types].is_a?(Array)
-      @properties = @properties.where(property_type: params[:property_types])
-    elsif params[:property_type].present?
-      @properties = @properties.where(property_type: params[:property_type])
-    end
-
-    # Location filters
-    @properties = @properties.where(city: params[:city]) if params[:city].present?
-    @properties = @properties.where(region: params[:region]) if params[:region].present?
-    @properties = @properties.where(country: params[:country]) if params[:country].present?
-
-    # Bedroom and bathroom filters
-    if params[:bedrooms].present? && params[:bedrooms] != ''
-      @properties = @properties.where('bedrooms >= ?', params[:bedrooms])
-    end
-    if params[:bathrooms].present? && params[:bathrooms] != ''
-      @properties = @properties.where('bathrooms >= ?', params[:bathrooms])
-    end
-
-    # Price range filter
-    @properties = @properties.where('price >= ?', params[:min_price]) if params[:min_price].present?
-    @properties = @properties.where('price <= ?', params[:max_price]) if params[:max_price].present?
-
-    # Square feet filter
-    @properties = @properties.where('square_feet >= ?', params[:min_sqft]) if params[:min_sqft].present?
-    @properties = @properties.where('square_feet <= ?', params[:max_sqft]) if params[:max_sqft].present?
-
-    # Features filter
-    if params[:features].present? && params[:features].is_a?(Array)
-      params[:features].each do |feature|
-        case feature
-        when 'featured'
-          @properties = @properties.where(featured: true)
-        when 'parking'
-          # You'd need to add these columns to the properties table
-          # For now, we'll skip these unless they exist
-        end
-      end
-    end
-
-    # Apply search if using pg_search
-    @properties = @properties.search_full_text(params[:search]) if params[:search].present?
-
-    # Sorting
-    case params[:sort]
-    when 'price_asc'
-      @properties = @properties.order(price: :asc)
-    when 'price_desc'
-      @properties = @properties.order(price: :desc)
-    when 'newest'
-      @properties = @properties.order(created_at: :desc)
-    when 'bedrooms'
-      @properties = @properties.order(bedrooms: :desc)
-    when 'sqft'
-      @properties = @properties.order(square_feet: :desc)
+    if result.success?
+      @properties = result.data[:properties]
+      @pagination = result.data[:pagination]
     else
-      @properties = @properties.order(created_at: :desc)
+      @properties = Property.none
+      @pagination = {}
+      flash.now[:alert] = "Search failed: #{result.error}"
     end
-
-    # Pagination (if needed)
-    @properties = @properties.page(params[:page]) if defined?(Kaminari)
 
     # Respond to both HTML and Turbo Stream requests
     respond_to do |format|
@@ -154,6 +97,47 @@ class PropertiesController < ApplicationController
     unless @property.user == current_user
       redirect_to properties_path, alert: 'You are not authorized to perform this action.'
     end
+  end
+
+  def normalize_search_params(params)
+    search_params = {}
+
+    # Basic filters
+    search_params[:city] = params[:city] if params[:city].present?
+    search_params[:property_type] = params[:property_type] if params[:property_type].present?
+    search_params[:min_price] = params[:min_price] if params[:min_price].present?
+    search_params[:max_price] = params[:max_price] if params[:max_price].present?
+    search_params[:min_bedrooms] = params[:bedrooms] if params[:bedrooms].present?
+    search_params[:min_bathrooms] = params[:bathrooms] if params[:bathrooms].present?
+    search_params[:min_square_feet] = params[:min_sqft] if params[:min_sqft].present?
+
+    # Search query
+    search_params[:q] = params[:search] if params[:search].present?
+
+    # Sorting - convert controller sort params to service params
+    case params[:sort]
+    when 'price_asc'
+      search_params[:sort] = 'price'
+      search_params[:order] = 'asc'
+    when 'price_desc'
+      search_params[:sort] = 'price'
+      search_params[:order] = 'desc'
+    when 'newest'
+      search_params[:sort] = 'created_at'
+      search_params[:order] = 'desc'
+    when 'bedrooms'
+      search_params[:sort] = 'bedrooms'
+      search_params[:order] = 'desc'
+    when 'sqft'
+      search_params[:sort] = 'square_feet'
+      search_params[:order] = 'desc'
+    end
+
+    # Pagination
+    search_params[:page] = params[:page] if params[:page].present?
+    search_params[:per_page] = params[:per_page] if params[:per_page].present?
+
+    search_params
   end
 
   def property_params
