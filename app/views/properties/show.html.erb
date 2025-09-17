@@ -1,139 +1,59 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-    <!-- Image Gallery Section -->
-    <div class="h-96 bg-gray-200 relative">
-      <% if @property.property_images.any? %>
-        <img src="<%= @property.property_images.ordered.first.image_url %>" alt="<%= @property.title %>" class="w-full h-full object-cover">
-      <% else %>
-        <div class="flex items-center justify-center h-full">
-          <svg class="h-24 w-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-          </svg>
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="flex justify-between items-start mb-6">
+      <h1 class="text-3xl font-bold"><%= @property.title %></h1>
+      <% if user_signed_in? && @property.user == current_user %>
+        <div class="flex space-x-2">
+          <%= link_to "Edit", edit_property_path(@property), class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" %>
+          <%= button_to "Delete", @property, method: :delete, data: { confirm: "Are you sure?" }, class: "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" %>
         </div>
       <% end %>
     </div>
 
-    <div class="px-4 py-5 sm:px-6">
-      <div class="flex justify-between items-start">
-        <div>
-          <h1 class="text-3xl font-bold text-gray-900">
-            <%= @property.title %>
-          </h1>
-          <p class="mt-1 text-lg text-gray-600">
-            <%= @property.property_type %> in <%= @property.city %><%= @property.region.present? ? ", #{@property.region}" : "" %>
-          </p>
-        </div>
-        <div class="text-right">
-          <p class="text-3xl font-bold text-blue-600">
-            <%= number_to_currency(@property.price, precision: 0) %>
-          </p>
-          <p class="text-sm text-gray-500 mt-1">
-            Status: <span class="font-medium capitalize"><%= @property.status %></span>
-          </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <p class="text-gray-600 mb-2">Type: <span class="font-semibold"><%= @property.property_type %></span></p>
+        <p class="text-gray-600 mb-2">Location: <span class="font-semibold"><%= @property.address %>, <%= @property.city %>, <%= @property.state || @property.region %> <%= @property.zip_code || @property.postal_code %></span></p>
+        <p class="text-3xl font-bold text-blue-600 mb-4">$<%= number_with_delimiter(@property.price) %></p>
+
+        <div class="flex space-x-4 text-gray-600 mb-6">
+          <% if @property.bedrooms.present? %>
+            <span><%= @property.bedrooms %> Bedrooms</span>
+          <% end %>
+          <% if @property.bathrooms.present? %>
+            <span><%= @property.bathrooms %> Bathrooms</span>
+          <% end %>
+          <% if @property.square_feet.present? %>
+            <span><%= number_with_delimiter(@property.square_feet) %> sqft</span>
+          <% end %>
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="mt-6 flex space-x-3">
+      <div>
         <% if user_signed_in? %>
-          <% if @property.user == current_user %>
-            <%= link_to "Edit", edit_property_path(@property), class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-            <%= button_to "Delete", property_path(@property), method: :delete, data: { confirm: "Are you sure?" }, class: "inline-flex items-center px-4 py-2 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+          <% if @is_favorited %>
+            <%= button_to "Remove from Favorites", unfavorite_property_path(@property), method: :delete, class: "bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 mb-4" %>
           <% else %>
-            <% if @is_favorited %>
-              <%= button_to "Remove from Favorites", unfavorite_property_path(@property), method: :delete, class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-            <% else %>
-              <%= button_to "Add to Favorites", favorite_property_path(@property), method: :post, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-            <% end %>
-            <%= link_to "Contact Seller", "mailto:#{@property.user.email}?subject=Inquiry about #{@property.title}", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
+            <%= button_to "Add to Favorites", favorite_property_path(@property), method: :post, class: "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4" %>
           <% end %>
+          <%= link_to "Contact Seller", "mailto:#{@property.user.email}?subject=Inquiry about #{@property.title}", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700" %>
         <% else %>
-          <%= link_to "Sign in to contact seller", new_user_session_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+          <%= link_to "Sign in to contact seller", new_user_session_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700" %>
         <% end %>
+
+        <p class="text-sm text-gray-500 mt-4">Status: <span class="font-semibold"><%= @property.status.capitalize %></span></p>
+        <p class="text-sm text-gray-500">Listed by: <span class="font-semibold"><%= @property.user.email %></span></p>
+        <p class="text-sm text-gray-500">Listed <%= time_ago_in_words(@property.created_at) %> ago</p>
       </div>
     </div>
 
-    <div class="border-t border-gray-200">
-      <dl>
-        <!-- Property Details -->
-        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">
-            Property Details
-          </dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-            <div class="grid grid-cols-2 gap-4">
-              <% if @property.bedrooms.present? %>
-                <div>
-                  <span class="font-medium">Bedrooms:</span> <%= @property.bedrooms %>
-                </div>
-              <% end %>
-              <% if @property.bathrooms.present? %>
-                <div>
-                  <span class="font-medium">Bathrooms:</span> <%= @property.bathrooms %>
-                </div>
-              <% end %>
-              <% if @property.square_feet.present? %>
-                <div>
-                  <span class="font-medium">Square Feet:</span> <%= number_with_delimiter(@property.square_feet) %>
-                </div>
-              <% end %>
-              <div>
-                <span class="font-medium">Property Type:</span> <%= @property.property_type %>
-              </div>
-            </div>
-          </dd>
-        </div>
-
-        <!-- Description -->
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">
-            Description
-          </dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-            <p class="whitespace-pre-wrap"><%= @property.description %></p>
-          </dd>
-        </div>
-
-        <!-- Location -->
-        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">
-            Location
-          </dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-            <%= @property.address %><br>
-            <%= @property.city %><%= @property.region.present? ? ", #{@property.region}" : "" %> <%= @property.postal_code %>
-          </dd>
-        </div>
-
-        <!-- Listed By -->
-        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">
-            Listed by
-          </dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-            <%= @property.user.email %><br>
-            <span class="text-gray-500">Listed <%= time_ago_in_words(@property.created_at) %> ago</span>
-          </dd>
-        </div>
-      </dl>
+    <div class="mt-6">
+      <h2 class="text-xl font-semibold mb-3">Description</h2>
+      <p class="text-gray-700"><%= @property.description %></p>
     </div>
   </div>
 
-  <!-- Additional Images -->
-  <% if @property.property_images.count > 1 %>
-    <div class="mt-8">
-      <h2 class="text-lg font-medium text-gray-900 mb-4">Additional Images</h2>
-      <div class="grid grid-cols-3 gap-4">
-        <% @property.property_images.ordered.offset(1).each do |image| %>
-          <div class="h-48 bg-gray-200 rounded-lg overflow-hidden">
-            <img src="<%= image.image_url %>" alt="<%= image.caption || @property.title %>" class="w-full h-full object-cover">
-          </div>
-        <% end %>
-      </div>
-    </div>
-  <% end %>
-
-  <div class="mt-8">
-    <%= link_to "← Back to Properties", properties_path, class: "text-blue-600 hover:text-blue-500" %>
+  <div class="mt-6">
+    <%= link_to "← Back to Properties", properties_path, class: "text-blue-600 hover:underline" %>
   </div>
 </div>

@@ -1,0 +1,106 @@
+<div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+  <%= link_to property, class: "block" do %>
+    <!-- Property Image -->
+    <div class="relative h-48 bg-gray-200">
+      <% if property.primary_image %>
+        <% if property.primary_image.respond_to?(:image) && property.primary_image.image.attached? %>
+          <%= image_tag property.primary_image.image,
+              class: "w-full h-full object-cover",
+              alt: property.title %>
+        <% elsif property.primary_image.image_url.present? %>
+          <%= image_tag property.primary_image.image_url,
+              class: "w-full h-full object-cover",
+              alt: property.title %>
+        <% else %>
+          <div class="flex items-center justify-center h-full">
+            <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="flex items-center justify-center h-full">
+          <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+          </svg>
+        </div>
+      <% end %>
+
+      <!-- Property Type Badge -->
+      <span class="absolute top-2 left-2 px-2 py-1 bg-blue-600 text-white text-xs rounded">
+        <%= property.property_type %>
+      </span>
+
+      <!-- Status Badge if not active -->
+      <% if property.status != 'active' %>
+        <span class="absolute top-2 right-2 px-2 py-1 bg-red-600 text-white text-xs rounded">
+          <%= property.status.capitalize %>
+        </span>
+      <% end %>
+    </div>
+
+    <!-- Property Details -->
+    <div class="p-4">
+      <h3 class="text-lg font-semibold text-gray-900 truncate">
+        <%= property.title %>
+      </h3>
+
+      <p class="mt-1 text-sm text-gray-600">
+        <%= property.address %>
+      </p>
+
+      <p class="text-sm text-gray-600">
+        <%= property.city %>, <%= property.state %> <%= property.zip_code %>
+      </p>
+
+      <!-- Distance (if available from search) -->
+      <% if property.respond_to?(:distance) && property.distance %>
+        <p class="text-sm text-gray-500 mt-1">
+          <%= number_with_precision(property.distance, precision: 1) %> miles away
+        </p>
+      <% end %>
+
+      <div class="mt-2 flex items-center justify-between">
+        <span class="text-2xl font-bold text-blue-600">
+          <%= number_to_currency(property.price, precision: 0) %>
+        </span>
+
+        <div class="flex items-center text-sm text-gray-600 space-x-2">
+          <% if property.bedrooms && property.bedrooms > 0 %>
+            <span class="flex items-center">
+              <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              <%= property.bedrooms %> bed<%= 's' if property.bedrooms != 1 %>
+            </span>
+          <% end %>
+
+          <% if property.bathrooms && property.bathrooms > 0 %>
+            <span class="flex items-center">
+              <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0a3 3 0 01-3 3H8a3 3 0 01-3-3m3 0a3 3 0 00-3 3v8a3 3 0 003 3h8a3 3 0 003-3v-8a3 3 0 00-3-3" />
+              </svg>
+              <%= property.bathrooms %> bath<%= 's' if property.bathrooms != 1 %>
+            </span>
+          <% end %>
+
+          <% if property.square_feet && property.square_feet > 0 %>
+            <span class="flex items-center">
+              <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+              <%= number_with_delimiter(property.square_feet) %> sqft
+            </span>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Description preview -->
+      <% if property.description.present? %>
+        <p class="mt-2 text-sm text-gray-600 line-clamp-2">
+          <%= property.description %>
+        </p>
+      <% end %>
+    </div>
+  <% end %>
+</div>

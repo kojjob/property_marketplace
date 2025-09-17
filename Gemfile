@@ -111,4 +111,5 @@ group :test do
   gem "selenium-webdriver"
   gem "shoulda-matchers", "~> 6.0"
   gem "database_cleaner-active_record"
+  gem "timecop"  # For time-based testing
 end

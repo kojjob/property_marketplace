@@ -11,7 +11,7 @@ module Searchable
         description: 'B',
         address: 'C',
         city: 'C',
-        region: 'D'
+        state: 'D'
       },
       using: {
         tsearch: {
@@ -171,11 +171,11 @@ module Searchable
 
     # Location suggestions for autocomplete
     def location_suggestions(query)
-      select(:city, :region)
+      select(:city, :state)
         .distinct
         .where('city ILIKE ?', "%#{query}%")
         .limit(10)
-        .map { |p| "#{p.city}, #{p.region}" }
+        .map { |p| "#{p.city}, #{p.state}" }
     end
 
     # Popular search terms (stub for now - would need a SearchTerm model)
@@ -195,7 +195,7 @@ module Searchable
 
   # Instance methods
   def full_address
-    [address, city, region, postal_code].compact.join(', ')
+    [address, city, state, zip_code].compact.join(', ')
   end
 
   def distance
@@ -206,7 +206,7 @@ module Searchable
   private
 
   def should_geocode?
-    (address_changed? || city_changed? || region_changed? || postal_code_changed?) &&
+    (address_changed? || city_changed? || state_changed? || zip_code_changed?) &&
       address.present? &&
       city.present?
   end

@@ -20,8 +20,8 @@ class Property < ApplicationRecord
   validates :square_feet, numericality: { greater_than: 0 }, allow_nil: true
   validates :address, presence: true
   validates :city, presence: true
-  validates :region, presence: true
-  validates :postal_code, presence: true
+  validates :state, presence: true
+  validates :zip_code, presence: true
   validates :status, inclusion: { in: STATUSES }
 
   # Additional scopes for common queries

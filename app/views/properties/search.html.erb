@@ -1,0 +1,258 @@
+<div class="min-h-screen bg-gray-50">
+  <!-- Search Header -->
+  <div class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <h1 class="text-2xl font-bold text-gray-900">Search Properties</h1>
+    </div>
+  </div>
+
+  <!-- Search Form -->
+  <div class="bg-white shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <%= form_with url: search_properties_path, method: :get, local: true, class: "space-y-4" do |f| %>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Text Search -->
+          <div>
+            <%= f.text_field :q, value: params[:q], placeholder: "Search properties...",
+                class: "w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+          </div>
+
+          <!-- Location -->
+          <div>
+            <%= f.text_field :location, value: params[:location], placeholder: "City or ZIP code",
+                class: "w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+          </div>
+
+          <!-- Property Type -->
+          <div>
+            <%= f.select :property_type,
+                options_for_select([['All Types', '']] + Property::PROPERTY_TYPES.map { |t| [t, t] }, params[:property_type]),
+                {},
+                class: "w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+          </div>
+
+          <!-- Sort By -->
+          <div>
+            <%= f.select :sort,
+                options_for_select([
+                  ['Newest First', 'newest'],
+                  ['Price: Low to High', 'price_asc'],
+                  ['Price: High to Low', 'price_desc'],
+                  ['Largest First', 'largest']
+                ], params[:sort]),
+                {},
+                class: "w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+          </div>
+        </div>
+
+        <!-- Advanced Filters (Collapsible) -->
+        <details class="group">
+          <summary class="cursor-pointer text-blue-600 hover:text-blue-800 font-medium">
+            Advanced Filters
+            <span class="ml-2 text-gray-400 group-open:hidden">▶</span>
+            <span class="ml-2 text-gray-400 hidden group-open:inline">▼</span>
+          </summary>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 mt-4">
+            <!-- Min Price -->
+            <div>
+              <%= f.number_field :min_price, value: params[:min_price], placeholder: "Min Price",
+                  class: "w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+            </div>
+
+            <!-- Max Price -->
+            <div>
+              <%= f.number_field :max_price, value: params[:max_price], placeholder: "Max Price",
+                  class: "w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+            </div>
+
+            <!-- Bedrooms -->
+            <div>
+              <%= f.number_field :bedrooms, value: params[:bedrooms], placeholder: "Min Beds", min: 0,
+                  class: "w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+            </div>
+
+            <!-- Bathrooms -->
+            <div>
+              <%= f.number_field :bathrooms, value: params[:bathrooms], placeholder: "Min Baths", min: 0, step: 0.5,
+                  class: "w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+            </div>
+
+            <!-- Min Sqft -->
+            <div>
+              <%= f.number_field :min_sqft, value: params[:min_sqft], placeholder: "Min Sqft",
+                  class: "w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+            </div>
+
+            <!-- Search Radius -->
+            <div>
+              <%= f.select :radius,
+                  options_for_select([
+                    ['5 miles', 5],
+                    ['10 miles', 10],
+                    ['25 miles', 25],
+                    ['50 miles', 50],
+                    ['100 miles', 100]
+                  ], params[:radius] || 25),
+                  {},
+                  class: "w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500" %>
+            </div>
+          </div>
+        </details>
+
+        <!-- Search Buttons -->
+        <div class="flex items-center space-x-4">
+          <%= f.submit "Search", class: "px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+          <%= link_to "Clear", search_properties_path, class: "text-gray-600 hover:text-gray-900" %>
+
+          <% if user_signed_in? %>
+            <div class="ml-auto">
+              <%= f.check_box :save_search, class: "mr-2" %>
+              <%= f.label :save_search, "Save this search", class: "text-sm text-gray-700" %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- View Toggle -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex items-center justify-between">
+      <p class="text-gray-700">
+        <% if @total_count && @total_count > 0 %>
+          Found <span class="font-semibold"><%= @total_count %></span> properties
+        <% end %>
+      </p>
+
+      <div class="flex space-x-2">
+        <%= link_to "List View", search_properties_path(params.permit!.merge(view: 'list')),
+            class: "px-4 py-2 #{ params[:view] != 'map' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' } rounded-md" %>
+        <%= link_to "Map View", search_properties_path(params.permit!.merge(view: 'map')),
+            class: "px-4 py-2 #{ params[:view] == 'map' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' } rounded-md" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Results -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+    <% if @properties.any? %>
+      <% if params[:view] == 'map' %>
+        <!-- Map View -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="bg-white rounded-lg shadow" style="height: 600px;">
+            <div id="search-map"
+                 class="w-full h-full rounded-lg"
+                 data-map
+                 data-properties="<%= @properties.to_json(only: [:id, :title, :price, :latitude, :longitude]) %>">
+            </div>
+          </div>
+
+          <div class="space-y-4 overflow-y-auto" style="height: 600px;">
+            <%= render partial: 'property_card', collection: @properties, as: :property %>
+          </div>
+        </div>
+      <% else %>
+        <!-- List View -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <%= render partial: 'property_card', collection: @properties, as: :property %>
+        </div>
+      <% end %>
+
+      <!-- Pagination -->
+      <% if @total_count && @total_count > (params[:per_page] || 20).to_i %>
+        <div class="mt-8 flex justify-center">
+          <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+            <% current_page = (params[:page] || 1).to_i %>
+            <% total_pages = (@total_count.to_f / (params[:per_page] || 20).to_i).ceil %>
+
+            <% if current_page > 1 %>
+              <%= link_to "Previous", search_properties_path(params.permit!.merge(page: current_page - 1)),
+                  class: "relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" %>
+            <% end %>
+
+            <% (1..total_pages).each do |page| %>
+              <% if page == current_page %>
+                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-blue-50 text-sm font-medium text-blue-600">
+                  <%= page %>
+                </span>
+              <% else %>
+                <%= link_to page, search_properties_path(params.permit!.merge(page: page)),
+                    class: "relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50" %>
+              <% end %>
+            <% end %>
+
+            <% if current_page < total_pages %>
+              <%= link_to "Next", search_properties_path(params.permit!.merge(page: current_page + 1)),
+                  class: "relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50" %>
+            <% end %>
+          </nav>
+        </div>
+      <% end %>
+
+    <% elsif @properties %>
+      <!-- No Results -->
+      <div class="bg-white rounded-lg shadow-sm p-8 text-center">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+        <h3 class="mt-2 text-lg font-medium text-gray-900">No properties found</h3>
+        <p class="mt-1 text-sm text-gray-500">Try adjusting your search criteria</p>
+
+        <% if @suggestions %>
+          <div class="mt-4">
+            <p class="text-sm font-medium text-gray-700">Suggestions:</p>
+            <ul class="mt-2 text-sm text-gray-600">
+              <% @suggestions.each do |suggestion| %>
+                <li><%= suggestion %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Facets Sidebar (Optional) -->
+  <% if @facets && params[:include_facets] %>
+    <div class="fixed right-0 top-0 w-64 h-full bg-white shadow-lg p-4 overflow-y-auto">
+      <h3 class="text-lg font-semibold mb-4">Refine Search</h3>
+
+      <% if @facets[:property_types] %>
+        <div class="mb-6">
+          <h4 class="font-medium mb-2">Property Type</h4>
+          <% @facets[:property_types].each do |type, count| %>
+            <div class="text-sm">
+              <%= link_to "#{type} (#{count})", search_properties_path(params.permit!.merge(property_type: type)),
+                  class: "text-blue-600 hover:text-blue-800" %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+      <% if @facets[:price_ranges] %>
+        <div class="mb-6">
+          <h4 class="font-medium mb-2">Price Range</h4>
+          <% @facets[:price_ranges].each do |range, count| %>
+            <div class="text-sm">
+              <%= range %> (<%= count %>)
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<!-- Map JavaScript (placeholder - will add actual map integration later) -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const mapElement = document.getElementById('search-map');
+    if (mapElement) {
+      // This is where we'll integrate with Mapbox or Google Maps
+      console.log('Map element ready for integration');
+      const properties = JSON.parse(mapElement.dataset.properties || '[]');
+      console.log('Properties for map:', properties);
+    }
+  });
+</script>

@@ -1,22 +1,29 @@
 class PropertiesController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show, :search, :autocomplete]
   before_action :set_property, only: [:show, :edit, :update, :destroy, :favorite, :unfavorite]
-  before_action :authorize_owner!, only: [:edit, :update, :destroy]
+  before_action :authenticate_user!, except: [:index, :show, :search, :autocomplete]
+  before_action :check_owner, only: [:edit, :update, :destroy]
 
   def index
     @properties = Property.active.newest_first
 
-    # Apply filters if present
+    # Apply filters
     @properties = @properties.where(property_type: params[:property_type]) if params[:property_type].present?
     @properties = @properties.where(city: params[:city]) if params[:city].present?
-    @properties = @properties.where("price <= ?", params[:max_price]) if params[:max_price].present?
-    @properties = @properties.where("price >= ?", params[:min_price]) if params[:min_price].present?
-    @properties = @properties.where("bedrooms >= ?", params[:bedrooms]) if params[:bedrooms].present?
-    @properties = @properties.where("bathrooms >= ?", params[:bathrooms]) if params[:bathrooms].present?
+    @properties = @properties.where(bedrooms: params[:bedrooms]) if params[:bedrooms].present?
+
+    # Price range filter
+    @properties = @properties.where('price >= ?', params[:min_price]) if params[:min_price].present?
+    @properties = @properties.where('price <= ?', params[:max_price]) if params[:max_price].present?
+
+    # Apply search if using pg_search
+    @properties = @properties.search_full_text(params[:search]) if params[:search].present?
+
+    # Pagination (if needed)
+    @properties = @properties.page(params[:page]) if defined?(Kaminari)
   end
 
   def show
-    @is_favorited = current_user&.favorites&.exists?(property: @property)
+    @is_favorited = user_signed_in? && current_user.favorites.exists?(property: @property)
   end
 
   def new
@@ -27,7 +34,7 @@ class PropertiesController < ApplicationController
     @property = current_user.properties.build(property_params)
 
     if @property.save
-      redirect_to @property, notice: 'Property was successfully listed.'
+      redirect_to @property, notice: 'Property was successfully created.'
     else
       render :new, status: :unprocessable_entity
     end
@@ -46,16 +53,17 @@ class PropertiesController < ApplicationController
 
   def destroy
     @property.destroy
-    redirect_to properties_path, notice: 'Property was successfully removed.'
+    redirect_to properties_path, notice: 'Property was successfully deleted.'
   end
 
   def favorite
-    current_user.favorites.create(property: @property)
+    @favorite = current_user.favorites.find_or_create_by(property: @property)
     redirect_back(fallback_location: @property, notice: 'Property added to favorites.')
   end
 
   def unfavorite
-    current_user.favorites.find_by(property: @property)&.destroy
+    @favorite = current_user.favorites.find_by(property: @property)
+    @favorite&.destroy
     redirect_back(fallback_location: @property, notice: 'Property removed from favorites.')
   end
 
@@ -124,14 +132,16 @@ class PropertiesController < ApplicationController
     @property = Property.find(params[:id])
   end
 
-  def authorize_owner!
-    redirect_to properties_path, alert: 'Not authorized' unless @property.user == current_user
+  def check_owner
+    unless @property.user == current_user
+      redirect_to properties_path, alert: 'You are not authorized to perform this action.'
+    end
   end
 
   def property_params
     params.require(:property).permit(:title, :description, :price, :property_type,
                                       :bedrooms, :bathrooms, :square_feet,
-                                      :address, :city, :region, :postal_code, :status,
+                                      :address, :city, :state, :region, :zip_code, :postal_code, :status,
                                       property_images_attributes: [:id, :image, :caption, :position, :_destroy])
   end
 

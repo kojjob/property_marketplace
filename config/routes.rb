@@ -1,9 +1,6 @@
 Rails.application.routes.draw do
   devise_for :users
-  root "properties#index"
-
-  resource :session
-  resources :passwords, param: :token
+  root "pages#home"
 
   resources :properties do
     member do
