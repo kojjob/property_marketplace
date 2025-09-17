@@ -68,7 +68,7 @@
           <div class="px-4 py-4">
             <h3 class="text-lg font-medium text-gray-900 truncate"><%= property.title %></h3>
             <p class="mt-1 text-sm text-gray-600">
-              <%= property.property_type %> • <%= property.city %>, <%= property.state %>
+              <%= property.property_type %> • <%= property.city %><%= property.region.present? ? ", #{property.region}" : "" %>
             </p>
             <div class="mt-2 flex items-center text-sm text-gray-500">
               <% if property.bedrooms.present? %>

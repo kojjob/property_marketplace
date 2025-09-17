@@ -32,20 +32,20 @@
             </div>
             <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
               <%= link_to "Browse Properties", properties_path, class: "inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 border-b-2 border-transparent hover:border-gray-300" %>
-              <% if signed_in? %>
-                <%= link_to "My Listings", properties_path(user_id: Current.user.id), class: "inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent hover:border-gray-300" %>
+              <% if user_signed_in? %>
+                <%= link_to "My Listings", properties_path(user_id: current_user.id), class: "inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent hover:border-gray-300" %>
                 <%= link_to "Favorites", favorites_path, class: "inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 hover:text-gray-700 border-b-2 border-transparent hover:border-gray-300" %>
               <% end %>
             </div>
           </div>
           <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
-            <% if signed_in? %>
+            <% if user_signed_in? %>
               <%= link_to "List Property", new_property_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-              <span class="text-gray-700"><%= Current.user.email_address %></span>
-              <%= button_to "Sign Out", session_path, method: :delete, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+              <span class="text-gray-700"><%= current_user.email %></span>
+              <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
             <% else %>
-              <%= link_to "Sign In", new_session_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
-              <%= link_to "Sign Up", new_session_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+              <%= link_to "Sign In", new_user_session_path, class: "inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+              <%= link_to "Sign Up", new_user_registration_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
             <% end %>
           </div>
         </div>

@@ -1,28 +1,15 @@
 class Property < ApplicationRecord
-  include PgSearch::Model
+  include Searchable
 
   belongs_to :user
   has_many :property_images, dependent: :destroy
   has_many :favorites, dependent: :destroy
 
+  # Support for nested attributes (for image management)
+  accepts_nested_attributes_for :property_images, allow_destroy: true, reject_if: :all_blank
+
   PROPERTY_TYPES = ['House', 'Apartment', 'Condo', 'Townhouse', 'Land', 'Commercial'].freeze
   STATUSES = ['active', 'pending', 'sold', 'rented'].freeze
-
-  # PgSearch configuration for full-text search
-  pg_search_scope :search_full_text,
-                  against: {
-                    title: 'A',
-                    description: 'B',
-                    address: 'C',
-                    city: 'C',
-                    state: 'D'
-                  },
-                  using: {
-                    tsearch: {
-                      prefix: true,
-                      dictionary: 'english'
-                    }
-                  }
 
   validates :title, presence: true, length: { maximum: 200 }
   validates :description, presence: true
@@ -33,15 +20,24 @@ class Property < ApplicationRecord
   validates :square_feet, numericality: { greater_than: 0 }, allow_nil: true
   validates :address, presence: true
   validates :city, presence: true
-  validates :state, presence: true
-  validates :zip_code, presence: true
+  validates :region, presence: true
+  validates :postal_code, presence: true
   validates :status, inclusion: { in: STATUSES }
 
-  scope :active, -> { where(status: 'active') }
-  scope :recent, -> { order(created_at: :desc) }
-  scope :by_price, ->(order = :asc) { order(price: order) }
+  # Additional scopes for common queries
+  scope :featured, -> { active.limit(6) }
+  scope :with_images, -> { includes(:property_images) }
 
   before_validation :set_default_status
+
+  # Helper methods
+  def primary_image
+    property_images.order(:position).first
+  end
+
+  def has_images?
+    property_images.any?
+  end
 
   private
 
