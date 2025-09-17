@@ -28,115 +28,36 @@
       </div>
     </div>
 
-    <!-- Price Range with DaisyUI - Context Aware -->
+    <!-- Price Range with DaisyUI - Dynamic Context Aware -->
     <div class="mb-5">
-      <h3 class="text-base font-semibold text-gray-900 mb-3">
-        <%= params[:listing_type] == 'rent' ? 'Monthly Rent' : 'Price' %> Range
+      <h3 class="text-base font-semibold text-gray-900 mb-3" data-property-filters-target="priceRangeTitle">
+        Price Range
       </h3>
       <div class="space-y-4">
-        <% if params[:listing_type] == 'rent' %>
-          <!-- Rent Price Ranges -->
-          <!-- Min Rent -->
-          <div>
-            <label class="text-sm text-gray-600">Min Rent: $<span data-property-filters-target="minPriceLabel"><%= number_with_delimiter(params[:min_price] || 0) %></span>/month</label>
-            <%= range_field_tag :min_price, params[:min_price] || 0,
-                min: 0, max: 10000, step: 100,
-                class: "range range-primary range-sm w-full",
-                data: {
-                  "property-filters-target": "minRange"
-                } %>
-          </div>
+        <!-- Min Price -->
+        <div>
+          <label class="text-sm text-gray-600" data-property-filters-target="minPriceText">Min Price: $<span data-property-filters-target="minPriceLabel">0</span></label>
+          <%= range_field_tag :min_price, params[:min_price] || 0,
+              min: 0, max: 2000000, step: 10000,
+              class: "range range-primary range-sm w-full",
+              data: {
+                "property-filters-target": "minRange"
+              } %>
+        </div>
 
-          <!-- Max Rent -->
-          <div>
-            <label class="text-sm text-gray-600">Max Rent: $<span data-property-filters-target="maxPriceLabel"><%= number_with_delimiter(params[:max_price] || 10000) %></span>/month</label>
-            <%= range_field_tag :max_price, params[:max_price] || 10000,
-                min: 0, max: 10000, step: 100,
-                class: "range range-primary range-sm w-full",
-                data: {
-                  "property-filters-target": "maxRange"
-                } %>
-          </div>
-        <% else %>
-          <!-- Sale Price Ranges -->
-          <!-- Min Price -->
-          <div>
-            <label class="text-sm text-gray-600">Min Price: $<span data-property-filters-target="minPriceLabel"><%= number_with_delimiter(params[:min_price] || 0) %></span></label>
-            <%= range_field_tag :min_price, params[:min_price] || 0,
-                min: 0, max: 2000000, step: 10000,
-                class: "range range-primary range-sm w-full",
-                data: {
-                  "property-filters-target": "minRange"
-                } %>
-          </div>
-
-          <!-- Max Price -->
-          <div>
-            <label class="text-sm text-gray-600">Max Price: $<span data-property-filters-target="maxPriceLabel"><%= number_with_delimiter(params[:max_price] || 2000000) %></span></label>
-            <%= range_field_tag :max_price, params[:max_price] || 2000000,
-                min: 0, max: 2000000, step: 10000,
-                class: "range range-primary range-sm w-full",
-                data: {
-                  "property-filters-target": "maxRange"
-                } %>
-          </div>
-        <% end %>
-
-        <!-- Quick Price Options - Context Aware -->
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <% if params[:listing_type] == 'rent' %>
-            <!-- Rent Quick Options -->
-            <button type="button"
-                    class="px-3 py-1 bg-gray-50 rounded-lg"
-                    data-action="click->property-filters#setPrice"
-                    data-min="0" data-max="1000">
-              Under $1K
-            </button>
-            <button type="button"
-                    class="px-3 py-1 bg-gray-50 rounded-lg"
-                    data-action="click->property-filters#setPrice"
-                    data-min="1000" data-max="2000">
-              $1K - $2K
-            </button>
-            <button type="button"
-                    class="px-3 py-1 bg-gray-50 rounded-lg"
-                    data-action="click->property-filters#setPrice"
-                    data-min="2000" data-max="3000">
-              $2K - $3K
-            </button>
-            <button type="button"
-                    class="px-3 py-1 bg-gray-50 rounded-lg"
-                    data-action="click->property-filters#setPrice"
-                    data-min="3000" data-max="10000">
-              $3K+
-            </button>
-          <% else %>
-            <!-- Sale Quick Options -->
-            <button type="button"
-                    class="px-3 py-1 bg-gray-50 rounded-lg"
-                    data-action="click->property-filters#setPrice"
-                    data-min="0" data-max="250000">
-              Under $250K
-            </button>
-            <button type="button"
-                    class="px-3 py-1 bg-gray-50 rounded-lg"
-                    data-action="click->property-filters#setPrice"
-                    data-min="250000" data-max="500000">
-              $250K - $500K
-            </button>
-            <button type="button"
-                    class="px-3 py-1 bg-gray-50 rounded-lg"
-                    data-action="click->property-filters#setPrice"
-                    data-min="500000" data-max="1000000">
-              $500K - $1M
-            </button>
-            <button type="button"
-                    class="px-3 py-1 bg-gray-50 rounded-lg"
-                    data-action="click->property-filters#setPrice"
-                    data-min="1000000" data-max="2000000">
-              $1M+
-            </button>
-          <% end %>
+        <!-- Max Price -->
+        <div>
+          <label class="text-sm text-gray-600" data-property-filters-target="maxPriceText">Max Price: $<span data-property-filters-target="maxPriceLabel">2,000,000</span></label>
+          <%= range_field_tag :max_price, params[:max_price] || 2000000,
+              min: 0, max: 2000000, step: 10000,
+              class: "range range-primary range-sm w-full",
+              data: {
+                "property-filters-target": "maxRange"
+              } %>
+        </div>
+        <!-- Quick Price Options - Dynamic -->
+        <div class="grid grid-cols-2 gap-2 text-xs" data-property-filters-target="quickButtons">
+          <!-- JavaScript will populate these buttons based on listing type -->
         </div>
       </div>
     </div>

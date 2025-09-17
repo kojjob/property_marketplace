@@ -8,6 +8,10 @@ class Property < ApplicationRecord
   has_many_attached :videos
   has_many_attached :vr_content
 
+  # Geocoding functionality
+  geocoded_by :full_address
+  after_validation :geocode, if: ->(obj) { obj.address_changed? || obj.city_changed? || obj.region_changed? || obj.postal_code_changed? || obj.country_changed? }
+
   PROPERTY_TYPES = ['House', 'Apartment', 'Condo', 'Townhouse', 'Land', 'Commercial'].freeze
   STATUSES = ['active', 'pending', 'sold', 'rented'].freeze
 
@@ -46,6 +50,10 @@ class Property < ApplicationRecord
   validates :postal_code, presence: true
   validates :country, presence: true
   validates :status, inclusion: { in: STATUSES }
+
+  # Validations for aliased attributes (for backward compatibility with specs)
+  validates :state, presence: true
+  validates :zip_code, presence: true
 
   scope :active, -> { where(status: 'active') }
   scope :recent, -> { order(created_at: :desc) }
