@@ -8,7 +8,7 @@ class PropertySearchService < ApplicationService
 
   def call
     validate_params
-    return failure('Invalid parameters', errors: @errors) if @errors.present?
+    return failure("Invalid parameters", errors: @errors) if @errors.present?
 
     properties = perform_search
     save_search if params[:save_search] && user.present?
@@ -26,7 +26,7 @@ class PropertySearchService < ApplicationService
     )
   rescue => e
     Rails.logger.error "PropertySearchService error: #{e.message}"
-    failure('Search failed', error: e.message)
+    failure("Search failed", error: e.message)
   end
 
   def suggestions
@@ -36,7 +36,7 @@ class PropertySearchService < ApplicationService
 
     # Property title suggestions
     suggestions += Property.active
-      .where('title ILIKE ?', "%#{params[:query]}%")
+      .where("title ILIKE ?", "%#{params[:query]}%")
       .limit(5)
       .pluck(:title)
 
@@ -64,7 +64,7 @@ class PropertySearchService < ApplicationService
     # Prioritize properties in same city
     if property.city.present?
       related = related.where(city: property.city)
-        .or(related.where('price BETWEEN ? AND ?',
+        .or(related.where("price BETWEEN ? AND ?",
                          property.price * 0.8,
                          property.price * 1.2))
     end
@@ -131,7 +131,7 @@ class PropertySearchService < ApplicationService
       lat = params[:latitude] || params[:lat]
       lng = params[:longitude] || params[:lng]
       radius = params[:radius] || 25
-      scope = scope.near([lat.to_f, lng.to_f], radius)
+      scope = scope.near([ lat.to_f, lng.to_f ], radius)
     end
 
     scope
@@ -180,15 +180,15 @@ class PropertySearchService < ApplicationService
     sort_by = params[:sort_by] || params[:sort]
 
     case sort_by
-    when 'price_asc'
+    when "price_asc"
       scope.price_low_to_high
-    when 'price_desc'
+    when "price_desc"
       scope.price_high_to_low
-    when 'newest'
+    when "newest"
       scope.newest_first
-    when 'largest'
+    when "largest"
       scope.largest_first
-    when 'distance'
+    when "distance"
       # Distance sorting is automatic when using near scope
       scope
     else
@@ -201,27 +201,27 @@ class PropertySearchService < ApplicationService
 
     # Validate price
     if params[:min_price].present? && !valid_number?(params[:min_price])
-      @errors << 'Invalid price format'
+      @errors << "Invalid price format"
     end
 
     if params[:max_price].present? && !valid_number?(params[:max_price])
-      @errors << 'Invalid price format'
+      @errors << "Invalid price format"
     end
 
     # Validate coordinates
     if params[:latitude].present? && !valid_coordinate?(params[:latitude], :latitude)
-      @errors << 'Invalid latitude'
+      @errors << "Invalid latitude"
     end
 
     if params[:longitude].present? && !valid_coordinate?(params[:longitude], :longitude)
-      @errors << 'Invalid longitude'
+      @errors << "Invalid longitude"
     end
 
     # Validate bounds
     if params[:bounds].present?
       bounds = params[:bounds]
       unless bounds[:north] && bounds[:south] && bounds[:east] && bounds[:west]
-        @errors << 'Invalid bounds parameters'
+        @errors << "Invalid bounds parameters"
       end
     end
   end
@@ -231,7 +231,8 @@ class PropertySearchService < ApplicationService
   end
 
   def valid_coordinate?(value, type)
-    coord = Float(value) rescue return false
+    coord = Float(value) rescue false
+    return false unless coord
 
     if type == :latitude
       coord >= -90 && coord <= 90
@@ -276,21 +277,21 @@ class PropertySearchService < ApplicationService
 
   def build_price_range_facets(scope)
     ranges = {
-      '0-500000' => scope.where(price: 0..500000).count,
-      '500000-1000000' => scope.where(price: 500000..1000000).count,
-      '1000000-2000000' => scope.where(price: 1000000..2000000).count,
-      '2000000+' => scope.where('price >= ?', 2000000).count
+      "0-500000" => scope.where(price: 0..500000).count,
+      "500000-1000000" => scope.where(price: 500000..1000000).count,
+      "1000000-2000000" => scope.where(price: 1000000..2000000).count,
+      "2000000+" => scope.where("price >= ?", 2000000).count
     }
     ranges.select { |_, count| count > 0 }
   end
 
   def build_bedroom_facets(scope)
     {
-      '1' => scope.where(bedrooms: 1).count,
-      '2' => scope.where(bedrooms: 2).count,
-      '3' => scope.where(bedrooms: 3).count,
-      '4' => scope.where(bedrooms: 4).count,
-      '5+' => scope.where('bedrooms >= ?', 5).count
+      "1" => scope.where(bedrooms: 1).count,
+      "2" => scope.where(bedrooms: 2).count,
+      "3" => scope.where(bedrooms: 3).count,
+      "4" => scope.where(bedrooms: 4).count,
+      "5+" => scope.where("bedrooms >= ?", 5).count
     }.select { |_, count| count > 0 }
   end
 
@@ -304,18 +305,18 @@ class PropertySearchService < ApplicationService
   end
 
   def build_suggestions
-    suggestions = ['Try broadening your search criteria']
+    suggestions = [ "Try broadening your search criteria" ]
 
     if params[:min_price].present? || params[:max_price].present?
-      suggestions << 'Try adjusting your price range'
+      suggestions << "Try adjusting your price range"
     end
 
     if params[:location].present? || params[:radius].present?
-      suggestions << 'Try expanding your search radius'
+      suggestions << "Try expanding your search radius"
     end
 
     if params[:property_type].present?
-      suggestions << 'Try searching for different property types'
+      suggestions << "Try searching for different property types"
     end
 
     suggestions
@@ -363,6 +364,6 @@ class PropertySearchService < ApplicationService
   end
 
   def include_facets?
-    params[:include_facets].present? && params[:include_facets] != 'false'
+    params[:include_facets].present? && params[:include_facets] != "false"
   end
 end

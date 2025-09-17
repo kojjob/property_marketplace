@@ -52,7 +52,7 @@ RSpec.describe 'Property Filtering', type: :system do
 
     before do
       # Create property images for each property
-      [house_sf, apartment_ny, condo_miami].each do |property|
+      [ house_sf, apartment_ny, condo_miami ].each do |property|
         create(:property_image, property: property)
       end
     end

@@ -1,7 +1,7 @@
 class Booking < ApplicationRecord
   belongs_to :listing
-  belongs_to :tenant, class_name: 'User', foreign_key: 'tenant_id'
-  belongs_to :landlord, class_name: 'User', foreign_key: 'landlord_id'
+  belongs_to :tenant, class_name: "User", foreign_key: "tenant_id"
+  belongs_to :landlord, class_name: "User", foreign_key: "landlord_id"
   has_many :payments, dependent: :destroy
 
   # Enums
@@ -15,9 +15,9 @@ class Booking < ApplicationRecord
   validate :no_overlapping_bookings, on: :create
 
   # Scopes
-  scope :upcoming, -> { where('check_in_date > ?', Date.current) }
-  scope :past, -> { where('check_out_date < ?', Date.current) }
-  scope :current, -> { where('check_in_date <= ? AND check_out_date >= ?', Date.current, Date.current) }
+  scope :upcoming, -> { where("check_in_date > ?", Date.current) }
+  scope :past, -> { where("check_out_date < ?", Date.current) }
+  scope :current, -> { where("check_in_date <= ? AND check_out_date >= ?", Date.current, Date.current) }
 
   # Instance methods
   def total_amount_cents
@@ -25,15 +25,15 @@ class Booking < ApplicationRecord
   end
 
   def total_paid
-    payments.successful.sum(:amount) - payments.successful.where(payment_type: 'refund').sum(:amount).abs
+    payments.successful.sum(:amount) - payments.successful.where(payment_type: "refund").sum(:amount).abs
   end
 
   def completed?
-    status == 'completed'
+    status == "completed"
   end
 
   def confirmed?
-    status == 'confirmed'
+    status == "confirmed"
   end
 
   private
@@ -50,9 +50,9 @@ class Booking < ApplicationRecord
     return unless listing && check_in_date && check_out_date
 
     overlapping = listing.bookings
-      .where(status: ['pending', 'confirmed'])
+      .where(status: [ "pending", "confirmed" ])
       .where.not(id: id)
-      .where('(check_in_date <= ? AND check_out_date >= ?) OR (check_in_date <= ? AND check_out_date >= ?)',
+      .where("(check_in_date <= ? AND check_out_date >= ?) OR (check_in_date <= ? AND check_out_date >= ?)",
              check_out_date, check_in_date, check_out_date, check_in_date)
 
     if overlapping.exists?

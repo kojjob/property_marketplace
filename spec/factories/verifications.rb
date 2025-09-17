@@ -6,7 +6,7 @@ FactoryBot.define do
 
     # Set document_url based on verification type
     document_url do
-      if verification_type && ['identity', 'address', 'background_check', 'income'].include?(verification_type)
+      if verification_type && [ 'identity', 'address', 'background_check', 'income' ].include?(verification_type)
         "https://example.com/documents/#{verification_type}_#{SecureRandom.uuid}.pdf"
       end
     end

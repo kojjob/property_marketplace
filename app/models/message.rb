@@ -1,7 +1,7 @@
 class Message < ApplicationRecord
   # Associations
-  belongs_to :sender, class_name: 'User', foreign_key: 'sender_id'
-  belongs_to :recipient, class_name: 'User', foreign_key: 'recipient_id'
+  belongs_to :sender, class_name: "User", foreign_key: "sender_id"
+  belongs_to :recipient, class_name: "User", foreign_key: "recipient_id"
   belongs_to :conversation
   belongs_to :regarding, polymorphic: true, optional: true
 
@@ -32,12 +32,12 @@ class Message < ApplicationRecord
   }
 
   # Scopes
-  scope :unread, -> { where(status: 'unread') }
-  scope :read, -> { where(status: 'read') }
-  scope :not_deleted, -> { where.not(status: 'deleted') }
-  scope :recent, -> { where('messages.created_at > ?', 30.days.ago) }
+  scope :unread, -> { where(status: "unread") }
+  scope :read, -> { where(status: "read") }
+  scope :not_deleted, -> { where.not(status: "deleted") }
+  scope :recent, -> { where("messages.created_at > ?", 30.days.ago) }
   scope :for_user, ->(user_id) {
-    where('sender_id = ? OR recipient_id = ?', user_id, user_id)
+    where("sender_id = ? OR recipient_id = ?", user_id, user_id)
   }
   scope :in_conversation, ->(conversation_id) {
     where(conversation_id: conversation_id)
@@ -50,31 +50,31 @@ class Message < ApplicationRecord
   # Instance methods
   def mark_as_read!
     return if read?
-    update!(status: 'read', read_at: Time.current)
+    update!(status: "read", read_at: Time.current)
   end
 
   def mark_as_unread!
-    update!(status: 'unread', read_at: nil)
+    update!(status: "unread", read_at: nil)
   end
 
   def archive!
-    update!(status: 'archived')
+    update!(status: "archived")
   end
 
   def unarchive!
-    update!(status: 'read')
+    update!(status: "read")
   end
 
   def soft_delete!
-    update!(status: 'deleted')
+    update!(status: "deleted")
   end
 
   def unread?
-    status == 'unread'
+    status == "unread"
   end
 
   def read?
-    status == 'read'
+    status == "read"
   end
 
   private
@@ -102,7 +102,7 @@ class Message < ApplicationRecord
   end
 
   def notify_recipient
-    return if message_type == 'system_message'
+    return if message_type == "system_message"
 
     # In a real app, this would enqueue a job with Solid Queue
     # For now, we'll simulate with a job class that would be created later

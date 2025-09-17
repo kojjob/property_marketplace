@@ -6,6 +6,6 @@ class CreateListingAmenities < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :listing_amenities, [:listing_id, :amenity_id], unique: true
+    add_index :listing_amenities, [ :listing_id, :amenity_id ], unique: true
   end
 end

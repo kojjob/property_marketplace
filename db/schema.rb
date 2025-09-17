@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_17_044140) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_17_101646) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -296,6 +296,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_17_044140) do
     t.index ["status"], name: "index_reviews_on_status"
   end
 
+  create_table "saved_searches", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name"
+    t.json "criteria"
+    t.integer "frequency"
+    t.datetime "last_run_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_saved_searches_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.string "ip_address"
@@ -375,6 +386,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_17_044140) do
   add_foreign_key "reviews", "bookings"
   add_foreign_key "reviews", "users", column: "response_by_id"
   add_foreign_key "reviews", "users", column: "reviewer_id"
+  add_foreign_key "saved_searches", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "verifications", "users"
   add_foreign_key "verifications", "users", column: "verified_by_id"

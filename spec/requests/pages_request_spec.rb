@@ -61,7 +61,7 @@ RSpec.describe 'Pages Requests', type: :request do
 
       it 'includes cities section with all cities' do
         get '/'
-        cities = ['San Francisco', 'New York', 'Miami', 'Austin', 'Seattle', 'Portland']
+        cities = [ 'San Francisco', 'New York', 'Miami', 'Austin', 'Seattle', 'Portland' ]
         cities.each do |city|
           expect(response.body).to include(city)
         end
@@ -125,7 +125,7 @@ RSpec.describe 'Pages Requests', type: :request do
       let!(:pending_featured) { create(:property, featured: true, status: 'pending') }
 
       before do
-        [active_featured, sold_featured, pending_featured].each do |property|
+        [ active_featured, sold_featured, pending_featured ].each do |property|
           create(:property_image, property: property)
         end
       end

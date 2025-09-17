@@ -1,8 +1,8 @@
 class ListingsController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :show]
-  before_action :set_listing, only: [:show, :edit, :update, :destroy]
-  before_action :ensure_owner, only: [:edit, :update, :destroy]
-  before_action :set_user_properties, only: [:new, :edit]
+  before_action :authenticate_user!, except: [ :index, :show ]
+  before_action :set_listing, only: [ :show, :edit, :update, :destroy ]
+  before_action :ensure_owner, only: [ :edit, :update, :destroy ]
+  before_action :set_user_properties, only: [ :new, :edit ]
 
   def index
     @listings = Listing.active.includes(:property, :user)
@@ -11,7 +11,6 @@ class ListingsController < ApplicationController
     @listings = filter_by_location(@listings) if params[:location].present?
     @listings = filter_by_price_range(@listings) if price_params_present?
     @listings = filter_by_listing_type(@listings) if params[:listing_type].present?
-
   end
 
   def show
@@ -30,7 +29,7 @@ class ListingsController < ApplicationController
     @listing = current_user.listings.build(listing_params)
 
     if @listing.save
-      redirect_to @listing, notice: 'Listing was successfully created.'
+      redirect_to @listing, notice: "Listing was successfully created."
     else
       set_user_properties
       render :new
@@ -42,7 +41,7 @@ class ListingsController < ApplicationController
 
   def update
     if @listing.update(listing_params)
-      redirect_to @listing, notice: 'Listing was successfully updated.'
+      redirect_to @listing, notice: "Listing was successfully updated."
     else
       set_user_properties
       render :edit
@@ -51,7 +50,7 @@ class ListingsController < ApplicationController
 
   def destroy
     @listing.destroy
-    redirect_to listings_path, notice: 'Listing was successfully deleted.'
+    redirect_to listings_path, notice: "Listing was successfully deleted."
   end
 
   private
@@ -62,7 +61,7 @@ class ListingsController < ApplicationController
 
   def ensure_owner
     unless @listing.user == current_user
-      redirect_to listings_path, alert: 'You are not authorized to edit this listing.'
+      redirect_to listings_path, alert: "You are not authorized to edit this listing."
     end
   end
 

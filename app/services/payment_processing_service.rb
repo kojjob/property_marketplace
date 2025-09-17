@@ -26,17 +26,17 @@ class PaymentProcessingService < ApplicationService
   attr_reader :booking, :payment_params
 
   def validate_booking_status
-    unless booking.status == 'confirmed' || booking.status == 'pending'
+    unless booking.status == "confirmed" || booking.status == "pending"
       raise StandardError, "Booking must be confirmed or pending for payment"
     end
   end
 
   def validate_payment_amount
-    if payment_params[:payment_type] == 'full_payment'
+    if payment_params[:payment_type] == "full_payment"
       unless payment_params[:amount].to_f == booking.total_amount
         raise StandardError, "Full payment amount must match booking total"
       end
-    elsif payment_params[:payment_type] == 'deposit'
+    elsif payment_params[:payment_type] == "deposit"
       min_deposit = booking.total_amount * 0.2  # 20% minimum deposit
       unless payment_params[:amount].to_f >= min_deposit
         raise StandardError, "Deposit must be at least 20% of total amount"
@@ -52,8 +52,8 @@ class PaymentProcessingService < ApplicationService
       amount: payment_params[:amount],
       payment_type: payment_params[:payment_type],
       payment_method: payment_params[:payment_method],
-      status: 'pending',
-      currency: payment_params[:currency] || 'USD'
+      status: "pending",
+      currency: payment_params[:currency] || "USD"
     )
 
     # Calculate service fee (3% platform fee)
@@ -68,7 +68,7 @@ class PaymentProcessingService < ApplicationService
 
     if result[:success]
       @payment.update!(
-        status: 'completed',
+        status: "completed",
         processed_at: Time.current,
         transaction_reference: result[:transaction_id]
       )
@@ -93,10 +93,10 @@ class PaymentProcessingService < ApplicationService
   end
 
   def update_booking_status
-    if @payment.payment_type == 'full_payment' && @payment.status == 'completed'
-      booking.update!(payment_status: 'paid', status: 'confirmed')
-    elsif @payment.payment_type == 'deposit' && @payment.status == 'completed'
-      booking.update!(payment_status: 'partially_paid', status: 'confirmed')
+    if @payment.payment_type == "full_payment" && @payment.status == "completed"
+      booking.update!(payment_status: "paid", status: "confirmed")
+    elsif @payment.payment_type == "deposit" && @payment.status == "completed"
+      booking.update!(payment_status: "partially_paid", status: "confirmed")
     end
   end
 
@@ -107,7 +107,7 @@ class PaymentProcessingService < ApplicationService
 
   def handle_payment_failure(error)
     @payment&.update!(
-      status: 'failed',
+      status: "failed",
       failure_reason: error.message
     )
   end

@@ -24,8 +24,8 @@ class BookingService < ApplicationService
   attr_reader :listing, :tenant, :booking_params
 
   def validate_availability
-    overlapping = Booking.where(listing: listing, status: ['confirmed', 'pending'])
-                         .where('(check_in_date <= ? AND check_out_date >= ?) OR (check_in_date <= ? AND check_out_date >= ?)',
+    overlapping = Booking.where(listing: listing, status: [ "confirmed", "pending" ])
+                         .where("(check_in_date <= ? AND check_out_date >= ?) OR (check_in_date <= ? AND check_out_date >= ?)",
                                 booking_params[:check_out_date], booking_params[:check_in_date],
                                 booking_params[:check_out_date], booking_params[:check_in_date])
 
@@ -47,7 +47,7 @@ class BookingService < ApplicationService
       check_in_date: booking_params[:check_in_date],
       check_out_date: booking_params[:check_out_date],
       total_amount: calculate_total_amount,
-      status: 'pending'
+      status: "pending"
     )
   end
 
@@ -58,6 +58,6 @@ class BookingService < ApplicationService
 
   def send_notifications
     # Queue notification jobs using Solid Queue
-    BookingNotificationJob.perform_later(@booking, 'created') if defined?(BookingNotificationJob)
+    BookingNotificationJob.perform_later(@booking, "created") if defined?(BookingNotificationJob)
   end
 end

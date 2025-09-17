@@ -1,4 +1,4 @@
-require 'ostruct'
+require "ostruct"
 
 class BookingPaymentService
   include ActiveModel::Model
@@ -52,7 +52,7 @@ class BookingPaymentService
     # Create payment intent with Stripe
     payment_intent = create_stripe_payment_intent
 
-    if payment_intent.status == 'succeeded'
+    if payment_intent.status == "succeeded"
       payment = create_payment_record(payment_intent)
       update_booking_payment_status(payment)
       success(payment: payment)
@@ -65,7 +65,7 @@ class BookingPaymentService
     # Create payment intent for security deposit
     payment_intent = create_stripe_deposit_payment_intent
 
-    if payment_intent.status == 'succeeded'
+    if payment_intent.status == "succeeded"
       payment = create_deposit_payment_record(payment_intent)
       success(deposit: payment)
     else
@@ -75,16 +75,16 @@ class BookingPaymentService
 
   def create_stripe_payment_intent
     # For testing, we'll mock this behavior based on payment method
-    if payment_params[:payment_method_id] == 'pm_card_visa_chargeDeclined'
+    if payment_params[:payment_method_id] == "pm_card_visa_chargeDeclined"
       raise Stripe::CardError.new("Your card was declined.", "card_declined")
     end
 
     # Mock successful payment intent
     OpenStruct.new(
       id: "pi_#{SecureRandom.hex(12)}",
-      status: 'succeeded',
+      status: "succeeded",
       amount: payment_params[:amount_cents],
-      currency: 'usd',
+      currency: "usd",
       payment_method: payment_params[:payment_method_id]
     )
   end
@@ -93,16 +93,16 @@ class BookingPaymentService
     # Mock successful deposit payment intent
     OpenStruct.new(
       id: "pi_#{SecureRandom.hex(12)}",
-      status: 'succeeded',
+      status: "succeeded",
       amount: payment_params[:amount_cents],
-      currency: 'usd',
+      currency: "usd",
       payment_method: payment_params[:payment_method_id]
     )
   end
 
   def create_payment_record(payment_intent)
     amount_dollars = payment_intent.amount / 100.0
-    payment_type = amount_dollars >= booking.total_amount ? 'full_payment' : 'deposit'
+    payment_type = amount_dollars >= booking.total_amount ? "full_payment" : "deposit"
 
     Payment.create!(
       booking: booking,
@@ -110,9 +110,9 @@ class BookingPaymentService
       payee: booking.landlord,
       amount: amount_dollars,
       transaction_reference: payment_intent.id,
-      payment_method: 'stripe',
+      payment_method: "stripe",
       payment_type: payment_type,
-      status: 'completed'
+      status: "completed"
     )
   end
 
@@ -123,18 +123,18 @@ class BookingPaymentService
       payee: booking.landlord,
       amount: payment_intent.amount / 100.0, # Convert cents to dollars
       transaction_reference: payment_intent.id,
-      payment_method: 'stripe',
-      payment_type: 'security_deposit',
-      status: 'completed'
+      payment_method: "stripe",
+      payment_type: "security_deposit",
+      status: "completed"
     )
   end
 
   def update_booking_payment_status(payment)
     payment_amount_cents = (payment.amount * 100).to_i
     if payment_amount_cents >= booking.total_amount_cents
-      booking.update!(payment_status: 'paid')
+      booking.update!(payment_status: "paid")
     else
-      booking.update!(payment_status: 'partially_paid')
+      booking.update!(payment_status: "partially_paid")
     end
   end
 

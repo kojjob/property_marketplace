@@ -137,7 +137,7 @@ RSpec.describe PropertiesController, type: :controller do
 
         context 'with image uploads' do
           let(:image_file) { fixture_file_upload('spec/fixtures/test_image.jpg', 'image/jpeg') }
-          let(:attributes_with_images) { valid_attributes.merge(images: [image_file]) }
+          let(:attributes_with_images) { valid_attributes.merge(images: [ image_file ]) }
 
           it 'creates property with attached images' do
             post :create, params: { property: attributes_with_images }
@@ -149,7 +149,7 @@ RSpec.describe PropertiesController, type: :controller do
           it 'handles multiple image uploads' do
             image1 = fixture_file_upload('spec/fixtures/test_image.jpg', 'image/jpeg')
             image2 = fixture_file_upload('spec/fixtures/test_image2.jpg', 'image/jpeg')
-            attributes_with_multiple_images = valid_attributes.merge(images: [image1, image2])
+            attributes_with_multiple_images = valid_attributes.merge(images: [ image1, image2 ])
 
             post :create, params: { property: attributes_with_multiple_images }
             property = Property.last

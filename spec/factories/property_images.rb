@@ -45,7 +45,7 @@ FactoryBot.define do
 
     # Legacy support for image_url field
     trait :with_image_url do
-      image_url { Faker::LoremFlickr.image(size: "800x600", search_terms: ['house', 'property']) }
+      image_url { Faker::LoremFlickr.image(size: "800x600", search_terms: [ 'house', 'property' ]) }
 
       after(:build) do |property_image|
         # Don't attach Active Storage image when using URL

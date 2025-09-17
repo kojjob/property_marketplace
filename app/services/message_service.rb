@@ -34,7 +34,7 @@ class MessageService < ApplicationService
       recipient: recipient,
       conversation: @conversation,
       content: message_params[:content],
-      message_type: message_params[:message_type] || 'text',
+      message_type: message_params[:message_type] || "text",
       regarding: message_params[:regarding]  # Optional polymorphic association
     )
 
@@ -44,9 +44,9 @@ class MessageService < ApplicationService
 
   def attach_files
     message_params[:attachments].each do |attachment|
-      if attachment[:type] == 'image'
+      if attachment[:type] == "image"
         @message.images.attach(attachment[:file])
-      elsif attachment[:type] == 'document'
+      elsif attachment[:type] == "document"
         @message.documents.attach(attachment[:file])
       end
     end
@@ -89,7 +89,7 @@ class MessageService < ApplicationService
 
   def should_send_email?
     # Send email if recipient hasn't been active in last hour
-    last_activity = recipient.sessions.where('updated_at > ?', 1.hour.ago).exists?
+    last_activity = recipient.sessions.where("updated_at > ?", 1.hour.ago).exists?
     !last_activity
   end
 

@@ -16,8 +16,8 @@ class Profile < ApplicationRecord
   }, allow_blank: true
 
   # Scopes
-  scope :verified, -> { where(verification_status: 'verified') }
-  scope :landlords, -> { where(role: 'landlord') }
+  scope :verified, -> { where(verification_status: "verified") }
+  scope :landlords, -> { where(role: "landlord") }
 
   # Instance methods
   def full_name
@@ -33,10 +33,10 @@ class Profile < ApplicationRecord
   end
 
   def verified?
-    verification_status == 'verified'
+    verification_status == "verified"
   end
 
   def can_list_property?
-    role.in?(['landlord', 'agent', 'admin'])
+    role.in?([ "landlord", "agent", "admin" ])
   end
 end

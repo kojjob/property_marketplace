@@ -1,7 +1,7 @@
 class PropertiesController < ApplicationController
-  before_action :set_property, only: [:show, :edit, :update, :destroy, :favorite, :unfavorite]
-  before_action :authenticate_user!, except: [:index, :show, :search, :autocomplete]
-  before_action :check_owner, only: [:edit, :update, :destroy]
+  before_action :set_property, only: [ :show, :edit, :update, :destroy, :favorite, :unfavorite ]
+  before_action :authenticate_user!, except: [ :index, :show, :search, :autocomplete ]
+  before_action :check_owner, only: [ :edit, :update, :destroy ]
 
   def index
     # Use the Property::SearchService for all filtering, searching, and pagination
@@ -36,7 +36,7 @@ class PropertiesController < ApplicationController
     @property = current_user.properties.build(property_params)
 
     if @property.save
-      redirect_to @property, notice: 'Property was successfully created.'
+      redirect_to @property, notice: "Property was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -64,7 +64,7 @@ class PropertiesController < ApplicationController
     end
 
     if @property.update(update_params)
-      redirect_to @property, notice: 'Property was successfully updated.'
+      redirect_to @property, notice: "Property was successfully updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -72,18 +72,18 @@ class PropertiesController < ApplicationController
 
   def destroy
     @property.destroy
-    redirect_to properties_path, notice: 'Property was successfully deleted.'
+    redirect_to properties_path, notice: "Property was successfully deleted."
   end
 
   def favorite
     @favorite = current_user.favorites.find_or_create_by(property: @property)
-    redirect_back(fallback_location: @property, notice: 'Property added to favorites.')
+    redirect_back(fallback_location: @property, notice: "Property added to favorites.")
   end
 
   def unfavorite
     @favorite = current_user.favorites.find_by(property: @property)
     @favorite&.destroy
-    redirect_back(fallback_location: @property, notice: 'Property removed from favorites.')
+    redirect_back(fallback_location: @property, notice: "Property removed from favorites.")
   end
 
   def search
@@ -127,7 +127,7 @@ class PropertiesController < ApplicationController
     suggestions = service.suggestions
 
     properties = Property.active
-      .where('title ILIKE ?', "%#{params[:q]}%")
+      .where("title ILIKE ?", "%#{params[:q]}%")
       .limit(5)
       .pluck(:id, :title, :city, :state, :price)
       .map do |id, title, city, state, price|
@@ -153,7 +153,7 @@ class PropertiesController < ApplicationController
 
   def check_owner
     unless @property.user == current_user
-      redirect_to properties_path, alert: 'You are not authorized to perform this action.'
+      redirect_to properties_path, alert: "You are not authorized to perform this action."
     end
   end
 
@@ -174,21 +174,21 @@ class PropertiesController < ApplicationController
 
     # Sorting - convert controller sort params to service params
     case params[:sort]
-    when 'price_asc'
-      search_params[:sort] = 'price'
-      search_params[:order] = 'asc'
-    when 'price_desc'
-      search_params[:sort] = 'price'
-      search_params[:order] = 'desc'
-    when 'newest'
-      search_params[:sort] = 'created_at'
-      search_params[:order] = 'desc'
-    when 'bedrooms'
-      search_params[:sort] = 'bedrooms'
-      search_params[:order] = 'desc'
-    when 'sqft'
-      search_params[:sort] = 'square_feet'
-      search_params[:order] = 'desc'
+    when "price_asc"
+      search_params[:sort] = "price"
+      search_params[:order] = "asc"
+    when "price_desc"
+      search_params[:sort] = "price"
+      search_params[:order] = "desc"
+    when "newest"
+      search_params[:sort] = "created_at"
+      search_params[:order] = "desc"
+    when "bedrooms"
+      search_params[:sort] = "bedrooms"
+      search_params[:order] = "desc"
+    when "sqft"
+      search_params[:sort] = "square_feet"
+      search_params[:order] = "desc"
     end
 
     # Pagination
@@ -207,7 +207,7 @@ class PropertiesController < ApplicationController
       :state, :zip_code,
       # Support both direct image uploads and nested attributes
       images: [], videos: [], vr_content: [],
-      property_images_attributes: [:id, :image, :caption, :position, :_destroy]
+      property_images_attributes: [ :id, :image, :caption, :position, :_destroy ]
     )
   end
 
@@ -217,7 +217,7 @@ class PropertiesController < ApplicationController
                   :property_type, :min_sqft, :max_sqft, :sort, :sort_by,
                   :page, :per_page, :view, :save_search, :search_name,
                   :alert_frequency, :include_facets, :include_markers, :use_cache,
-                  bounds: [:north, :south, :east, :west],
+                  bounds: [ :north, :south, :east, :west ],
                   filters: {})
   end
 
@@ -251,9 +251,9 @@ class PropertiesController < ApplicationController
         price: property.price,
         id: property.id,
         info_window: render_to_string(
-          partial: 'properties/map_info_window',
+          partial: "properties/map_info_window",
           locals: { property: property },
-          formats: [:html]
+          formats: [ :html ]
         )
       }
     end

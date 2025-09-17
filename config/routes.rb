@@ -18,8 +18,8 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :favorites, only: [:index]
-  resources :profiles, only: [:show, :edit, :update]
+  resources :favorites, only: [ :index ]
+  resources :profiles, only: [ :show, :edit, :update ]
 
   # Contact page
   get "contact", to: "contact#index"
@@ -30,7 +30,7 @@ Rails.application.routes.draw do
 
   # Webhook routes
   namespace :webhooks do
-    resources :stripe, only: [:create]
+    resources :stripe, only: [ :create ]
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

@@ -1,4 +1,4 @@
-require 'ostruct'
+require "ostruct"
 
 class Payment::SubscriptionService
   include ActiveModel::Model
@@ -47,7 +47,7 @@ class Payment::SubscriptionService
     customer = booking.tenant
 
     # For testing, check for declined payment method
-    if subscription_params[:payment_method_id] == 'pm_card_visa_chargeDeclined'
+    if subscription_params[:payment_method_id] == "pm_card_visa_chargeDeclined"
       raise Stripe::CardError.new("Your card was declined.", "card_declined")
     end
 
@@ -87,9 +87,9 @@ class Payment::SubscriptionService
       payee: booking.landlord,
       amount: booking.total_amount,
       transaction_reference: subscription.processor_id,
-      payment_method: 'stripe',
-      payment_type: 'subscription',
-      status: 'completed'
+      payment_method: "stripe",
+      payment_type: "subscription",
+      status: "completed"
     )
   end
 
@@ -102,9 +102,9 @@ class Payment::SubscriptionService
       payee: booking.tenant,
       amount: 1.00, # Minimum amount for validation, pro-rated refund would be calculated here
       transaction_reference: subscription.processor_id,
-      payment_method: 'stripe',
-      payment_type: 'refund',
-      status: 'completed'
+      payment_method: "stripe",
+      payment_type: "refund",
+      status: "completed"
     )
   end
 
@@ -113,8 +113,8 @@ class Payment::SubscriptionService
     # In production, this would use Pay gem's actual subscription creation
     OpenStruct.new(
       processor_id: "sub_#{SecureRandom.hex(12)}",
-      name: 'Property Subscription',
-      status: 'active',
+      name: "Property Subscription",
+      status: "active",
       processor_plan: subscription_params[:price_id],
       trial_period_days: subscription_params[:trial_period_days],
       created_at: Time.current
@@ -125,8 +125,8 @@ class Payment::SubscriptionService
     # Mock cancelled subscription for testing
     OpenStruct.new(
       processor_id: subscription_id,
-      name: 'Property Subscription',
-      status: 'canceled',
+      name: "Property Subscription",
+      status: "canceled",
       cancelled_at: Time.current
     )
   end
@@ -135,15 +135,15 @@ class Payment::SubscriptionService
     # Mock updated subscription for testing
     OpenStruct.new(
       processor_id: subscription_id,
-      name: 'Property Subscription',
-      status: 'active',
+      name: "Property Subscription",
+      status: "active",
       processor_plan: update_params[:price_id],
       updated_at: Time.current
     )
   end
 
   def update_booking_status
-    booking.update!(payment_status: 'paid')
+    booking.update!(payment_status: "paid")
   end
 
   def success(data = {})
