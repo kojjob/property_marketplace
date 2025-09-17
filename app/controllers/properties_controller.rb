@@ -110,12 +110,12 @@ class PropertiesController < ApplicationController
     properties = Property.active
       .where('title ILIKE ?', "%#{params[:q]}%")
       .limit(5)
-      .pluck(:id, :title, :city, :region, :price)
-      .map do |id, title, city, region, price|
+      .pluck(:id, :title, :city, :state, :price)
+      .map do |id, title, city, state, price|
         {
           id: id,
           title: title,
-          location: "#{city}, #{region}",
+          location: "#{city}, #{state}",
           price: price
         }
       end
@@ -167,7 +167,7 @@ class PropertiesController < ApplicationController
       property_type: property.property_type,
       address: property.address,
       city: property.city,
-      region: property.region,
+      state: property.state,
       latitude: property.latitude,
       longitude: property.longitude,
       image_url: property.primary_image&.image_url,
