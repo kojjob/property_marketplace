@@ -2,6 +2,9 @@ class Profile < ApplicationRecord
   belongs_to :user
   has_one_attached :avatar
 
+  # Declare the attribute for messaging_availability enum
+  attribute :messaging_availability, :string, default: 'everyone'
+
   # Enums
   enum :role, { tenant: 0, landlord: 1, agent: 2, admin: 3 }
   enum :verification_status, { unverified: 0, pending: 1, verified: 2 }
@@ -10,7 +13,7 @@ class Profile < ApplicationRecord
     verified_only: 'verified_only', # Only verified users can message
     connections_only: 'connections_only', # Only users with existing conversations
     disabled: 'disabled'            # No one can message
-  }, prefix: true, default: 'everyone'
+  }, prefix: true
 
   # Validations
   validates :first_name, presence: true
