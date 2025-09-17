@@ -9,6 +9,15 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :listings do
+    resources :bookings, shallow: true do
+      member do
+        patch :confirm
+        patch :cancel
+      end
+    end
+  end
+
   resources :favorites, only: [:index]
   resources :profiles, only: [:show, :edit, :update]
 
