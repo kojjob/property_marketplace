@@ -28,8 +28,8 @@
           <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
             <!-- Property Image -->
             <div class="relative h-64 bg-gray-200">
-              <% if property.property_images.any? %>
-                <%= image_tag property.property_images.first.image_url,
+              <% if property.images.attached? && property.images.any? %>
+                <%= image_tag property.images.first,
                     class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500",
                     alt: property.title %>
               <% else %>
