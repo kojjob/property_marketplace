@@ -2,9 +2,9 @@ require 'rails_helper'
 
 RSpec.describe ProfilesController, type: :controller do
   let(:user) { create(:user) }
-  let!(:profile) { create(:profile, user: user) }
+  let(:profile) { create(:profile, user: user) }
   let(:other_user) { create(:user) }
-  let!(:other_profile) { create(:profile, user: other_user) }
+  let(:other_profile) { create(:profile, user: other_user) }
 
   describe 'authentication' do
     context 'when user is not signed in' do
@@ -218,11 +218,7 @@ RSpec.describe ProfilesController, type: :controller do
   end
 
   describe 'private methods' do
-    before { sign_in(user) }
-
     describe '#profile_params' do
-      let(:controller) { ProfilesController.new }
-
       it 'permits the correct parameters' do
         params = ActionController::Parameters.new(
           profile: {

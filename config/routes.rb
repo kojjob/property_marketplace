@@ -21,6 +21,12 @@ Rails.application.routes.draw do
   resources :favorites, only: [ :index ]
   resources :profiles, only: [ :show, :edit, :update ]
 
+  # Messaging routes
+  resources :conversations do
+    resources :messages, shallow: true
+  end
+  resources :messages, only: [ :index, :show, :update, :destroy ]
+
   # Contact page
   get "contact", to: "contact#index"
   post "contact", to: "contact#create"

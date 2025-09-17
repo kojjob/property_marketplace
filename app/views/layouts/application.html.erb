@@ -8,6 +8,27 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <!-- Performance Hints -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <meta http-equiv="x-dns-prefetch-control" content="on">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="<%= content_for?(:description) ? yield(:description) : 'Find your perfect property with our modern marketplace. Browse listings, connect with owners, and discover your dream home.' %>">
+    <meta name="keywords" content="property, real estate, rental, listing, marketplace, homes, apartments">
+    <meta name="author" content="Property Marketplace">
+
+    <!-- Open Graph Tags -->
+    <meta property="og:title" content="<%= content_for?(:title) ? yield(:title) : 'Property Marketplace' %>">
+    <meta property="og:description" content="<%= content_for?(:description) ? yield(:description) : 'Find your perfect property with our modern marketplace.' %>">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= request.original_url %>">
+
+    <!-- Twitter Card Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= content_for?(:title) ? yield(:title) : 'Property Marketplace' %>">
+    <meta name="twitter:description" content="<%= content_for?(:description) ? yield(:description) : 'Find your perfect property with our modern marketplace.' %>">
+
     <%= yield :head %>
 
     <link rel="manifest" href="/manifest.json">

@@ -17,6 +17,13 @@ class User < ApplicationRecord
   has_many :received_reviews, as: :reviewable, class_name: "Review", dependent: :destroy
   has_many :verifications, dependent: :destroy
 
+  # Messaging associations
+  has_many :sent_messages, class_name: "Message", foreign_key: "sender_id", dependent: :destroy
+  has_many :received_messages, class_name: "Message", foreign_key: "recipient_id", dependent: :destroy
+  has_many :conversations_as_participant1, class_name: "Conversation", foreign_key: "participant1_id", dependent: :destroy
+  has_many :conversations_as_participant2, class_name: "Conversation", foreign_key: "participant2_id", dependent: :destroy
+  has_many :sessions, dependent: :destroy
+
   # Callbacks
   after_create :create_profile
 
@@ -52,6 +59,26 @@ class User < ApplicationRecord
   # Get or create profile
   def profile_or_build
     profile || build_profile
+  end
+
+  # Messaging methods
+  def conversations
+    Conversation.for_user(id)
+  end
+
+  def unread_messages_count
+    received_messages.unread.count
+  end
+
+  def conversation_with(other_user)
+    Conversation.between(id, other_user.id).first
+  end
+
+  def can_message?(other_user)
+    return false if other_user == self
+    return false unless other_user.is_a?(User)
+    # Add additional business logic here (e.g., verification requirements)
+    true
   end
 
   private

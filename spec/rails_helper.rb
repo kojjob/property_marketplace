@@ -65,10 +65,15 @@ RSpec.configure do |config|
   # Include FactoryBot methods
   config.include FactoryBot::Syntax::Methods
 
-  # Include Devise test helpers
+  # Include Devise test helpers with explicit mapping fix
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.include Devise::Test::IntegrationHelpers, type: :system
+
+  # Fix for Devise mapping issues in tests
+  config.before(:each, type: :controller) do
+    @request.env["devise.mapping"] = Devise.mappings[:user] if @request
+  end
 
   # Database Cleaner configuration
   config.before(:suite) do
