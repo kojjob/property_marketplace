@@ -1,111 +1,40 @@
-<div class="px-4 sm:px-6 lg:px-8">
-  <div class="sm:flex sm:items-center">
-    <div class="sm:flex-auto">
-      <h1 class="text-3xl font-semibold text-gray-900">Properties</h1>
-      <p class="mt-2 text-sm text-gray-700">Browse available properties in our marketplace</p>
-    </div>
-    <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-      <% if signed_in? %>
-        <%= link_to "List New Property", new_property_path, class: "inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:w-auto" %>
-      <% end %>
-    </div>
-  </div>
-
-  <!-- Filter Section -->
-  <div class="mt-6 bg-white shadow rounded-lg p-4">
-    <%= form_with url: properties_path, method: :get, local: true, class: "space-y-4 sm:space-y-0 sm:flex sm:space-x-4 sm:items-end" do |form| %>
-      <div>
-        <%= form.label :property_type, class: "block text-sm font-medium text-gray-700" %>
-        <%= form.select :property_type, options_for_select([['All Types', '']] + Property::PROPERTY_TYPES.map { |t| [t, t] }, params[:property_type]), {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
-      </div>
-
-      <div>
-        <%= form.label :city, class: "block text-sm font-medium text-gray-700" %>
-        <%= form.text_field :city, value: params[:city], placeholder: "Enter city", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
-      </div>
-
-      <div>
-        <%= form.label :min_price, "Min Price", class: "block text-sm font-medium text-gray-700" %>
-        <%= form.number_field :min_price, value: params[:min_price], placeholder: "0", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
-      </div>
-
-      <div>
-        <%= form.label :max_price, "Max Price", class: "block text-sm font-medium text-gray-700" %>
-        <%= form.number_field :max_price, value: params[:max_price], placeholder: "Any", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
-      </div>
-
-      <div>
-        <%= form.label :bedrooms, "Min Bedrooms", class: "block text-sm font-medium text-gray-700" %>
-        <%= form.number_field :bedrooms, value: params[:bedrooms], placeholder: "Any", min: 0, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
-      </div>
-
-      <div>
-        <%= form.submit "Filter", class: "inline-flex items-center justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" %>
-        <%= link_to "Clear", properties_path, class: "ml-2 inline-flex items-center justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" %>
-      </div>
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-bold">Properties</h1>
+    <% if user_signed_in? %>
+      <%= link_to "Add Property", new_property_path, class: "bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600" %>
     <% end %>
   </div>
 
-  <!-- Properties Grid -->
-  <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     <% @properties.each do |property| %>
-      <div class="bg-white overflow-hidden shadow rounded-lg">
-        <%= link_to property_path(property), class: "block hover:bg-gray-50" do %>
-          <div class="h-48 bg-gray-200 relative">
-            <% if property.property_images.any? %>
-              <img src="<%= property.property_images.ordered.first.image_url %>" alt="<%= property.title %>" class="w-full h-full object-cover">
-            <% else %>
-              <div class="flex items-center justify-center h-full">
-                <svg class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-              </div>
+      <div class="bg-white rounded-lg shadow-md overflow-hidden">
+        <div class="p-6">
+          <h2 class="text-xl font-semibold mb-2">
+            <%= link_to property.title, property, class: "hover:text-blue-600" %>
+          </h2>
+          <p class="text-gray-600 mb-2"><%= property.property_type %></p>
+          <p class="text-gray-600 mb-2"><%= property.city %>, <%= property.state %></p>
+          <p class="text-2xl font-bold text-blue-600">$<%= number_with_delimiter(property.price) %></p>
+          <div class="mt-4 text-sm text-gray-500">
+            <% if property.bedrooms.present? %>
+              <span><%= property.bedrooms %> bed</span>
             <% end %>
-            <div class="absolute top-2 right-2 bg-white px-2 py-1 rounded text-sm font-semibold text-gray-900">
-              <%= number_to_currency(property.price, precision: 0) %>
-            </div>
+            <% if property.bathrooms.present? %>
+              <span class="ml-4"><%= property.bathrooms %> bath</span>
+            <% end %>
+            <% if property.square_feet.present? %>
+              <span class="ml-4"><%= number_with_delimiter(property.square_feet) %> sqft</span>
+            <% end %>
           </div>
-          <div class="px-4 py-4">
-            <h3 class="text-lg font-medium text-gray-900 truncate"><%= property.title %></h3>
-            <p class="mt-1 text-sm text-gray-600">
-              <%= property.property_type %> • <%= property.city %>, <%= property.state %>
-            </p>
-            <div class="mt-2 flex items-center text-sm text-gray-500">
-              <% if property.bedrooms.present? %>
-                <span class="flex items-center mr-3">
-                  <svg class="flex-shrink-0 mr-1 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                  </svg>
-                  <%= property.bedrooms %> bed<%= 's' if property.bedrooms != 1 %>
-                </span>
-              <% end %>
-              <% if property.bathrooms.present? %>
-                <span class="flex items-center mr-3">
-                  <svg class="flex-shrink-0 mr-1 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <%= property.bathrooms %> bath<%= 's' if property.bathrooms != 1 %>
-                </span>
-              <% end %>
-              <% if property.square_feet.present? %>
-                <span class="flex items-center">
-                  <svg class="flex-shrink-0 mr-1 h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                  </svg>
-                  <%= number_with_delimiter(property.square_feet) %> sq ft
-                </span>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
+        </div>
       </div>
     <% end %>
   </div>
 
   <% if @properties.empty? %>
-    <div class="mt-8 text-center">
-      <p class="text-gray-500">No properties found matching your criteria.</p>
-      <%= link_to "Clear filters", properties_path, class: "mt-2 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+    <div class="text-center py-12">
+      <p class="text-gray-500 text-lg">No properties found.</p>
     </div>
   <% end %>
 </div>

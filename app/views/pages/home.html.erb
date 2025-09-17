@@ -1,0 +1,263 @@
+<!-- Hero Section with Search -->
+<section class="hero min-h-[600px] relative" style="background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-4.0.3') center/cover;">
+  <div class="hero-overlay bg-opacity-60"></div>
+  <div class="hero-content text-center text-neutral-content">
+    <div class="max-w-4xl">
+      <h1 class="mb-5 text-5xl font-bold text-white">Find Your Dream Property</h1>
+      <p class="mb-8 text-xl text-white/90">Discover the perfect home from our extensive collection of properties</p>
+
+      <!-- Search Form -->
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <%= form_with url: properties_path, method: :get, local: true, class: "space-y-4" do |f| %>
+            <!-- Search Tabs -->
+            <div class="tabs tabs-boxed bg-base-200">
+              <a class="tab tab-active" data-listing-type="all">All Status</a>
+              <a class="tab" data-listing-type="sale">For Sale</a>
+              <a class="tab" data-listing-type="rent">For Rent</a>
+            </div>
+
+            <!-- Search Fields -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <!-- Location Input -->
+              <div class="form-control">
+                <%= f.text_field :location,
+                    placeholder: "Location",
+                    class: "input input-bordered w-full" %>
+              </div>
+
+              <!-- Property Type -->
+              <div class="form-control">
+                <%= f.select :property_type,
+                    options_for_select([
+                      ["All Types", ""],
+                      ["Apartment", "apartment"],
+                      ["House", "house"],
+                      ["Villa", "villa"],
+                      ["Commercial", "commercial"],
+                      ["Land", "land"]
+                    ]),
+                    {},
+                    class: "select select-bordered w-full" %>
+              </div>
+
+              <!-- Price Range -->
+              <div class="form-control">
+                <%= f.select :price_range,
+                    options_for_select([
+                      ["Any Price", ""],
+                      ["$0 - $100k", "0-100000"],
+                      ["$100k - $250k", "100000-250000"],
+                      ["$250k - $500k", "250000-500000"],
+                      ["$500k - $1M", "500000-1000000"],
+                      ["$1M+", "1000000-"]
+                    ]),
+                    {},
+                    class: "select select-bordered w-full" %>
+              </div>
+
+              <!-- Search Button -->
+              <div class="form-control">
+                <%= f.submit "Search", class: "btn btn-primary btn-block" %>
+              </div>
+            </div>
+
+            <!-- Advanced Search Link -->
+            <div class="text-sm">
+              <a href="#" class="link link-primary">Advanced Search →</a>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Properties -->
+<section class="py-16 bg-base-200">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold mb-4">Featured Properties</h2>
+      <p class="text-lg text-base-content/70">Hand-picked properties just for you</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% if @featured_properties&.any? %>
+        <% @featured_properties.each do |property| %>
+          <div class="card bg-base-100 shadow-xl property-card-hover">
+            <figure class="relative">
+              <% if property.property_images.any? %>
+                <%= image_tag property.property_images.first.image_url,
+                    class: "w-full h-64 object-cover" %>
+              <% else %>
+                <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=400"
+                     alt="Property"
+                     class="w-full h-64 object-cover">
+              <% end %>
+
+              <!-- Status Badge -->
+              <div class="badge badge-primary absolute top-4 left-4">
+                <%= property.listing_type&.humanize || "For Sale" %>
+              </div>
+
+              <!-- Price Badge -->
+              <div class="badge badge-secondary absolute top-4 right-4">
+                <%= number_to_currency(property.price) %>
+              </div>
+            </figure>
+
+            <div class="card-body">
+              <h3 class="card-title">
+                <%= link_to property.title, property_path(property),
+                    class: "hover:text-primary transition-colors" %>
+              </h3>
+
+              <p class="text-base-content/70">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline mr-1">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+                <%= property.address %>
+              </p>
+
+              <!-- Property Features -->
+              <div class="flex gap-4 mt-4 text-sm">
+                <span class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                  </svg>
+                  <%= property.bedrooms || 3 %> Beds
+                </span>
+                <span class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v-5.25m0 5.25h9m-9 0v5.25m0-5.25h9m0 0v-5.25m0 5.25v5.25M3 9.75h18v10.5a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 20.25V9.75zm3-6h12v3H6v-3z" />
+                  </svg>
+                  <%= property.bathrooms || 2 %> Baths
+                </span>
+                <span class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" />
+                  </svg>
+                  <%= property.square_feet || 1500 %> sqft
+                </span>
+              </div>
+
+              <div class="card-actions justify-between items-center mt-4">
+                <div class="text-xs text-base-content/50">
+                  Listed <%= time_ago_in_words(property.created_at) %> ago
+                </div>
+                <%= link_to "View Details", property_path(property),
+                    class: "btn btn-primary btn-sm" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <!-- Demo Properties -->
+        <% 6.times do |i| %>
+          <div class="card bg-base-100 shadow-xl property-card-hover">
+            <figure class="relative">
+              <img src="https://images.unsplash.com/photo-<%= ["1564013799919-ab600027ffc6", "1570129477492-45c003edd2be", "1568605114967-8887f206b6ab"][i % 3] %>?w=400"
+                   alt="Property"
+                   class="w-full h-64 object-cover">
+              <div class="badge badge-primary absolute top-4 left-4">For Sale</div>
+              <div class="badge badge-secondary absolute top-4 right-4">$<%= (350000 + (i * 50000)).to_s.reverse.scan(/\d{3}|.+/).join(",").reverse %></div>
+            </figure>
+            <div class="card-body">
+              <h3 class="card-title">Modern <%= ["Villa", "Apartment", "House"][i % 3] %> in Downtown</h3>
+              <p class="text-base-content/70">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4 inline mr-1">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                </svg>
+                123 Main Street, City
+              </p>
+              <div class="flex gap-4 mt-4 text-sm">
+                <span class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                  </svg>
+                  <%= 3 + (i % 2) %> Beds
+                </span>
+                <span class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v-5.25m0 5.25h9m-9 0v5.25m0-5.25h9m0 0v-5.25m0 5.25v5.25M3 9.75h18v10.5a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 20.25V9.75zm3-6h12v3H6v-3z" />
+                  </svg>
+                  <%= 2 + (i % 2) %> Baths
+                </span>
+                <span class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" />
+                  </svg>
+                  <%= 1500 + (i * 200) %> sqft
+                </span>
+              </div>
+              <div class="card-actions justify-between items-center mt-4">
+                <div class="text-xs text-base-content/50">Listed 2 days ago</div>
+                <a href="#" class="btn btn-primary btn-sm">View Details</a>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="text-center mt-12">
+      <%= link_to "View All Properties", properties_path, class: "btn btn-primary btn-lg" %>
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="py-16 bg-base-100">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold mb-4">Why Choose PropertyHub</h2>
+      <p class="text-lg text-base-content/70">We make finding your dream property simple and enjoyable</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="text-center">
+        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-primary">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold mb-2">Wide Selection</h3>
+        <p class="text-base-content/70">Browse through thousands of properties to find your perfect match</p>
+      </div>
+
+      <div class="text-center">
+        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-primary">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold mb-2">Trusted Platform</h3>
+        <p class="text-base-content/70">All listings are verified and secure for your peace of mind</p>
+      </div>
+
+      <div class="text-center">
+        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-primary">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold mb-2">Expert Support</h3>
+        <p class="text-base-content/70">Our team of experts is here to help you every step of the way</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 bg-primary text-primary-content">
+  <div class="container mx-auto px-4 text-center">
+    <h2 class="text-4xl font-bold mb-4">Ready to Find Your Dream Property?</h2>
+    <p class="text-xl mb-8">Join thousands of happy homeowners who found their perfect property with us</p>
+    <div class="flex gap-4 justify-center">
+      <%= link_to "Browse Properties", properties_path, class: "btn btn-secondary btn-lg" %>
+      <%= link_to "List Your Property", new_property_path, class: "btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-primary" %>
+    </div>
+  </div>
+</section>

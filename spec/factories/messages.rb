@@ -1,21 +1,34 @@
 FactoryBot.define do
   factory :message do
-    sender { association :user }
-    recipient { association :user }
-    conversation { association :conversation, participant1: sender, participant2: recipient }
+    # First ensure we have two different users
+    transient do
+      user1 { create(:user) }
+      user2 { create(:user) }
+    end
+
+    # Use the transient users as defaults
+    sender { user1 }
+    recipient { user2 }
+
+    # Create conversation with these users
+    conversation { association(:conversation, participant1: sender, participant2: recipient) }
 
     content { "This is a test message content that meets the minimum length requirement." }
     status { 'unread' }
     message_type { 'text' }
 
-    # When a conversation is provided externally (in tests), use its participants
-    after(:build) do |message|
-      if message.conversation &&
-         (!message.conversation.participant?(message.sender) ||
-          !message.conversation.participant?(message.recipient))
-        # Use the conversation's participants if the message participants don't match
-        message.sender = message.conversation.participant1
-        message.recipient = message.conversation.participant2
+    # After building, ensure consistency between conversation and participants
+    after(:build) do |message, evaluator|
+      # If a conversation was explicitly provided, use its participants
+      if message.conversation && message.conversation.persisted? &&
+         message.conversation.participant1 && message.conversation.participant2
+        # Only override if sender/recipient weren't explicitly set to something else
+        if message.sender_id.nil? || message.sender == evaluator.user1
+          message.sender = message.conversation.participant1
+        end
+        if message.recipient_id.nil? || message.recipient == evaluator.user2
+          message.recipient = message.conversation.participant2
+        end
       end
     end
 
