@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  include Pay::Billable
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -6,6 +8,7 @@ class User < ApplicationRecord
          :confirmable, :trackable
 
   # Associations
+  has_many :payments, dependent: :destroy
   has_many :properties, dependent: :destroy
   has_many :favorites, dependent: :destroy
   has_many :favorited_properties, through: :favorites, source: :property
