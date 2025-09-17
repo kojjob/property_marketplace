@@ -80,6 +80,13 @@
               <% if user_signed_in? %>
                 <li><%= link_to "My Listings", properties_path(user_id: current_user.id) %></li>
                 <li><%= link_to "Favorites", favorites_path %></li>
+              <% else %>
+                <li class="border-t mt-2 pt-2">
+                  <%= link_to "Sign In", new_user_session_path, class: "font-medium" %>
+                </li>
+                <li>
+                  <%= link_to "Sign Up", new_user_registration_path, class: "font-medium text-primary" %>
+                </li>
               <% end %>
             </ul>
           </div>
@@ -117,38 +124,60 @@
             <% end %>
             <li><%= link_to "About", "#" %></li>
             <li><%= link_to "Contact", "#" %></li>
+
+            <!-- Auth links in navbar for large screens when not signed in -->
+            <% unless user_signed_in? %>
+              <li><%= link_to "Sign In", new_user_session_path %></li>
+              <li><%= link_to "Sign Up", new_user_registration_path, class: "btn btn-primary btn-sm ml-2" %></li>
+            <% end %>
           </ul>
         </div>
 
         <!-- Right side actions -->
-        <div class="navbar-end gap-2">
-          <% if user_signed_in? %>
-            <!-- User menu dropdown -->
-            <div class="dropdown dropdown-end">
-              <label tabindex="0" class="btn btn-ghost btn-circle avatar">
-                <div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
-                  <span class="text-lg font-semibold"><%= current_user.email[0].upcase %></span>
-                </div>
-              </label>
-              <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                <li class="menu-title">
-                  <span><%= current_user.email %></span>
-                </li>
-                <li><%= link_to "Dashboard", "#" %></li>
-                <li><%= link_to "Profile", edit_user_registration_path %></li>
-                <li><%= link_to "My Properties", properties_path(user_id: current_user.id) %></li>
-                <li><%= link_to "Saved Searches", "#" %></li>
-                <li class="mt-2">
-                  <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "btn btn-error btn-sm btn-block" %>
-                </li>
-              </ul>
-            </div>
+        <div class="navbar-end">
+          <div class="flex items-center gap-2">
+            <% if user_signed_in? %>
+              <!-- User menu dropdown -->
+              <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-ghost btn-circle avatar">
+                  <div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
+                    <span class="text-lg font-semibold"><%= current_user.email[0].upcase %></span>
+                  </div>
+                </label>
+                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+                  <li class="menu-title">
+                    <span><%= current_user.email %></span>
+                  </li>
+                  <li><%= link_to "Dashboard", "#" %></li>
+                  <li><%= link_to "Profile", edit_user_registration_path %></li>
+                  <li><%= link_to "My Properties", properties_path(user_id: current_user.id) %></li>
+                  <li><%= link_to "Saved Searches", "#" %></li>
+                  <li class="mt-2">
+                    <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "btn btn-error btn-sm btn-block" %>
+                  </li>
+                </ul>
+              </div>
 
-            <%= link_to "List Property", new_property_path, class: "btn btn-primary" %>
-          <% else %>
-            <%= link_to "Sign In", new_user_session_path, class: "btn btn-ghost" %>
-            <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-primary" %>
-          <% end %>
+              <%= link_to "List Property", new_property_path, class: "btn btn-primary" %>
+            <% else %>
+              <!-- Mobile auth dropdown (small/medium screens) -->
+              <div class="dropdown dropdown-end lg:hidden">
+                <label tabindex="0" class="btn btn-ghost btn-circle">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                  </svg>
+                </label>
+                <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-40">
+                  <li>
+                    <%= link_to "Sign In", new_user_session_path, class: "font-medium" %>
+                  </li>
+                  <li>
+                    <%= link_to "Sign Up", new_user_registration_path, class: "font-medium text-primary" %>
+                  </li>
+                </ul>
+              </div>
+            <% end %>
+          </div>
         </div>
       </div>
     </header>
