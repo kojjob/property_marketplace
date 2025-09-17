@@ -124,14 +124,14 @@
           <%= link_to "About", "#", class: "text-base font-medium hover:text-primary transition-colors" %>
           <%= link_to "Contact", "#", class: "text-base font-medium hover:text-primary transition-colors" %>
 
-          <!-- Auth links inline when not signed in -->
+          <!-- Push content to the right -->
+          <div class="flex-grow"></div>
+
+          <!-- Auth links at far right when not signed in -->
           <% unless user_signed_in? %>
             <%= link_to "Sign In", new_user_session_path, class: "text-base font-medium hover:text-primary transition-colors" %>
             <%= link_to "Sign Up", new_user_registration_path, class: "btn btn-primary btn-sm" %>
           <% end %>
-
-          <!-- Push content to the right -->
-          <div class="flex-grow"></div>
 
           <!-- User menu and List Property button when signed in -->
           <% if user_signed_in? %>
