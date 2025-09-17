@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :booking do
     association :listing
     association :tenant, factory: :user
+    association :landlord, factory: :user
     check_in_date { 1.week.from_now }
     check_out_date { 2.weeks.from_now }
     status { 'pending' }

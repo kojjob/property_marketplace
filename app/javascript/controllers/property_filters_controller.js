@@ -15,6 +15,8 @@ export default class extends Controller {
     listingTypeRadios.forEach(radio => {
       radio.addEventListener('change', () => {
         this.updatePriceRanges()
+        // Submit form when listing type changes to filter properties
+        this.formTarget.requestSubmit()
       })
     })
   }
