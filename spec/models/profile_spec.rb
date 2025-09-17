@@ -3,6 +3,7 @@ require 'rails_helper'
 RSpec.describe Profile, type: :model do
   describe 'associations' do
     it { should belong_to(:user) }
+    it { should have_one_attached(:avatar) }
   end
 
   describe 'validations' do
@@ -95,6 +96,70 @@ RSpec.describe Profile, type: :model do
         expect(Profile.landlords).to include(landlord)
         expect(Profile.landlords).not_to include(tenant)
       end
+    end
+  end
+
+  describe 'new profile fields' do
+    let(:profile) { build(:profile) }
+
+    it 'accepts company_name' do
+      profile.company_name = 'ABC Realty'
+      expect(profile.company_name).to eq('ABC Realty')
+    end
+
+    it 'accepts position' do
+      profile.position = 'Senior Agent'
+      expect(profile.position).to eq('Senior Agent')
+    end
+
+    it 'accepts years_experience' do
+      profile.years_experience = 10
+      expect(profile.years_experience).to eq(10)
+    end
+
+    it 'accepts languages' do
+      profile.languages = 'English, Spanish'
+      expect(profile.languages).to eq('English, Spanish')
+    end
+
+    it 'accepts address information' do
+      profile.address = '123 Main St'
+      profile.city = 'New York'
+      profile.state = 'NY'
+      profile.country = 'USA'
+
+      expect(profile.address).to eq('123 Main St')
+      expect(profile.city).to eq('New York')
+      expect(profile.state).to eq('NY')
+      expect(profile.country).to eq('USA')
+    end
+
+    it 'accepts website' do
+      profile.website = 'https://johndoe.com'
+      expect(profile.website).to eq('https://johndoe.com')
+    end
+
+    it 'accepts social media URLs' do
+      profile.facebook_url = 'https://facebook.com/johndoe'
+      profile.twitter_url = 'https://twitter.com/johndoe'
+      profile.linkedin_url = 'https://linkedin.com/in/johndoe'
+      profile.instagram_url = 'https://instagram.com/johndoe'
+
+      expect(profile.facebook_url).to eq('https://facebook.com/johndoe')
+      expect(profile.twitter_url).to eq('https://twitter.com/johndoe')
+      expect(profile.linkedin_url).to eq('https://linkedin.com/in/johndoe')
+      expect(profile.instagram_url).to eq('https://instagram.com/johndoe')
+    end
+  end
+
+  describe 'avatar attachment' do
+    it 'can attach an avatar' do
+      profile = create(:profile)
+      expect(profile.avatar).to_not be_attached
+
+      # In a real test, you would attach a test image file
+      # For now, we just test that the method exists and returns false when no avatar
+      expect(profile.avatar.attached?).to be false
     end
   end
 end

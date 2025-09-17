@@ -1,5 +1,6 @@
 class Profile < ApplicationRecord
   belongs_to :user
+  has_one_attached :avatar
 
   # Enums
   enum :role, { tenant: 0, landlord: 1, agent: 2, admin: 3 }

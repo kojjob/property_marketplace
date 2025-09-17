@@ -10,6 +10,14 @@ Rails.application.routes.draw do
   end
 
   resources :favorites, only: [:index]
+  resources :profiles, only: [:show, :edit, :update]
+
+  # Contact page
+  get "contact", to: "contact#index"
+  post "contact", to: "contact#create"
+
+  # About page
+  get "about", to: "about#index"
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

@@ -139,8 +139,8 @@
           <!-- Houzez-Style Property Card -->
           <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100">
             <div class="relative overflow-hidden">
-              <% if property.property_images.any? %>
-                <%= image_tag property.property_images.first.image_url,
+              <% if property.images.any? %>
+                <%= image_tag property.images.first,
                     class: "w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" %>
               <% else %>
                 <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&h=400&fit=crop"

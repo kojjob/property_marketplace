@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_17_010148) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_17_034117) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -70,6 +70,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_17_010148) do
     t.index ["payment_status"], name: "index_bookings_on_payment_status"
     t.index ["status"], name: "index_bookings_on_status"
     t.index ["tenant_id"], name: "index_bookings_on_tenant_id"
+  end
+
+  create_table "contact_messages", force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.string "phone"
+    t.string "subject"
+    t.text "message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "conversations", force: :cascade do |t|
@@ -203,6 +213,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_17_010148) do
     t.integer "verification_status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "company_name"
+    t.string "position"
+    t.integer "years_experience"
+    t.string "languages"
+    t.string "address"
+    t.string "city"
+    t.string "state"
+    t.string "country"
+    t.string "website"
+    t.string "facebook_url"
+    t.string "twitter_url"
+    t.string "linkedin_url"
+    t.string "instagram_url"
     t.index ["role"], name: "index_profiles_on_role"
     t.index ["user_id"], name: "index_profiles_on_user_id", unique: true
     t.index ["verification_status"], name: "index_profiles_on_verification_status"
@@ -219,8 +242,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_17_010148) do
     t.integer "square_feet"
     t.string "address"
     t.string "city"
-    t.string "state"
-    t.string "zip_code"
+    t.string "region"
+    t.string "postal_code"
     t.decimal "latitude"
     t.decimal "longitude"
     t.string "status"
@@ -228,6 +251,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_17_010148) do
     t.datetime "updated_at", null: false
     t.boolean "featured", default: false
     t.string "listing_type", default: "sale"
+    t.string "country"
+    t.text "formatted_address"
+    t.index ["country"], name: "index_properties_on_country"
     t.index ["user_id"], name: "index_properties_on_user_id"
   end
 
