@@ -10,8 +10,8 @@ FactoryBot.define do
     square_feet { Faker::Number.between(from: 500, to: 5000) }
     address { Faker::Address.street_address }
     city { Faker::Address.city }
-    state { Faker::Address.state_abbr }
-    zip_code { Faker::Address.zip_code }
+    region { Faker::Address.state_abbr }
+    postal_code { Faker::Address.zip_code }
     status { 'active' }
     latitude { Faker::Address.latitude }
     longitude { Faker::Address.longitude }

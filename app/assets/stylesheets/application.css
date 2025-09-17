@@ -8,3 +8,115 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+/* Drag and Drop Image Gallery Styles */
+.drag-over {
+  border-color: #3b82f6 !important;
+  background-color: #dbeafe !important;
+  transform: scale(1.02);
+  transition: all 0.2s ease-in-out;
+}
+
+.image-item {
+  transition: all 0.3s ease;
+  cursor: move;
+}
+
+.image-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.sortable-ghost {
+  opacity: 0.4;
+  transform: rotate(2deg);
+}
+
+.sortable-chosen {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+.sortable-drag {
+  transform: rotate(5deg);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.remove-image {
+  transition: all 0.2s ease;
+}
+
+.remove-image:hover {
+  transform: scale(1.1);
+  background-color: #ef4444;
+}
+
+.primary-indicator {
+  transition: all 0.2s ease;
+  font-weight: 600;
+}
+
+.alert {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.image-gallery {
+  min-height: 200px;
+}
+
+.image-preview {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.image-preview img {
+  transition: transform 0.3s ease;
+}
+
+.image-preview:hover img {
+  transform: scale(1.05);
+}
+
+.file-input-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(59, 130, 246, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.file-input-overlay:hover {
+  opacity: 1;
+}
+
+.progress-indicator {
+  background: linear-gradient(90deg, #3b82f6 0%, #1d4ed8 100%);
+  height: 4px;
+  border-radius: 2px;
+  animation: progress 0.5s ease-in-out;
+}
+
+@keyframes progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}

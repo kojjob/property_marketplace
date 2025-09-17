@@ -126,6 +126,138 @@
       </div>
     </div>
 
+    <!-- Image Gallery -->
+    <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:p-6" data-controller="image-gallery" data-image-gallery-max-files-value="10">
+      <div class="md:grid md:grid-cols-3 md:gap-6">
+        <div class="md:col-span-1">
+          <h3 class="text-lg font-medium leading-6 text-gray-900">Property Images</h3>
+          <p class="mt-1 text-sm text-gray-600">Upload up to 10 high-quality images. The first image will be the primary image shown in listings. Drag and drop to reorder.</p>
+        </div>
+        <div class="mt-5 md:col-span-2 md:mt-0">
+          <!-- Drag and Drop Zone -->
+          <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors" data-image-gallery-target="dropZone">
+            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+              <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div class="mt-4">
+              <label for="file-upload" class="cursor-pointer">
+                <span class="mt-2 block text-sm font-medium text-gray-900">
+                  Drag and drop images here, or
+                  <span class="text-blue-600 hover:text-blue-500">browse to upload</span>
+                </span>
+                <input id="file-upload" name="file-upload" type="file" class="sr-only" multiple accept="image/*" data-image-gallery-target="fileInput">
+              </label>
+              <p class="mt-2 text-xs text-gray-500">PNG, JPG, GIF up to 10MB each</p>
+            </div>
+          </div>
+
+          <!-- Image Gallery Grid -->
+          <div class="mt-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" data-image-gallery-target="gallery">
+              <!-- Existing images will be displayed here -->
+              <% property.property_images.ordered.each_with_index do |image, index| %>
+                <div class="relative group image-item" data-position="<%= index %>" data-image-id="<%= image.id %>">
+                  <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+                    <% if image.image.attached? %>
+                      <%= image_tag image.image.variant(resize_to_limit: [300, 300]),
+                                    class: "w-full h-full object-cover",
+                                    alt: image.caption || "Property image #{index + 1}" %>
+                    <% else %>
+                      <div class="w-full h-full flex items-center justify-center text-gray-400">
+                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clip-rule="evenodd" />
+                        </svg>
+                      </div>
+                    <% end %>
+                  </div>
+
+                  <!-- Image Controls -->
+                  <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center">
+                    <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-2">
+                      <!-- Remove Button -->
+                      <button type="button" class="remove-image bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                      <!-- Drag Handle -->
+                      <button type="button" class="bg-gray-600 text-white p-2 rounded-full hover:bg-gray-700 transition-colors cursor-grab" draggable="true">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Primary Indicator -->
+                  <div class="absolute top-2 left-2">
+                    <span class="primary-indicator inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white shadow-sm <%= index == 0 ? 'text-green-600' : 'text-gray-400' %>">
+                      <%= index == 0 ? 'Primary' : "##{index + 1}" %>
+                    </span>
+                  </div>
+
+                  <!-- Caption Input -->
+                  <div class="mt-2">
+                    <%= form.fields_for :property_images, image do |image_form| %>
+                      <%= image_form.hidden_field :id if image.persisted? %>
+                      <%= image_form.hidden_field :position, value: index %>
+                      <%= image_form.text_field :caption,
+                                               placeholder: "Image caption...",
+                                               class: "image-caption w-full text-xs border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500" %>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+
+          <!-- Hidden input for image reordering -->
+          <input type="hidden" name="image_order" data-image-gallery-target="reorderInput">
+        </div>
+      </div>
+    </div>
+
+    <!-- Image Template (hidden) -->
+    <template data-image-gallery-target="imageTemplate">
+      <div class="relative group image-item">
+        <div class="aspect-square bg-gray-100 rounded-lg overflow-hidden">
+          <img class="w-full h-full object-cover" src="" alt="">
+        </div>
+
+        <!-- Image Controls -->
+        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 rounded-lg flex items-center justify-center">
+          <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-2">
+            <!-- Remove Button -->
+            <button type="button" class="remove-image bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <!-- Drag Handle -->
+            <button type="button" class="bg-gray-600 text-white p-2 rounded-full hover:bg-gray-700 transition-colors cursor-grab" draggable="true">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Primary Indicator -->
+        <div class="absolute top-2 left-2">
+          <span class="primary-indicator inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-white shadow-sm text-gray-400">
+            #1
+          </span>
+        </div>
+
+        <!-- Caption Input -->
+        <div class="mt-2">
+          <input type="text" class="image-caption w-full text-xs border-gray-300 rounded-md focus:border-blue-500 focus:ring-blue-500" placeholder="Image caption...">
+          <input type="file" class="hidden" name="property[property_images_attributes][][image]">
+          <input type="hidden" name="property[property_images_attributes][][position]" value="0">
+        </div>
+      </div>
+    </template>
+
     <div class="flex justify-end space-x-3">
       <%= link_to "Cancel", properties_path, class: "rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" %>
       <%= form.submit class: "inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" %>

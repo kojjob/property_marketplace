@@ -5,6 +5,14 @@ class Property < ApplicationRecord
   has_many :property_images, dependent: :destroy
   has_many :favorites, dependent: :destroy
 
+  # Accept nested attributes for images
+  accepts_nested_attributes_for :property_images, allow_destroy: true, reject_if: :all_blank
+
+  # Helper method to get the primary image
+  def primary_image
+    property_images.primary.first
+  end
+
   PROPERTY_TYPES = ['House', 'Apartment', 'Condo', 'Townhouse', 'Land', 'Commercial'].freeze
   STATUSES = ['active', 'pending', 'sold', 'rented'].freeze
 
@@ -15,7 +23,7 @@ class Property < ApplicationRecord
                     description: 'B',
                     address: 'C',
                     city: 'C',
-                    state: 'D'
+                    region: 'D'
                   },
                   using: {
                     tsearch: {
@@ -33,8 +41,8 @@ class Property < ApplicationRecord
   validates :square_feet, numericality: { greater_than: 0 }, allow_nil: true
   validates :address, presence: true
   validates :city, presence: true
-  validates :state, presence: true
-  validates :zip_code, presence: true
+  validates :region, presence: true
+  validates :postal_code, presence: true
   validates :status, inclusion: { in: STATUSES }
 
   scope :active, -> { where(status: 'active') }
