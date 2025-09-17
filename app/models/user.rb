@@ -77,8 +77,13 @@ class User < ApplicationRecord
   def can_message?(other_user)
     return false if other_user == self
     return false unless other_user.is_a?(User)
-    # Add additional business logic here (e.g., verification requirements)
-    true
+
+    # Check if the recipient accepts messages
+    other_profile = other_user.profile
+    return false unless other_profile
+
+    # Check messaging preferences
+    other_profile.can_receive_message_from?(self)
   end
 
   private

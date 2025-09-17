@@ -37,7 +37,19 @@ class ConversationsController < ApplicationController
     end
 
     unless current_user.can_message?(@recipient)
-      redirect_to conversations_path, alert: "You cannot message this user."
+      # Provide more specific error messages
+      recipient_profile = @recipient.profile
+      if recipient_profile && !recipient_profile.allow_messages
+        alert_message = "This user has disabled messaging."
+      elsif recipient_profile && recipient_profile.messaging_availability_verified_only? && !current_user.profile&.verified?
+        alert_message = "You need to be verified to message this user."
+      elsif recipient_profile && recipient_profile.messaging_availability_connections_only?
+        alert_message = "This user only accepts messages from existing connections."
+      else
+        alert_message = "You cannot message this user."
+      end
+
+      redirect_to request.referer || root_path, alert: alert_message
       return
     end
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_17_101646) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_17_222306) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -228,6 +228,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_17_101646) do
     t.string "twitter_url"
     t.string "linkedin_url"
     t.string "instagram_url"
+    t.boolean "allow_messages", default: true, null: false
+    t.string "messaging_availability", default: "everyone"
+    t.index ["allow_messages"], name: "index_profiles_on_allow_messages"
     t.index ["role"], name: "index_profiles_on_role"
     t.index ["user_id"], name: "index_profiles_on_user_id", unique: true
     t.index ["verification_status"], name: "index_profiles_on_verification_status"

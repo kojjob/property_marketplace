@@ -45,7 +45,8 @@ class ProfilesController < ApplicationController
       :first_name, :last_name, :phone_number, :bio, :company_name,
       :position, :years_experience, :languages, :address, :city,
       :state, :country, :website, :facebook_url, :twitter_url,
-      :linkedin_url, :instagram_url, :avatar
+      :linkedin_url, :instagram_url, :avatar,
+      :allow_messages, :messaging_availability
     )
   end
 end
