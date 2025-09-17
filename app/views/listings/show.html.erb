@@ -273,8 +273,8 @@
 
             <!-- Owner Profile -->
             <div class="text-center mb-6">
-              <% if @listing.user.avatar.attached? %>
-                <%= image_tag @listing.user.avatar, class: "w-20 h-20 rounded-full mx-auto mb-3 object-cover" %>
+              <% if @listing.user.profile&.avatar&.attached? %>
+                <%= image_tag @listing.user.profile.avatar, class: "w-20 h-20 rounded-full mx-auto mb-3 object-cover" %>
               <% else %>
                 <div class="w-20 h-20 bg-blue-600 rounded-full mx-auto mb-3 flex items-center justify-center">
                   <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
