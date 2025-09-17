@@ -1,8 +1,61 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900">List a New Property</h1>
-    <p class="mt-2 text-sm text-gray-700">Fill in the details below to list your property in the marketplace.</p>
-  </div>
+<!-- Houzez-Inspired Property Listing Page -->
+<div class="min-h-screen bg-gray-50">
+  <!-- Hero Header -->
+  <section class="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-16">
+    <div class="container mx-auto px-4">
+      <div class="max-w-4xl mx-auto text-center">
+        <h1 class="text-5xl font-bold mb-6">List Your Property</h1>
+        <p class="text-xl text-blue-100 mb-8">Join thousands of property owners who trust our platform to showcase their properties to qualified buyers and renters</p>
+        <div class="flex justify-center items-center space-x-8 text-blue-100">
+          <div class="flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>Free to List</span>
+          </div>
+          <div class="flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            </svg>
+            <span>Quick Approval</span>
+          </div>
+          <div class="flex items-center">
+            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+            <span>Maximum Exposure</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <%= render 'form', property: @property %>
+  <!-- Main Form Section -->
+  <section class="py-16">
+    <div class="container mx-auto px-4">
+      <div class="max-w-5xl mx-auto">
+        <!-- Progress Steps -->
+        <div class="mb-12">
+          <div class="flex items-center justify-center space-x-8">
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold">1</div>
+              <span class="ml-3 text-blue-600 font-semibold">Property Details</span>
+            </div>
+            <div class="flex-1 h-px bg-gray-300"></div>
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center font-semibold">2</div>
+              <span class="ml-3 text-gray-600">Photos & Media</span>
+            </div>
+            <div class="flex-1 h-px bg-gray-300"></div>
+            <div class="flex items-center">
+              <div class="w-10 h-10 bg-gray-300 text-gray-600 rounded-full flex items-center justify-center font-semibold">3</div>
+              <span class="ml-3 text-gray-600">Review & Publish</span>
+            </div>
+          </div>
+        </div>
+
+        <%= render 'form', property: @property %>
+      </div>
+    </div>
+  </section>
 </div>

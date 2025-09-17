@@ -5,6 +5,7 @@ RSpec.describe Property, type: :model do
     it { should belong_to(:user) }
     it { should have_many(:property_images).dependent(:destroy) }
     it { should have_many(:favorites).dependent(:destroy) }
+    it { should have_many_attached(:images) }
   end
 
   describe 'validations' do
@@ -112,6 +113,41 @@ RSpec.describe Property, type: :model do
       create(:favorite, property: property)
 
       expect { property.destroy }.to change { Favorite.count }.by(-1)
+    end
+  end
+
+  describe 'image attachments' do
+    let(:property) { create(:property) }
+    let(:image_file) { fixture_file_upload('spec/fixtures/test_image.jpg', 'image/jpeg') }
+
+    it 'can attach multiple images' do
+      property.images.attach(image_file)
+      expect(property.images.count).to eq(1)
+      expect(property.images.first.content_type).to eq('image/jpeg')
+    end
+
+    it 'can attach multiple images at once' do
+      image1 = fixture_file_upload('spec/fixtures/test_image.jpg', 'image/jpeg')
+      image2 = fixture_file_upload('spec/fixtures/test_image2.jpg', 'image/jpeg')
+
+      property.images.attach([image1, image2])
+      expect(property.images.count).to eq(2)
+    end
+
+    it 'destroys attached images when property is destroyed' do
+      property.images.attach(image_file)
+      expect(property.images.count).to eq(1)
+
+      property.destroy
+      expect(ActiveStorage::Attachment.count).to eq(0)
+    end
+
+    it 'validates image content type' do
+      text_file = fixture_file_upload('spec/fixtures/test_file.txt', 'text/plain')
+
+      property.images.attach(text_file)
+      expect(property).not_to be_valid
+      expect(property.errors[:images]).to include('must be a valid image format (JPEG, PNG, GIF)')
     end
   end
 end

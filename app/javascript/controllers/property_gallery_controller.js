@@ -2,24 +2,24 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="property-gallery"
 export default class extends Controller {
-  static targets = ["carousel", "counter", "thumbnail"]
+  static targets = ["slide", "counter", "thumbnail", "prevBtn", "nextBtn"]
   static values = { currentSlide: Number }
 
   connect() {
-    this.currentSlideValue = 1
+    this.currentSlideValue = 0
+    this.totalSlides = this.slideTargets.length
     this.setupCarousel()
     this.setupThumbnails()
     this.setupKeyboardNavigation()
-    console.log("Property gallery controller connected")
+    this.setupTouchNavigation()
+    console.log("Property gallery controller connected", this.totalSlides, "slides")
   }
 
   setupCarousel() {
-    if (!this.hasCarouselTarget) return
+    if (this.totalSlides === 0) return
 
-    // Set up intersection observer to track current slide
-    this.setupSlideObserver()
-
-    // Auto-update counter
+    // Initialize first slide
+    this.showSlide(0)
     this.updateCounter()
   }
 
@@ -29,7 +29,7 @@ export default class extends Controller {
     this.thumbnailTargets.forEach((thumbnail, index) => {
       thumbnail.addEventListener('click', (event) => {
         event.preventDefault()
-        this.goToSlide(index + 1)
+        this.showSlide(index)
         this.updateThumbnailSelection(index)
       })
     })
@@ -48,52 +48,51 @@ export default class extends Controller {
     })
   }
 
-  setupSlideObserver() {
-    if (!window.IntersectionObserver) return
+  showSlide(index) {
+    if (index < 0 || index >= this.totalSlides) return
 
-    const slides = this.carouselTarget.querySelectorAll('.carousel-item')
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const slideId = entry.target.id
-          const slideNumber = parseInt(slideId.replace('slide', ''))
-          this.currentSlideValue = slideNumber
-          this.updateCounter()
-          this.updateThumbnailSelection(slideNumber - 1)
-        }
-      })
-    }, {
-      threshold: 0.5
+    // Hide all slides
+    this.slideTargets.forEach((slide, i) => {
+      if (i === index) {
+        slide.classList.remove('opacity-0')
+        slide.classList.add('opacity-100')
+      } else {
+        slide.classList.remove('opacity-100')
+        slide.classList.add('opacity-0')
+      }
     })
 
-    slides.forEach(slide => observer.observe(slide))
+    this.currentSlideValue = index
+    this.updateCounter()
+    this.updateThumbnailSelection(index)
   }
 
-  goToSlide(slideNumber) {
-    const targetSlide = document.getElementById(`slide${slideNumber}`)
-    if (targetSlide) {
-      targetSlide.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-      this.currentSlideValue = slideNumber
-      this.updateCounter()
-    }
+  showImage(event) {
+    const index = parseInt(event.currentTarget.dataset.index)
+    this.showSlide(index)
+  }
+
+  nextImage() {
+    const nextIndex = this.currentSlideValue >= this.totalSlides - 1 ? 0 : this.currentSlideValue + 1
+    this.showSlide(nextIndex)
+  }
+
+  previousImage() {
+    const prevIndex = this.currentSlideValue <= 0 ? this.totalSlides - 1 : this.currentSlideValue - 1
+    this.showSlide(prevIndex)
   }
 
   nextSlide() {
-    const totalSlides = this.carouselTarget.querySelectorAll('.carousel-item').length
-    const nextSlide = this.currentSlideValue >= totalSlides ? 1 : this.currentSlideValue + 1
-    this.goToSlide(nextSlide)
+    this.nextImage()
   }
 
   previousSlide() {
-    const totalSlides = this.carouselTarget.querySelectorAll('.carousel-item').length
-    const prevSlide = this.currentSlideValue <= 1 ? totalSlides : this.currentSlideValue - 1
-    this.goToSlide(prevSlide)
+    this.previousImage()
   }
 
   updateCounter() {
     if (this.hasCounterTarget) {
-      this.counterTarget.textContent = this.currentSlideValue
+      this.counterTarget.textContent = this.currentSlideValue + 1
     }
   }
 
@@ -102,11 +101,11 @@ export default class extends Controller {
 
     this.thumbnailTargets.forEach((thumbnail, index) => {
       if (index === activeIndex) {
-        thumbnail.classList.add('border-primary')
-        thumbnail.classList.remove('border-transparent')
+        thumbnail.classList.remove('border-gray-200')
+        thumbnail.classList.add('border-blue-500', 'ring-2', 'ring-blue-200')
       } else {
-        thumbnail.classList.remove('border-primary')
-        thumbnail.classList.add('border-transparent')
+        thumbnail.classList.remove('border-blue-500', 'ring-2', 'ring-blue-200')
+        thumbnail.classList.add('border-gray-200')
       }
     })
   }
@@ -116,12 +115,12 @@ export default class extends Controller {
     let startX = null
     let startY = null
 
-    this.carouselTarget.addEventListener('touchstart', (event) => {
+    this.element.addEventListener('touchstart', (event) => {
       startX = event.touches[0].clientX
       startY = event.touches[0].clientY
     })
 
-    this.carouselTarget.addEventListener('touchend', (event) => {
+    this.element.addEventListener('touchend', (event) => {
       if (!startX || !startY) return
 
       const endX = event.changedTouches[0].clientX
@@ -134,10 +133,10 @@ export default class extends Controller {
       if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
         if (diffX > 0) {
           // Swiped left - go to next slide
-          this.nextSlide()
+          this.nextImage()
         } else {
           // Swiped right - go to previous slide
-          this.previousSlide()
+          this.previousImage()
         }
       }
 
@@ -146,10 +145,29 @@ export default class extends Controller {
     })
   }
 
-  // Fullscreen gallery (future enhancement)
-  openFullscreen() {
-    // Implementation for fullscreen gallery modal
-    console.log("Opening fullscreen gallery")
+  // Fullscreen toggle
+  toggleFullscreen() {
+    console.log("Toggling fullscreen gallery")
+    // For now, just open a modal with the current image
+    this.openImageModal()
+  }
+
+  openImageModal() {
+    // Create a simple modal overlay for fullscreen view
+    const modal = document.createElement('div')
+    modal.className = 'fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4'
+    modal.addEventListener('click', () => modal.remove())
+
+    const currentSlide = this.slideTargets[this.currentSlideValue]
+    const img = currentSlide.querySelector('img')
+
+    if (img) {
+      const modalImg = img.cloneNode()
+      modalImg.className = 'max-w-full max-h-full object-contain'
+      modal.appendChild(modalImg)
+    }
+
+    document.body.appendChild(modal)
   }
 
   // Auto-play functionality (future enhancement)

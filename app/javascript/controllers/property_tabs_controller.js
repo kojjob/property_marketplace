@@ -34,9 +34,11 @@ export default class extends Controller {
     this.tabTargets.forEach(tab => {
       const tabName = tab.dataset.tab
       if (tabName === this.activeTabValue) {
-        tab.classList.add('tab-active')
+        // Active tab styling
+        tab.className = "px-4 py-2 rounded-lg font-medium transition-all duration-200 bg-blue-600 text-white shadow-md"
       } else {
-        tab.classList.remove('tab-active')
+        // Inactive tab styling
+        tab.className = "px-4 py-2 rounded-lg font-medium transition-all duration-200 text-gray-600 hover:bg-blue-50 hover:text-blue-600"
       }
     })
 

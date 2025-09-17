@@ -134,6 +134,28 @@ RSpec.describe PropertiesController, type: :controller do
           post :create, params: { property: valid_attributes }
           expect(response).to redirect_to(Property.last)
         end
+
+        context 'with image uploads' do
+          let(:image_file) { fixture_file_upload('spec/fixtures/test_image.jpg', 'image/jpeg') }
+          let(:attributes_with_images) { valid_attributes.merge(images: [image_file]) }
+
+          it 'creates property with attached images' do
+            post :create, params: { property: attributes_with_images }
+            property = Property.last
+            expect(property.images.count).to eq(1)
+            expect(property.images.first.content_type).to eq('image/jpeg')
+          end
+
+          it 'handles multiple image uploads' do
+            image1 = fixture_file_upload('spec/fixtures/test_image.jpg', 'image/jpeg')
+            image2 = fixture_file_upload('spec/fixtures/test_image2.jpg', 'image/jpeg')
+            attributes_with_multiple_images = valid_attributes.merge(images: [image1, image2])
+
+            post :create, params: { property: attributes_with_multiple_images }
+            property = Property.last
+            expect(property.images.count).to eq(2)
+          end
+        end
       end
 
       context 'with invalid params' do

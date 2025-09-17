@@ -17,6 +17,9 @@ class User < ApplicationRecord
   has_many :received_reviews, as: :reviewable, class_name: 'Review', dependent: :destroy
   has_many :verifications, dependent: :destroy
 
+  # Callbacks
+  after_create :create_profile
+
   # Verification helper methods
   def identity_verified?
     verifications.where(verification_type: 'identity', status: 'approved').exists?
@@ -44,5 +47,16 @@ class User < ApplicationRecord
 
   def fully_verified?
     identity_verified? && email_verified? && phone_verified?
+  end
+
+  # Get or create profile
+  def profile_or_build
+    profile || build_profile
+  end
+
+  private
+
+  def create_profile
+    build_profile(first_name: email.split('@').first.capitalize) unless profile.present?
   end
 end
