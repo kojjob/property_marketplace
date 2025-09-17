@@ -47,7 +47,14 @@
               <div class="carousel-inner h-96 relative">
                 <% @listing.property.images.each_with_index do |image, index| %>
                   <div class="absolute inset-0 transition-opacity duration-500 <%= index == 0 ? 'opacity-100' : 'opacity-0' %>" data-carousel-target="slide">
-                    <%= image_tag image, class: "w-full h-full object-cover" %>
+                    <%= image_tag image,
+                        class: "w-full h-full object-cover",
+                        width: 800,
+                        height: 400,
+                        loading: index == 0 ? "eager" : "lazy",
+                        sizes: "(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw",
+                        alt: "#{@listing.title} - Image #{index + 1}",
+                        decoding: "async" %>
                   </div>
                 <% end %>
               </div>
@@ -242,7 +249,13 @@
                 <div class="group">
                   <div class="bg-gray-50 rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
                     <% if listing.property.images.attached? %>
-                      <%= image_tag listing.property.images.first, class: "w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300" %>
+                      <%= image_tag listing.property.images.first,
+                          class: "w-full h-40 object-cover group-hover:scale-105 transition-transform duration-300",
+                          width: 300,
+                          height: 160,
+                          loading: "lazy",
+                          alt: "#{listing.title} preview",
+                          decoding: "async" %>
                     <% else %>
                       <div class="w-full h-40 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                         <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

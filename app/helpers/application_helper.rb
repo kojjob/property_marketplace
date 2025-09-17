@@ -5,7 +5,7 @@ module ApplicationHelper
     # Only allow http and https protocols
     begin
       uri = URI.parse(url)
-      return url if ['http', 'https'].include?(uri.scheme)
+      return url if [ "http", "https" ].include?(uri.scheme)
     rescue URI::InvalidURIError
       return nil
     end
