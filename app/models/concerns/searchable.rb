@@ -89,9 +89,12 @@ module Searchable
       # Sorting
       results = apply_sorting(results, params[:sort_by] || params[:sort])
 
-      # Pagination
+      # Pagination (manual implementation without Kaminari)
       if params[:page].present?
-        results = results.page(params[:page]).per(params[:per_page] || 20)
+        page = params[:page].to_i
+        per_page = (params[:per_page] || 20).to_i
+        offset = (page - 1) * per_page
+        results = results.limit(per_page).offset(offset)
       end
 
       results

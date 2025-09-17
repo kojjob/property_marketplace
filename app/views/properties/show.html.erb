@@ -45,7 +45,7 @@
             <% else %>
               <%= button_to "Add to Favorites", favorite_property_path(@property), method: :post, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
             <% end %>
-            <%= link_to "Contact Seller", "mailto:#{@property.user.email_address}?subject=Inquiry about #{@property.title}", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
+            <%= link_to "Contact Seller", "mailto:#{@property.user.email}?subject=Inquiry about #{@property.title}", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
           <% end %>
         <% else %>
           <%= link_to "Sign in to contact seller", new_user_session_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
@@ -111,7 +111,7 @@
             Listed by
           </dt>
           <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-            <%= @property.user.email_address %><br>
+            <%= @property.user.email %><br>
             <span class="text-gray-500">Listed <%= time_ago_in_words(@property.created_at) %> ago</span>
           </dd>
         </div>
