@@ -1,5 +1,4 @@
 class MessagesController < ApplicationController
-  before_action :authenticate_user!
   before_action :set_conversation, only: [ :index, :create ]
   before_action :set_message, only: [ :show, :update, :destroy ]
 

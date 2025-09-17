@@ -75,6 +75,14 @@ RSpec.configure do |config|
     @request.env["devise.mapping"] = Devise.mappings[:user] if @request
   end
 
+  config.before(:each, type: :request) do
+    Warden.test_mode!
+  end
+
+  config.after(:each, type: :request) do
+    Warden.test_reset!
+  end
+
   # Database Cleaner configuration
   config.before(:suite) do
     DatabaseCleaner.clean_with(:truncation)

@@ -25,7 +25,6 @@ Rails.application.routes.draw do
   resources :conversations do
     resources :messages, shallow: true
   end
-  resources :messages, only: [ :index, :show, :update, :destroy ]
 
   # Contact page
   get "contact", to: "contact#index"
