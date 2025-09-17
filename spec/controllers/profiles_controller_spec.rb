@@ -252,7 +252,7 @@ RSpec.describe ProfilesController, type: :controller do
         permitted_params = controller.send(:profile_params)
 
         expect(permitted_params.keys).to include(
-          'first_name', 'last_name', 'phone_number', 'bio', 'role',
+          'first_name', 'last_name', 'phone_number', 'bio',
           'company_name', 'position', 'years_experience', 'languages',
           'address', 'city', 'state', 'country', 'website',
           'facebook_url', 'twitter_url', 'linkedin_url', 'instagram_url',

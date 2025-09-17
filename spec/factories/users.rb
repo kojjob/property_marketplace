@@ -4,6 +4,7 @@ FactoryBot.define do
     password { 'password123' }
     password_confirmation { 'password123' }
     confirmed_at { Time.current } # Auto-confirm for tests
+    role { 'user' } # Default role to prevent Devise mapping issues
 
     trait :unconfirmed do
       confirmed_at { nil }
