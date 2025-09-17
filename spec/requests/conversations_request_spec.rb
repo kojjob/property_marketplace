@@ -7,10 +7,9 @@ RSpec.describe "Conversations", type: :request do
   let!(:conversation1) { create(:conversation, participant1: user, participant2: other_user) }
   let!(:conversation2) { create(:conversation, participant1: user, participant2: third_user) }
 
-  # Temporarily skip authentication for testing core functionality
+  # Sign in user for testing core functionality
   before do
-    allow_any_instance_of(ApplicationController).to receive(:authenticate_user!)
-    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+    sign_in user
   end
 
   describe "GET /conversations" do

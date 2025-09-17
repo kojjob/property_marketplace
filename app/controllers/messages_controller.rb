@@ -53,7 +53,16 @@ class MessagesController < ApplicationController
           flash[:notice] = "Message sent successfully."
           redirect_to conversation_path(@conversation)
         end
-        format.json { render json: @message, status: :created }
+        format.json {
+          render json: {
+            success: true,
+            message: {
+              id: @message.id,
+              content: @message.content,
+              created_at: @message.created_at.iso8601
+            }
+          }, status: :created
+        }
       end
     else
       respond_to do |format|

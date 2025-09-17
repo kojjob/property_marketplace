@@ -111,16 +111,15 @@ export default class extends Controller {
   }
 
   handleNewMessage(data) {
-    // Don't show messages from current user (they're already displayed)
-    if (data.message.sender_id === this.currentUserIdValue) {
-      return
-    }
-
-    // Insert the new message HTML
+    // Insert the new message HTML for all messages
     if (data.html) {
       this.messagesContainerTarget.insertAdjacentHTML('beforeend', data.html)
       this.scrollToBottom()
-      this.markMessagesAsRead()
+
+      // Only mark as read if it's not from current user
+      if (data.message.sender_id !== this.currentUserIdValue) {
+        this.markMessagesAsRead()
+      }
     }
 
     // Hide typing indicator since user sent message
@@ -189,13 +188,22 @@ export default class extends Controller {
 
     this.disableForm()
 
+    // Store message content for immediate display
+    const messageContent = content
+
+    // Clear the form immediately for better UX
+    this.messageInputTarget.value = ''
+    this.adjustTextareaHeight()
+
     // Send via ActionCable for real-time delivery
     if (this.subscription) {
-      this.subscription.speak(content)
+      this.subscription.speak(messageContent)
     }
 
     // Also submit the form for persistence and fallback
     const formData = new FormData(this.messageFormTarget)
+    // Re-add content since we cleared the input
+    formData.set('message[content]', messageContent)
 
     fetch(this.messageFormTarget.action, {
       method: 'POST',
@@ -205,19 +213,36 @@ export default class extends Controller {
         'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
       }
     })
-    .then(response => response.json())
+    .then(response => {
+      if (response.ok) {
+        return response.json()
+      } else {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+    })
     .then(data => {
       if (data.errors) {
-        this.handleMessageError(data)
-      } else {
-        // Clear the form
-        this.messageInputTarget.value = ''
+        // If there's an error, restore the message content
+        this.messageInputTarget.value = messageContent
         this.adjustTextareaHeight()
+        this.handleMessageError(data)
+      } else if (data.success) {
+        // Success - form is already cleared
+        this.enableForm()
+        console.log("Message sent successfully:", data.message)
+      } else {
+        // Unexpected response format
+        this.messageInputTarget.value = messageContent
+        this.adjustTextareaHeight()
+        console.error("Unexpected response:", data)
         this.enableForm()
       }
     })
     .catch(error => {
       console.error('Error sending message:', error)
+      // Restore the message content on error
+      this.messageInputTarget.value = messageContent
+      this.adjustTextareaHeight()
       alert('Failed to send message. Please try again.')
       this.enableForm()
     })
@@ -306,12 +331,14 @@ export default class extends Controller {
   disableForm() {
     this.sendButtonTarget.disabled = true
     this.sendButtonTarget.classList.add('opacity-50', 'cursor-not-allowed')
+    this.sendButtonTarget.textContent = 'Sending...'
     this.messageInputTarget.disabled = true
   }
 
   enableForm() {
     this.sendButtonTarget.disabled = false
     this.sendButtonTarget.classList.remove('opacity-50', 'cursor-not-allowed')
+    this.sendButtonTarget.textContent = 'Send'
     this.messageInputTarget.disabled = false
     this.messageInputTarget.focus()
   }

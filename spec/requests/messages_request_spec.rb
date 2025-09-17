@@ -7,10 +7,9 @@ RSpec.describe "Messages", type: :request do
   let!(:message1) { create(:message, conversation: conversation, sender: other_user, recipient: user) }
   let!(:message2) { create(:message, conversation: conversation, sender: user, recipient: other_user) }
 
-  # Temporarily skip authentication for testing core functionality
+  # Sign in user for testing core functionality
   before do
-    allow_any_instance_of(ApplicationController).to receive(:authenticate_user!)
-    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+    sign_in user
   end
 
   describe "GET /conversations/:conversation_id/messages" do
