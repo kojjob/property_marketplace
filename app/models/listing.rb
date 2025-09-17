@@ -87,8 +87,6 @@ class Listing < ApplicationRecord
     overlapping_bookings.empty?
   end
 
-  private
-
   def rental_listing?
     listing_type == "rent"
   end
