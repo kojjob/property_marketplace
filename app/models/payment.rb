@@ -43,7 +43,8 @@ class Payment < ApplicationRecord
     final_payment: 2,
     refund: 3,
     security_deposit: 4,
-    additional_fee: 5
+    additional_fee: 5,
+    subscription: 6
   }
 
   enum :payment_method, {

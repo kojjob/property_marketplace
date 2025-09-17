@@ -1,6 +1,7 @@
 class Booking < ApplicationRecord
   belongs_to :listing
   belongs_to :tenant, class_name: 'User', foreign_key: 'tenant_id'
+  belongs_to :landlord, class_name: 'User', foreign_key: 'landlord_id'
   has_many :payments, dependent: :destroy
 
   # Enums
@@ -19,6 +20,10 @@ class Booking < ApplicationRecord
   scope :current, -> { where('check_in_date <= ? AND check_out_date >= ?', Date.current, Date.current) }
 
   # Instance methods
+  def total_amount_cents
+    (total_amount * 100).to_i if total_amount
+  end
+
   def total_paid
     payments.successful.sum(:amount) - payments.successful.where(payment_type: 'refund').sum(:amount).abs
   end
