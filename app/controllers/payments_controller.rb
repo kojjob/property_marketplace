@@ -18,7 +18,7 @@ class PaymentsController < ApplicationController
     else
       @client_secret = create_payment_intent
       @error = result.error
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -31,7 +31,7 @@ class PaymentsController < ApplicationController
     if result.success?
       render json: { success: true, payment: result.data[:payment] }, status: :ok
     else
-      render json: { success: false, error: result.error }, status: :unprocessable_entity
+      render json: { success: false, error: result.error }, status: :unprocessable_content
     end
   end
 

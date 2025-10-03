@@ -14,7 +14,7 @@ class ContactController < ApplicationController
       redirect_to contact_path
     else
       flash.now[:alert] = "Please correct the errors below."
-      render :index, status: :unprocessable_entity
+      render :index, status: :unprocessable_content
     end
   end
 

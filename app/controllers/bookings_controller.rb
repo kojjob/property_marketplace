@@ -48,7 +48,7 @@ class BookingsController < ApplicationController
 
       redirect_to @booking, notice: "Booking request submitted successfully! You will receive a confirmation email shortly."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -59,7 +59,7 @@ class BookingsController < ApplicationController
     if @booking.update(booking_params)
       redirect_to @booking, notice: "Booking was successfully updated."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

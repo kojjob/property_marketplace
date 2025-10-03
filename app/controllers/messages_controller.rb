@@ -74,7 +74,7 @@ class MessagesController < ApplicationController
                                   .order(:created_at)
           render "conversations/show"
         end
-        format.json { render json: { errors: @message.errors }, status: :unprocessable_entity }
+        format.json { render json: { errors: @message.errors }, status: :unprocessable_content }
       end
     end
   end
@@ -113,7 +113,7 @@ class MessagesController < ApplicationController
             flash[:alert] = "Messages can only be edited within #{EDIT_TIME_LIMIT.inspect} of sending."
             redirect_to conversation_path(@message.conversation)
           end
-          format.json { render json: { error: "Edit time limit exceeded" }, status: :unprocessable_entity }
+          format.json { render json: { error: "Edit time limit exceeded" }, status: :unprocessable_content }
         end
         return
       end
@@ -132,7 +132,7 @@ class MessagesController < ApplicationController
           flash[:alert] = "Unable to update message."
           redirect_to conversation_path(@message.conversation)
         end
-        format.json { render json: { errors: @message.errors }, status: :unprocessable_entity }
+        format.json { render json: { errors: @message.errors }, status: :unprocessable_content }
       end
     end
   end

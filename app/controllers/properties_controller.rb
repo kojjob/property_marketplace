@@ -38,7 +38,7 @@ class PropertiesController < ApplicationController
     if @property.save
       redirect_to @property, notice: "Property was successfully created."
     else
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -66,7 +66,7 @@ class PropertiesController < ApplicationController
     if @property.update(update_params)
       redirect_to @property, notice: "Property was successfully updated."
     else
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 
@@ -117,7 +117,7 @@ class PropertiesController < ApplicationController
 
       respond_to do |format|
         format.html { render :search }
-        format.json { render json: { error: @error }, status: :unprocessable_entity }
+        format.json { render json: { error: @error }, status: :unprocessable_content }
       end
     end
   end
