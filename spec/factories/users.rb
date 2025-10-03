@@ -5,16 +5,24 @@ FactoryBot.define do
     password_confirmation { 'password123' }
     confirmed_at { Time.current } # Auto-confirm for tests
 
+    after(:create) do |user|
+      create(:profile, user: user) if user.profile.blank?
+    end
+
     trait :unconfirmed do
       confirmed_at { nil }
     end
 
     trait :admin do
-      role { 'admin' }
+      after(:create) do |user|
+        user.profile.update(role: 'admin')
+      end
     end
 
     trait :host do
-      role { 'host' }
+      after(:create) do |user|
+        user.profile.update(role: 'host')
+      end
     end
   end
 end

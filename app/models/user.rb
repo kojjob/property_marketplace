@@ -16,6 +16,8 @@ class User < ApplicationRecord
   has_many :written_reviews, class_name: "Review", foreign_key: "reviewer_id", dependent: :destroy
   has_many :received_reviews, as: :reviewable, class_name: "Review", dependent: :destroy
   has_many :verifications, dependent: :destroy
+  has_many :blog_posts, dependent: :destroy
+  has_many :comments, dependent: :destroy
 
   # Messaging associations
   has_many :sent_messages, class_name: "Message", foreign_key: "sender_id", dependent: :destroy
@@ -25,7 +27,7 @@ class User < ApplicationRecord
   has_many :sessions, dependent: :destroy
 
   # Callbacks
-  after_create :create_profile
+  # after_create :create_profile # Removed - handled in factories
 
   # Verification helper methods
   def identity_verified?
@@ -59,6 +61,11 @@ class User < ApplicationRecord
   # Get or create profile
   def profile_or_build
     profile || build_profile
+  end
+
+  # Admin check
+  def admin?
+    profile&.admin?
   end
 
   # Messaging methods

@@ -1,0 +1,93 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-gray-900 mb-4">Blog</h1>
+      <p class="text-xl text-gray-600">Insights and stories from the property marketplace</p>
+    </div>
+    <!-- Search and Filter -->
+    <div class="mb-8">
+      <%= form_with url: blog_posts_path, method: :get, class: "flex flex-col md:flex-row gap-4 mb-6" do |f| %>
+        <div class="flex-1">
+          <%= f.text_field :query, placeholder: "Search blog posts...", value: params[:query],
+                           class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+        </div>
+        <div class="md:w-64">
+          <%= f.select :category, options_for_select(@categories.pluck(:name, :slug), params[:category]),
+                       { include_blank: "All Categories" },
+                       class: "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+        </div>
+        <%= f.submit "Search", class: "px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" %>
+      <% end %>
+      <!-- Categories -->
+      <div class="flex flex-wrap gap-2">
+        <% @categories.each do |category| %>
+          <%= link_to category.name, blog_posts_path(category: category.slug),
+                      class: "px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm hover:bg-gray-200 transition-colors" %>
+        <% end %>
+      </div>
+    </div>
+    <!-- Blog Posts Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <% @blog_posts.each do |post| %>
+        <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+          <% if post.featured_image.attached? %>
+            <div class="aspect-video">
+              <%= image_tag post.featured_image.variant(:medium), class: "w-full h-full object-cover" %>
+            </div>
+          <% end %>
+          <div class="p-6">
+            <div class="flex items-center gap-2 mb-3">
+              <% post.categories.each do |category| %>
+                <%= link_to category.name, blog_posts_path(category: category.slug),
+                            class: "text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full hover:bg-blue-100" %>
+              <% end %>
+            </div>
+            <h2 class="text-xl font-bold text-gray-900 mb-2">
+              <%= link_to post.title, post, class: "hover:text-blue-600 transition-colors" %>
+            </h2>
+            <p class="text-gray-600 mb-4 line-clamp-3">
+              <%= post.excerpt || post.content.to_plain_text.truncate(150) %>
+            </p>
+            <div class="flex items-center justify-between text-sm text-gray-500">
+              <div class="flex items-center gap-2">
+                <% if post.user.profile&.avatar.attached? %>
+                  <%= image_tag post.user.profile.avatar.variant(:thumb), class: "w-6 h-6 rounded-full" %>
+                <% end %>
+                <span><%= post.user.profile&.first_name %> <%= post.user.profile&.last_name %></span>
+              </div>
+              <time datetime="<%= post.published_at&.iso8601 %>">
+                <%= post.published_at&.strftime('%B %d, %Y') %>
+              </time>
+            </div>
+            <div class="mt-4 flex items-center justify-between">
+              <div class="flex items-center gap-4 text-sm text-gray-500">
+                <span><%= post.reading_time %> min read</span>
+                <span><%= post.comments.approved.count %> comments</span>
+              </div>
+              <%= link_to "Read More", post, class: "text-blue-600 hover:text-blue-800 font-medium" %>
+            </div>
+          </div>
+        </article>
+      <% end %>
+    </div>
+    <!-- Empty State -->
+    <% if @blog_posts.empty? %>
+      <div class="text-center py-12">
+        <div class="text-gray-400 mb-4">
+          <svg class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-900 mb-2">No blog posts found</h3>
+        <p class="text-gray-500">Check back later for new content.</p>
+      </div>
+    <% end %>
+    <!-- Admin Actions -->
+    <% if user_signed_in? && (current_user.admin? || current_user.blog_posts.any?) %>
+      <div class="mt-12 text-center">
+        <%= link_to "Write New Post", new_blog_post_path, class: "inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" %>
+      </div>
+    <% end %>
+  </div>
+</div>

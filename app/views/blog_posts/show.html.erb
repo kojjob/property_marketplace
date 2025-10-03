@@ -1,0 +1,118 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <!-- Breadcrumbs -->
+    <nav class="mb-8">
+      <%= link_to "Blog", blog_posts_path, class: "text-blue-600 hover:text-blue-800" %>
+      <% @blog_post.categories.each do |category| %>
+        <span class="text-gray-400 mx-2">/</span>
+        <%= link_to category.name, blog_posts_path(category: category.slug), class: "text-blue-600 hover:text-blue-800" %>
+      <% end %>
+    </nav>
+    <!-- Article Header -->
+    <header class="mb-8">
+      <div class="flex items-center gap-2 mb-4">
+        <% @blog_post.categories.each do |category| %>
+          <%= link_to category.name, blog_posts_path(category: category.slug),
+                      class: "text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full hover:bg-blue-100" %>
+        <% end %>
+      </div>
+      <h1 class="text-4xl font-bold text-gray-900 mb-4"><%= @blog_post.title %></h1>
+      <% if @blog_post.excerpt.present? %>
+        <p class="text-xl text-gray-600 mb-6"><%= @blog_post.excerpt %></p>
+      <% end %>
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <% if @blog_post.user.profile&.avatar.attached? %>
+            <%= image_tag @blog_post.user.profile.avatar.variant(:thumb), class: "w-10 h-10 rounded-full" %>
+          <% end %>
+          <div>
+            <div class="font-medium text-gray-900">
+              <%= @blog_post.user.profile&.first_name %> <%= @blog_post.user.profile&.last_name %>
+            </div>
+            <div class="text-sm text-gray-500">
+              <%= @blog_post.published_at&.strftime('%B %d, %Y') %> • <%= @blog_post.reading_time %> min read
+            </div>
+          </div>
+        </div>
+        <!-- Admin Actions -->
+        <% if user_signed_in? && (@blog_post.user == current_user || current_user.admin?) %>
+          <div class="flex gap-2">
+            <%= link_to "Edit", edit_blog_post_path(@blog_post), class: "text-blue-600 hover:text-blue-800" %>
+            <%= link_to "Delete", @blog_post, method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800" %>
+          </div>
+        <% end %>
+      </div>
+    </header>
+    <!-- Featured Image -->
+    <% if @blog_post.featured_image.attached? %>
+      <div class="mb-8">
+        <%= image_tag @blog_post.featured_image.variant(:large), class: "w-full rounded-lg shadow-lg" %>
+      </div>
+    <% end %>
+    <!-- Article Content -->
+    <article class="prose prose-lg max-w-none mb-12">
+      <%= @blog_post.content %>
+    </article>
+    <!-- Media Files -->
+    <% if @blog_post.media_files.attached? %>
+      <div class="mb-12">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6">Media Files</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <% @blog_post.media_files.each do |file| %>
+            <div class="border border-gray-200 rounded-lg p-4">
+              <% if file.content_type.start_with?('image/') %>
+                <%= image_tag file.variant(:medium), class: "w-full h-32 object-cover rounded" %>
+              <% elsif file.content_type.start_with?('video/') %>
+                <video controls class="w-full h-32 object-cover rounded">
+                  <%= source_tag src: url_for(file), type: file.content_type %>
+                </video>
+              <% elsif file.content_type.start_with?('audio/') %>
+                <audio controls class="w-full">
+                  <%= source_tag src: url_for(file), type: file.content_type %>
+                </audio>
+              <% else %>
+                <div class="flex items-center gap-3">
+                  <div class="text-2xl">📄</div>
+                  <div>
+                    <div class="font-medium"><%= file.filename %></div>
+                    <div class="text-sm text-gray-500"><%= number_to_human_size(file.byte_size) %></div>
+                  </div>
+                </div>
+              <% end %>
+              <div class="mt-2">
+                <%= link_to "Download", url_for(file), target: "_blank", class: "text-blue-600 hover:text-blue-800 text-sm" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    <!-- Related Posts -->
+    <% if @related_posts.any? %>
+      <div class="mb-12">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6">Related Posts</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <% @related_posts.each do |post| %>
+            <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+              <% if post.featured_image.attached? %>
+                <%= image_tag post.featured_image.variant(:small), class: "w-full h-32 object-cover" %>
+              <% end %>
+              <div class="p-4">
+                <h4 class="font-bold text-gray-900 mb-2">
+                  <%= link_to post.title, post, class: "hover:text-blue-600 transition-colors" %>
+                </h4>
+                <p class="text-sm text-gray-600 line-clamp-2">
+                  <%= post.excerpt || post.content.to_plain_text.truncate(100) %>
+                </p>
+              </div>
+            </article>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    <!-- Comments Section -->
+    <div id="comments-section">
+      <%= render 'comments/comments_section', blog_post: @blog_post, comment: @comment %>
+    </div>
+  </div>
+</div>

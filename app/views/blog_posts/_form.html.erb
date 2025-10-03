@@ -1,0 +1,130 @@
+<%= form_with model: blog_post, class: "space-y-6" do |f| %>
+  <% if blog_post.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+      <h3 class="text-red-800 font-medium mb-2">Please fix the following errors:</h3>
+      <ul class="text-red-700 text-sm">
+        <% blog_post.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+  <!-- Basic Information -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
+    <div class="grid grid-cols-1 gap-6">
+      <div>
+        <%= f.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.text_field :title, placeholder: "Enter an engaging title...",
+                         class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+      <div>
+        <%= f.label :excerpt, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.text_area :excerpt, rows: 3, placeholder: "Brief summary of your post (optional)...",
+                        class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+      </div>
+      <div>
+        <%= f.label :categories, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <% @categories.each do |category| %>
+            <label class="flex items-center">
+              <%= f.check_box :category_ids, { multiple: true, include_hidden: false }, category.id, nil %>
+              <span class="ml-2 text-sm text-gray-700"><%= category.name %></span>
+            </label>
+          <% end %>
+        </div>
+      </div>
+      <div class="flex items-center">
+        <%= f.check_box :published, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+        <%= f.label :published, class: "ml-2 block text-sm text-gray-900" %>
+        <span class="text-sm text-gray-500 ml-1">(Make this post public)</span>
+      </div>
+    </div>
+  </div>
+  <!-- Content -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Content</h3>
+    <div>
+      <%= f.label :content, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= f.rich_text_area :content, placeholder: "Write your blog post content here...",
+                           class: "w-full min-h-96 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+    </div>
+  </div>
+  <!-- Media -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">Media</h3>
+    <div class="space-y-6">
+      <!-- Featured Image -->
+      <div>
+        <%= f.label :featured_image, "Featured Image", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.file_field :featured_image, accept: "image/*", class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" %>
+        <% if blog_post.featured_image.attached? %>
+          <div class="mt-2">
+            <p class="text-sm text-gray-600">Current featured image:</p>
+            <%= image_tag blog_post.featured_image.variant(:medium), class: "mt-2 max-w-xs rounded-lg shadow-sm" %>
+          </div>
+        <% end %>
+      </div>
+      <!-- Additional Media Files -->
+      <div>
+        <%= f.label :media_files, "Additional Media Files (Images, Videos, Audio, PDFs)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.file_field :media_files, multiple: true, accept: "image/*,video/*,audio/*,.pdf,.doc,.docx",
+                         class: "block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100" %>
+        <p class="text-xs text-gray-500 mt-1">You can select multiple files. Supported formats: Images, Videos, Audio, PDFs, Documents</p>
+        <% if blog_post.media_files.attached? %>
+          <div class="mt-4">
+            <p class="text-sm text-gray-600 mb-2">Current media files:</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <% blog_post.media_files.each do |file| %>
+                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <% if file.content_type.start_with?('image/') %>
+                    <%= image_tag file.variant(:thumb), class: "w-12 h-12 object-cover rounded" %>
+                  <% elsif file.content_type.start_with?('video/') %>
+                    <div class="w-12 h-12 bg-blue-100 rounded flex items-center justify-center">🎥</div>
+                  <% elsif file.content_type.start_with?('audio/') %>
+                    <div class="w-12 h-12 bg-green-100 rounded flex items-center justify-center">🎵</div>
+                  <% else %>
+                    <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center">📄</div>
+                  <% end %>
+                  <div class="flex-1">
+                    <p class="text-sm font-medium text-gray-900"><%= file.filename %></p>
+                    <p class="text-xs text-gray-500"><%= number_to_human_size(file.byte_size) %></p>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <!-- SEO Settings -->
+  <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <h3 class="text-lg font-medium text-gray-900 mb-4">SEO Settings (Optional)</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= f.label :meta_title, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.text_field :meta_title, placeholder: "Custom title for search engines...",
+                         class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+        <p class="text-xs text-gray-500 mt-1">Recommended: 50-60 characters</p>
+      </div>
+      <div>
+        <%= f.label :meta_description, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.text_area :meta_description, rows: 3, placeholder: "Description for search engines...",
+                        class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+        <p class="text-xs text-gray-500 mt-1">Recommended: 150-160 characters</p>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :meta_keywords, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= f.text_field :meta_keywords, placeholder: "keyword1, keyword2, keyword3",
+                         class: "w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+        <p class="text-xs text-gray-500 mt-1">Comma-separated keywords</p>
+      </div>
+    </div>
+  </div>
+  <!-- Actions -->
+  <div class="flex justify-end gap-4">
+    <%= link_to "Cancel", blog_posts_path, class: "px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors" %>
+    <%= f.submit "Save Post", class: "px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors" %>
+  </div>
+<% end %>
