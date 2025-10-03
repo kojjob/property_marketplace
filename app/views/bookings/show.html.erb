@@ -1,0 +1,63 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-4xl mx-auto">
+    <div class="bg-white shadow-lg rounded-lg p-6">
+      <div class="flex justify-between items-start mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Booking Details</h1>
+        <span class="px-3 py-1 rounded-full text-sm font-medium <%= status_badge_class(@booking.status) %>">
+          <%= @booking.status.titleize %>
+        </span>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h2 class="text-xl font-semibold mb-4">Property Information</h2>
+          <div class="space-y-2">
+            <p><strong>Property:</strong> <%= link_to @booking.listing.property.title, @booking.listing.property %></p>
+            <p><strong>Address:</strong> <%= @booking.listing.property.address %>, <%= @booking.listing.property.city %></p>
+            <p><strong>Listing Type:</strong> <%= @booking.listing.listing_type.titleize %></p>
+            <p><strong>Price per Night:</strong> <%= number_to_currency(@booking.listing.price) %></p>
+          </div>
+        </div>
+        <div>
+          <h2 class="text-xl font-semibold mb-4">Booking Information</h2>
+          <div class="space-y-2">
+            <p><strong>Check-in:</strong> <%= @booking.check_in_date %></p>
+            <p><strong>Check-out:</strong> <%= @booking.check_out_date %></p>
+            <p><strong>Guests:</strong> <%= @booking.guests_count %></p>
+            <p><strong>Total Amount:</strong> <%= number_to_currency(@booking.total_amount) %></p>
+            <p><strong>Payment Status:</strong> <span class="<%= payment_status_class(@booking.payment_status) %>"><%= @booking.payment_status.titleize %></span></p>
+          </div>
+        </div>
+      </div>
+      <% if @booking.special_requests.present? %>
+        <div class="mt-6">
+          <h2 class="text-xl font-semibold mb-4">Special Requests</h2>
+          <p class="text-gray-700"><%= @booking.special_requests %></p>
+        </div>
+      <% end %>
+      <div class="mt-6 flex space-x-4">
+        <% if @booking.tenant == current_user && @booking.confirmed? && @booking.payment_status != 'paid' %>
+          <%= link_to "Make Payment", new_booking_payment_path(@booking), class: "bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700" %>
+        <% end %>
+        <% if @booking.landlord == current_user && @booking.pending? %>
+          <%= link_to "Confirm Booking", confirm_booking_path(@booking), method: :patch, class: "bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700" %>
+        <% end %>
+        <% if @booking.tenant == current_user && @booking.confirmed? %>
+          <%= link_to "Cancel Booking", cancel_booking_path(@booking), method: :patch, data: { confirm: "Are you sure?" }, class: "bg-red-600 text-white py-2 px-4 rounded-md hover:bg-red-700" %>
+        <% end %>
+        <%= link_to "Back to Bookings", bookings_path, class: "bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700" %>
+      </div>
+    </div>
+  </div>
+</div>
+<% content_for :head do %>
+  <style>
+    .status-pending { background-color: #fef3c7; color: #92400e; }
+    .status-confirmed { background-color: #d1fae5; color: #065f46; }
+    .status-cancelled { background-color: #fee2e2; color: #991b1b; }
+    .status-completed { background-color: #e0e7ff; color: #3730a3; }
+
+    .payment-unpaid { color: #dc2626; }
+    .payment-partially_paid { color: #ea580c; }
+    .payment-paid { color: #16a34a; }
+  </style>
+<% end %>
