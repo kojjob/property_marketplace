@@ -9,19 +9,20 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :listings do
-    resources :bookings, shallow: true do
-      member do
-        patch :confirm
-        patch :cancel
-      end
-      resources :payments, only: [ :new, :create ] do
-        post :process_payment, on: :collection
-      end
-    end
-  end
+   resources :listings do
+     resources :bookings, shallow: true do
+       member do
+         patch :confirm
+         patch :cancel
+       end
+       resources :payments, only: [ :new, :create ] do
+         post :process_payment, on: :collection
+       end
+     end
+   end
 
-  resources :favorites, only: [ :index ]
+   resources :bookings, only: [ :index, :show ]
+   resources :favorites, only: [ :index ]
   resources :profiles, only: [ :show, :edit, :update ]
 
   # Messaging routes

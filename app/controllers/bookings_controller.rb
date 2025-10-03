@@ -1,7 +1,7 @@
 class BookingsController < ApplicationController
-  before_action :authenticate_user!
-  before_action :set_listing, only: [ :new, :create, :index ]
-  before_action :set_booking, only: [ :show, :confirm, :cancel, :edit, :update, :destroy ]
+   before_action :authenticate_user!
+   before_action :set_listing, only: [ :new, :create ], if: -> { params[:listing_id].present? }
+   before_action :set_booking, only: [ :show, :confirm, :cancel, :edit, :update, :destroy ]
   before_action :ensure_owner_or_tenant, only: [ :show, :edit, :update, :destroy ]
   before_action :ensure_landlord, only: [ :confirm ]
   before_action :ensure_tenant, only: [ :cancel ]

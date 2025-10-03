@@ -51,7 +51,6 @@
     </div>
   </div>
 </div>
-
 <!-- Enhanced Main Navigation -->
 <header class="bg-white shadow-lg sticky top-0 z-50 border-b border-gray-100">
   <div class="container mx-auto px-4">
@@ -74,6 +73,7 @@
         </li>
         <% if user_signed_in? %>
           <li><%= link_to "My Listings", properties_path(user_id: current_user.id) %></li>
+          <li><%= link_to "My Bookings", bookings_path %></li>
           <li><%= link_to "Favorites", favorites_path %></li>
         <% end %>
         <li><%= link_to "About", about_path %></li>
@@ -88,7 +88,6 @@
         <% end %>
       </ul>
     </div>
-
     <!-- Enhanced Desktop Navigation -->
     <div class="hidden lg:flex lg:items-center lg:w-full lg:justify-between py-4">
       <!-- Logo Section -->
@@ -103,11 +102,9 @@
           <div class="text-xs text-gray-500 -mt-1">Premium Real Estate</div>
         </div>
       <% end %>
-
       <!-- Navigation Links -->
       <nav class="flex items-center space-x-8">
         <%= link_to "Home", root_path, class: "text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200" %>
-
         <div class="relative group">
           <button class="flex items-center text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
             Properties
@@ -155,9 +152,9 @@
             </div>
           </div>
         </div>
-
         <% if user_signed_in? %>
           <%= link_to "My Listings", properties_path(user_id: current_user.id), class: "text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200" %>
+          <%= link_to "My Bookings", bookings_path, class: "text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200" %>
           <%= link_to conversations_path, class: "text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 flex items-center gap-1" do %>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
@@ -169,18 +166,15 @@
           <% end %>
           <%= link_to "Favorites", favorites_path, class: "text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200" %>
         <% end %>
-
         <%= link_to "About", about_path, class: "text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200" %>
         <%= link_to "Contact", contact_path, class: "text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200" %>
       </nav>
-
       <!-- Right Side Actions -->
       <div class="flex items-center space-x-4">
         <% unless user_signed_in? %>
           <%= link_to "Sign In", new_user_session_path, class: "text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200" %>
           <%= link_to "Sign Up", new_user_registration_path, class: "bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 shadow-md hover:shadow-lg" %>
         <% end %>
-
         <% if user_signed_in? %>
           <%= link_to new_property_path, class: "bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors duration-200 shadow-md hover:shadow-lg flex items-center gap-2" do %>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -188,7 +182,6 @@
             </svg>
             List Property
           <% end %>
-
           <div class="relative group">
             <button class="w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-full flex items-center justify-center transition-colors">
               <span class="text-sm font-semibold text-gray-700"><%= current_user.email[0].upcase %></span>
@@ -234,6 +227,12 @@
                     </svg>
                     <span class="font-medium">My Properties</span>
                   <% end %>
+                  <%= link_to bookings_path, class: "flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors rounded-lg mx-2" do %>
+                    <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="font-medium">My Bookings</span>
+                  <% end %>
                   <%= link_to favorites_path, class: "flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors rounded-lg mx-2" do %>
                     <svg class="w-5 h-5 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
@@ -261,7 +260,6 @@
         <% end %>
       </div>
     </div>
-
     <!-- Mobile: Logo centered -->
     <div class="lg:hidden flex-1 flex justify-center">
       <%= link_to root_path, class: "flex items-center gap-2" do %>
@@ -273,7 +271,6 @@
         <span class="text-xl font-bold">PropertyHub</span>
       <% end %>
     </div>
-
     <!-- Mobile: User dropdown when signed in, Auth dropdown when not -->
     <% if user_signed_in? %>
       <div class="lg:hidden dropdown dropdown-end">
@@ -293,6 +290,7 @@
           <% end %>
           <li><%= link_to "Account Settings", edit_user_registration_path %></li>
           <li><%= link_to "My Properties", properties_path(user_id: current_user.id) %></li>
+          <li><%= link_to "My Bookings", bookings_path %></li>
           <li><%= link_to "Saved Searches", "#" %></li>
           <li class="mt-2">
             <%= button_to "Sign Out", destroy_user_session_path, method: :delete, class: "btn btn-error btn-sm btn-block" %>
