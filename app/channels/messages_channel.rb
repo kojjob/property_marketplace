@@ -21,23 +21,23 @@ class MessagesChannel < ApplicationCable::Channel
     return unless conversation && authorized_for_conversation?(conversation)
 
     message = conversation.messages.build(
-      content: data['content'],
+      content: data["content"],
       sender: current_user,
       recipient: conversation.other_participant(current_user),
-      message_type: data['message_type'] || 'text'
+      message_type: data["message_type"] || "text"
     )
 
     if message.save
       # Broadcast to all subscribers of this conversation
       MessagesChannel.broadcast_to(conversation, {
-        action: 'message_created',
+        action: "message_created",
         message: message_json(message),
         html: render_message_html(message)
       })
     else
       # Send error back to sender only
       transmit(
-        action: 'message_error',
+        action: "message_error",
         errors: message.errors.full_messages
       )
     end
@@ -50,10 +50,10 @@ class MessagesChannel < ApplicationCable::Channel
 
     # Broadcast typing status to other participants only
     broadcast_to_others(conversation, {
-      action: 'user_typing',
+      action: "user_typing",
       user_id: current_user.id,
-      user_name: current_user.profile&.first_name || current_user.email.split('@').first,
-      typing: data['typing'] # true or false
+      user_name: current_user.profile&.first_name || current_user.email.split("@").first,
+      typing: data["typing"] # true or false
     })
   end
 
@@ -62,9 +62,9 @@ class MessagesChannel < ApplicationCable::Channel
     conversation = find_conversation
     return unless conversation && authorized_for_conversation?(conversation)
 
-    if data['message_id']
+    if data["message_id"]
       # Mark specific message as read
-      message = conversation.messages.find_by(id: data['message_id'])
+      message = conversation.messages.find_by(id: data["message_id"])
       if message && message.recipient == current_user
         message.mark_as_read!
         broadcast_read_receipt(conversation, message)
@@ -83,17 +83,17 @@ class MessagesChannel < ApplicationCable::Channel
 
     # Broadcast presence to other participants
     broadcast_to_others(conversation, {
-      action: 'user_presence',
+      action: "user_presence",
       user_id: current_user.id,
-      user_name: current_user.profile&.first_name || current_user.email.split('@').first,
-      status: data['status'] # 'online', 'away', 'offline'
+      user_name: current_user.profile&.first_name || current_user.email.split("@").first,
+      status: data["status"] # 'online', 'away', 'offline'
     })
   end
 
   private
 
   def find_conversation
-    conversation_id = params[:conversation_id] || params['conversation_id']
+    conversation_id = params[:conversation_id] || params["conversation_id"]
     return nil unless conversation_id
 
     Conversation.find_by(id: conversation_id)
@@ -112,13 +112,13 @@ class MessagesChannel < ApplicationCable::Channel
       message_type: message.message_type,
       status: message.status,
       created_at: message.created_at.iso8601,
-      sender_name: message.sender.profile&.first_name || message.sender.email.split('@').first
+      sender_name: message.sender.profile&.first_name || message.sender.email.split("@").first
     }
   end
 
   def render_message_html(message)
     ApplicationController.renderer.render(
-      partial: 'messages/message',
+      partial: "messages/message",
       locals: {
         message: message,
         current_user: current_user,
@@ -139,7 +139,7 @@ class MessagesChannel < ApplicationCable::Channel
 
   def broadcast_read_receipt(conversation, message)
     MessagesChannel.broadcast_to(conversation, {
-      action: 'message_read',
+      action: "message_read",
       message_id: message.id,
       reader_id: current_user.id,
       read_at: message.read_at&.iso8601
@@ -148,7 +148,7 @@ class MessagesChannel < ApplicationCable::Channel
 
   def broadcast_conversation_read(conversation)
     MessagesChannel.broadcast_to(conversation, {
-      action: 'conversation_read',
+      action: "conversation_read",
       reader_id: current_user.id,
       read_at: Time.current.iso8601
     })

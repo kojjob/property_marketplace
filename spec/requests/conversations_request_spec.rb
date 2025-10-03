@@ -97,7 +97,7 @@ RSpec.describe "Conversations", type: :request do
         it "creates conversation with correct participants" do
           post conversations_path, params: { recipient_id: third_user.id }
           conversation = Conversation.last
-          expect([conversation.participant1, conversation.participant2]).to contain_exactly(user, third_user)
+          expect([ conversation.participant1, conversation.participant2 ]).to contain_exactly(user, third_user)
         end
       end
 

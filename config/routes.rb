@@ -15,6 +15,9 @@ Rails.application.routes.draw do
         patch :confirm
         patch :cancel
       end
+      resources :payments, only: [ :new, :create ] do
+        post :process_payment, on: :collection
+      end
     end
   end
 
