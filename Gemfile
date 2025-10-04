@@ -65,7 +65,7 @@ gem "pg_search", "~> 2.3"         # PostgreSQL full-text search
  gem "jwt", "~> 2.8"               # JSON Web Tokens for API authentication
 
 # External Services
-gem "aws-sdk-s3", "~> 1.140"      # S3 for Active Storage
+gem "aws-sdk-s3", "~> 1.199"      # S3 for Active Storage
 gem "twilio-ruby", "~> 6.9"       # SMS notifications
 gem "postmark-rails", "~> 0.22"   # Transactional email
 
