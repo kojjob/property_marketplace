@@ -7,5 +7,5 @@ class Amenity < ApplicationRecord
 
   # Scopes
   scope :by_category, ->(category) { where(category: category) }
-  scope :popular, -> { joins(:listing_amenities).group(:id).order('COUNT(listing_amenities.id) DESC') }
+  scope :popular, -> { joins(:listing_amenities).group(:id).order("COUNT(listing_amenities.id) DESC") }
 end

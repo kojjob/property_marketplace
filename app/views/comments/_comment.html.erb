@@ -1,0 +1,68 @@
+<div id="<%= dom_id(comment) %>" class="border border-gray-200 rounded-lg p-6 <%= 'ml-8' if comment.reply? %>">
+  <div class="flex items-start gap-4">
+    <!-- Avatar -->
+    <div class="flex-shrink-0">
+      <% if comment.user&.profile&.avatar&.attached? %>
+        <%= image_tag comment.user.profile.avatar.variant(:thumb), class: "w-10 h-10 rounded-full" %>
+      <% else %>
+        <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+          <span class="text-gray-600 font-medium">
+            <%= (comment.author_name || comment.user&.email)&.first&.upcase %>
+          </span>
+        </div>
+      <% end %>
+    </div>
+    <!-- Comment Content -->
+    <div class="flex-1">
+      <div class="flex items-center gap-2 mb-2">
+        <span class="font-medium text-gray-900">
+          <%= comment.author_name || "#{comment.user.profile&.first_name} #{comment.user.profile&.last_name}" %>
+        </span>
+        <% if comment.user %>
+          <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Verified User</span>
+        <% end %>
+        <time class="text-sm text-gray-500" datetime="<%= comment.created_at.iso8601 %>">
+          <%= time_ago_in_words(comment.created_at) %> ago
+        </time>
+        <% if comment.pending? %>
+          <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Pending Approval</span>
+        <% elsif comment.approved? %>
+          <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Approved</span>
+        <% elsif comment.rejected? %>
+          <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">Rejected</span>
+        <% end %>
+      </div>
+      <div class="text-gray-700 mb-4 prose prose-sm max-w-none">
+        <%= simple_format(comment.content) %>
+      </div>
+      <!-- Comment Actions -->
+      <div class="flex items-center gap-4">
+        <% if user_signed_in? %>
+          <button class="text-blue-600 hover:text-blue-800 text-sm font-medium reply-button"
+                  data-comment-id="<%= comment.id %>"
+                  data-author-name="<%= comment.author_name || comment.user.profile&.first_name %>">
+            Reply
+          </button>
+        <% end %>
+        <% if user_signed_in? && (comment.user == current_user || current_user.admin?) %>
+          <%= link_to "Edit", "#", class: "text-gray-600 hover:text-gray-800 text-sm" %>
+          <%= link_to "Delete", comment, method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800 text-sm" %>
+        <% end %>
+        <% if user_signed_in? && current_user.admin? && !comment.approved? %>
+          <%= link_to "Approve", approve_comment_path(comment), method: :patch, class: "text-green-600 hover:text-green-800 text-sm" %>
+          <%= link_to "Reject", reject_comment_path(comment), method: :patch, class: "text-red-600 hover:text-red-800 text-sm" %>
+        <% end %>
+      </div>
+      <!-- Reply Form (hidden by default) -->
+      <div id="reply-form-<%= comment.id %>" class="hidden mt-4">
+        <%= render 'comments/form', comment: Comment.new(parent: comment), blog_post: comment.blog_post %>
+      </div>
+    </div>
+  </div>
+  <!-- Nested Replies -->
+  <% if comment.replies.approved.any? %>
+    <div class="mt-6 space-y-4">
+      <%= render comment.replies.approved.includes(:user, :replies) %>
+    </div>
+  <% end %>
+</div>

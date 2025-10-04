@@ -1,8 +1,8 @@
 class Payment < ApplicationRecord
   # Associations
   belongs_to :booking
-  belongs_to :payer, class_name: 'User', foreign_key: 'payer_id'
-  belongs_to :payee, class_name: 'User', foreign_key: 'payee_id'
+  belongs_to :payer, class_name: "User", foreign_key: "payer_id"
+  belongs_to :payee, class_name: "User", foreign_key: "payee_id"
 
   # Validations
   validates :amount, presence: true, numericality: { greater_than: 0 }
@@ -18,14 +18,14 @@ class Payment < ApplicationRecord
   validate :valid_currency_code
   validate :service_fee_not_negative
   validate :valid_status_transition, if: :status_changed?
-  validate :refund_amount_valid, if: -> { payment_type == 'refund' }
+  validate :refund_amount_valid, if: -> { payment_type == "refund" }
 
   # Callbacks
   before_validation :set_default_currency
   before_validation :upcase_currency
   before_validation :round_amounts
   before_create :generate_transaction_id
-  after_commit :update_booking_payment_status, on: [:create, :update]
+  after_commit :update_booking_payment_status, on: [ :create, :update ]
 
   # Enums
   enum :status, {
@@ -43,7 +43,8 @@ class Payment < ApplicationRecord
     final_payment: 2,
     refund: 3,
     security_deposit: 4,
-    additional_fee: 5
+    additional_fee: 5,
+    subscription: 6
   }
 
   enum :payment_method, {
@@ -57,10 +58,10 @@ class Payment < ApplicationRecord
   }
 
   # Scopes
-  scope :successful, -> { where(status: 'completed') }
-  scope :pending, -> { where(status: 'pending') }
-  scope :failed, -> { where(status: 'failed') }
-  scope :recent, -> { where('payments.created_at > ?', 30.days.ago) }
+  scope :successful, -> { where(status: "completed") }
+  scope :pending, -> { where(status: "pending") }
+  scope :failed, -> { where(status: "failed") }
+  scope :recent, -> { where("payments.created_at > ?", 30.days.ago) }
   scope :for_booking, ->(booking_id) { where(booking_id: booking_id) }
 
   # Class methods
@@ -70,24 +71,24 @@ class Payment < ApplicationRecord
 
   # Instance methods
   def process_payment!
-    return false if status != 'pending' && status != 'processing'
+    return false if status != "pending" && status != "processing"
 
-    update!(status: 'processing') if status == 'pending'
+    update!(status: "processing") if status == "pending"
 
     if charge_payment_method
-      update!(status: 'completed', processed_at: Time.current)
+      update!(status: "completed", processed_at: Time.current)
       true
     else
-      update!(status: 'failed')
+      update!(status: "failed")
       false
     end
   rescue StandardError => e
-    update!(status: 'failed', failure_reason: e.message)
+    update!(status: "failed", failure_reason: e.message)
     false
   end
 
   def refundable?
-    status == 'completed'
+    status == "completed"
   end
 
   def process_refund!(refund_amount = nil)
@@ -100,8 +101,8 @@ class Payment < ApplicationRecord
     # Check if total refunds would exceed original amount
     existing_refunds = Payment.where(
       booking: booking,
-      payment_type: 'refund',
-      status: 'completed'
+      payment_type: "refund",
+      status: "completed"
     ).sum(:amount).abs
 
     if existing_refunds + refund_amount > amount
@@ -113,15 +114,15 @@ class Payment < ApplicationRecord
       payer: payee,  # Refund goes from payee back to payer
       payee: payer,
       amount: refund_amount,
-      payment_type: 'refund',
-      status: 'completed',
+      payment_type: "refund",
+      status: "completed",
       currency: currency,
       payment_method: payment_method,
       processed_at: Time.current
     )
 
     # Mark original payment as refunded if full refund
-    update!(status: 'refunded', refunded_at: Time.current) if refund_amount == amount
+    update!(status: "refunded", refunded_at: Time.current) if refund_amount == amount
 
     refund
   end
@@ -133,16 +134,16 @@ class Payment < ApplicationRecord
 
   def formatted_amount
     symbol = case currency
-             when 'USD' then '$'
-             when 'EUR' then '€'
-             when 'GBP' then '£'
-             when 'JPY' then '¥'
-             when 'CNY' then '¥'
-             else currency + ' '
-             end
+    when "USD" then "$"
+    when "EUR" then "€"
+    when "GBP" then "£"
+    when "JPY" then "¥"
+    when "CNY" then "¥"
+    else currency + " "
+    end
 
-    formatted_value = '%.2f' % amount
-    parts = formatted_value.split('.')
+    formatted_value = "%.2f" % amount
+    parts = formatted_value.split(".")
     parts[0].gsub!(/(\d)(?=(\d{3})+(?!\d))/, '\\1,')
     "#{symbol}#{parts.join('.')}"
   end
@@ -150,15 +151,15 @@ class Payment < ApplicationRecord
   def total_refunded
     Payment.where(
       booking: booking,
-      payment_type: 'refund',
-      status: 'completed'
-    ).where('created_at > ?', created_at).sum(:amount)
+      payment_type: "refund",
+      status: "completed"
+    ).where("created_at > ?", created_at).sum(:amount)
   end
 
   private
 
   def set_default_currency
-    self.currency ||= 'USD'
+    self.currency ||= "USD"
   end
 
   def upcase_currency
@@ -182,7 +183,7 @@ class Payment < ApplicationRecord
   def charge_payment_method
     # Simulate payment processing
     # In real implementation, this would integrate with payment gateway
-    return true if payment_method == 'cash'
+    return true if payment_method == "cash"
 
     # Simulate success rate for testing
     rand > 0.1  # 90% success rate
@@ -196,7 +197,7 @@ class Payment < ApplicationRecord
   end
 
   def amount_matches_booking
-    return unless booking && payment_type == 'full_payment' && amount.present?
+    return unless booking && payment_type == "full_payment" && amount.present?
 
     if amount != booking.total_amount
       errors.add(:amount, "must match booking total for full payment")
@@ -204,11 +205,11 @@ class Payment < ApplicationRecord
   end
 
   def no_duplicate_payment
-    return unless booking && payment_type == 'full_payment'
+    return unless booking && payment_type == "full_payment"
 
     existing = Payment.where(
       booking: booking,
-      payment_type: 'full_payment'
+      payment_type: "full_payment"
     ).where.not(id: id)
 
     if existing.exists?
@@ -246,9 +247,9 @@ class Payment < ApplicationRecord
     return unless status_changed? && status_was.present?
 
     invalid_transitions = {
-      'cancelled' => ['completed'],
-      'refunded' => ['pending', 'processing'],
-      'failed' => ['refunded']
+      "cancelled" => [ "completed" ],
+      "refunded" => [ "pending", "processing" ],
+      "failed" => [ "refunded" ]
     }
 
     if invalid_transitions[status_was]&.include?(status)
@@ -259,7 +260,7 @@ class Payment < ApplicationRecord
   def refund_amount_valid
     # Refunds should have positive amounts like other payments
     # The refund nature is tracked by payment_type, not negative amount
-    return unless payment_type == 'refund' && amount
+    return unless payment_type == "refund" && amount
 
     if amount <= 0
       errors.add(:amount, "must be positive for refunds")
@@ -267,14 +268,14 @@ class Payment < ApplicationRecord
   end
 
   def update_booking_payment_status
-    return unless booking && status == 'completed'
+    return unless booking && status == "completed"
 
     total_paid = Payment.for_booking(booking.id).successful.sum(:amount)
 
     if total_paid >= booking.total_amount
-      booking.update_column(:payment_status, 'paid')
+      booking.update_column(:payment_status, "paid")
     elsif total_paid > 0
-      booking.update_column(:payment_status, 'partially_paid')
+      booking.update_column(:payment_status, "partially_paid")
     end
   end
 end

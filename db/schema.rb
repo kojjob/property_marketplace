@@ -10,9 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_16_234945) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_03_222829) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "action_text_rich_texts", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "body"
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
+  end
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -52,6 +62,45 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_234945) do
     t.index ["name"], name: "index_amenities_on_name", unique: true
   end
 
+  create_table "blog_categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "slug", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["slug"], name: "index_blog_categories_on_slug", unique: true
+  end
+
+  create_table "blog_post_categories", force: :cascade do |t|
+    t.bigint "blog_post_id", null: false
+    t.bigint "blog_category_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["blog_category_id"], name: "index_blog_post_categories_on_blog_category_id"
+    t.index ["blog_post_id", "blog_category_id"], name: "idx_on_blog_post_id_blog_category_id_d507501be3", unique: true
+    t.index ["blog_post_id"], name: "index_blog_post_categories_on_blog_post_id"
+  end
+
+  create_table "blog_posts", force: :cascade do |t|
+    t.string "title", null: false
+    t.text "content"
+    t.text "excerpt"
+    t.string "slug", null: false
+    t.boolean "published", default: false
+    t.datetime "published_at"
+    t.bigint "user_id", null: false
+    t.string "meta_title"
+    t.text "meta_description"
+    t.string "meta_keywords"
+    t.string "featured_image_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["published"], name: "index_blog_posts_on_published"
+    t.index ["published_at"], name: "index_blog_posts_on_published_at"
+    t.index ["slug"], name: "index_blog_posts_on_slug", unique: true
+    t.index ["user_id"], name: "index_blog_posts_on_user_id"
+  end
+
   create_table "bookings", force: :cascade do |t|
     t.bigint "listing_id", null: false
     t.bigint "tenant_id", null: false
@@ -65,11 +114,42 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_234945) do
     t.datetime "updated_at", null: false
     t.integer "payment_status", default: 0, null: false
     t.decimal "total_amount", precision: 12, scale: 2, default: "0.0", null: false
+    t.bigint "landlord_id", null: false
+    t.index ["landlord_id"], name: "index_bookings_on_landlord_id"
     t.index ["listing_id", "check_in_date", "check_out_date"], name: "index_bookings_on_listing_and_dates"
     t.index ["listing_id"], name: "index_bookings_on_listing_id"
     t.index ["payment_status"], name: "index_bookings_on_payment_status"
     t.index ["status"], name: "index_bookings_on_status"
     t.index ["tenant_id"], name: "index_bookings_on_tenant_id"
+  end
+
+  create_table "comments", force: :cascade do |t|
+    t.text "content", null: false
+    t.string "author_name"
+    t.string "author_email"
+    t.bigint "blog_post_id", null: false
+    t.bigint "parent_id"
+    t.string "status", default: "pending"
+    t.datetime "approved_at"
+    t.bigint "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["approved_at"], name: "index_comments_on_approved_at"
+    t.index ["blog_post_id", "status"], name: "index_comments_on_blog_post_id_and_status"
+    t.index ["blog_post_id"], name: "index_comments_on_blog_post_id"
+    t.index ["parent_id"], name: "index_comments_on_parent_id"
+    t.index ["status"], name: "index_comments_on_status"
+    t.index ["user_id"], name: "index_comments_on_user_id"
+  end
+
+  create_table "contact_messages", force: :cascade do |t|
+    t.string "name"
+    t.string "email"
+    t.string "phone"
+    t.string "subject"
+    t.text "message"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "conversations", force: :cascade do |t|
@@ -203,6 +283,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_234945) do
     t.integer "verification_status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "company_name"
+    t.string "position"
+    t.integer "years_experience"
+    t.string "languages"
+    t.string "address"
+    t.string "city"
+    t.string "state"
+    t.string "country"
+    t.string "website"
+    t.string "facebook_url"
+    t.string "twitter_url"
+    t.string "linkedin_url"
+    t.string "instagram_url"
+    t.boolean "allow_messages", default: true, null: false
+    t.string "messaging_availability", default: "everyone"
+    t.index ["allow_messages"], name: "index_profiles_on_allow_messages"
     t.index ["role"], name: "index_profiles_on_role"
     t.index ["user_id"], name: "index_profiles_on_user_id", unique: true
     t.index ["verification_status"], name: "index_profiles_on_verification_status"
@@ -219,13 +315,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_234945) do
     t.integer "square_feet"
     t.string "address"
     t.string "city"
-    t.string "state"
-    t.string "zip_code"
+    t.string "region"
+    t.string "postal_code"
     t.decimal "latitude"
     t.decimal "longitude"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "featured", default: false
+    t.string "listing_type", default: "sale"
+    t.string "country"
+    t.text "formatted_address"
+    t.index ["country"], name: "index_properties_on_country"
     t.index ["user_id"], name: "index_properties_on_user_id"
   end
 
@@ -264,6 +365,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_234945) do
     t.index ["reviewable_type", "reviewable_id"], name: "index_reviews_on_reviewable"
     t.index ["reviewer_id"], name: "index_reviews_on_reviewer_id"
     t.index ["status"], name: "index_reviews_on_status"
+  end
+
+  create_table "saved_searches", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name"
+    t.json "criteria"
+    t.integer "frequency"
+    t.datetime "last_run_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_saved_searches_on_user_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -322,8 +434,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_234945) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "blog_post_categories", "blog_categories"
+  add_foreign_key "blog_post_categories", "blog_posts"
+  add_foreign_key "blog_posts", "users"
   add_foreign_key "bookings", "listings"
+  add_foreign_key "bookings", "users", column: "landlord_id"
   add_foreign_key "bookings", "users", column: "tenant_id"
+  add_foreign_key "comments", "blog_posts"
+  add_foreign_key "comments", "comments", column: "parent_id"
+  add_foreign_key "comments", "users"
   add_foreign_key "conversations", "users", column: "participant1_id"
   add_foreign_key "conversations", "users", column: "participant2_id"
   add_foreign_key "favorites", "properties"
@@ -344,6 +463,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_16_234945) do
   add_foreign_key "reviews", "bookings"
   add_foreign_key "reviews", "users", column: "response_by_id"
   add_foreign_key "reviews", "users", column: "reviewer_id"
+  add_foreign_key "saved_searches", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "verifications", "users"
   add_foreign_key "verifications", "users", column: "verified_by_id"

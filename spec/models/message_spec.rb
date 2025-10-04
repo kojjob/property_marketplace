@@ -17,7 +17,8 @@ RSpec.describe Message, type: :model do
     describe 'custom validations' do
       context '#sender_and_recipient_different' do
         let(:user) { create(:user) }
-        let(:conversation) { create(:conversation) }
+        let(:user2) { create(:user) }
+        let(:conversation) { create(:conversation, participant1: user, participant2: user2) }
 
         it 'prevents sending messages to self' do
           message = build(:message, sender: user, recipient: user, conversation: conversation)
@@ -28,7 +29,8 @@ RSpec.describe Message, type: :model do
         it 'allows messages between different users' do
           sender = create(:user)
           recipient = create(:user)
-          message = build(:message, sender: sender, recipient: recipient, conversation: conversation)
+          conversation_for_test = create(:conversation, participant1: sender, participant2: recipient)
+          message = build(:message, sender: sender, recipient: recipient, conversation: conversation_for_test)
           expect(message).to be_valid
         end
       end
@@ -117,8 +119,12 @@ RSpec.describe Message, type: :model do
 
     describe '.for_user' do
       let(:user) { create(:user) }
-      let!(:sent_message) { create(:message, sender: user) }
-      let!(:received_message) { create(:message, recipient: user) }
+      let(:other_user) { create(:user) }
+      let(:third_user) { create(:user) }
+      let(:conversation1) { create(:conversation, participant1: user, participant2: other_user) }
+      let(:conversation2) { create(:conversation, participant1: third_user, participant2: user) }
+      let!(:sent_message) { create(:message, sender: user, recipient: other_user, conversation: conversation1) }
+      let!(:received_message) { create(:message, sender: third_user, recipient: user, conversation: conversation2) }
       let!(:other_message) { create(:message) }
 
       it 'returns messages sent or received by user' do

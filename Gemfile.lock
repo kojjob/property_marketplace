@@ -469,6 +469,7 @@ GEM
     thruster (0.1.15-aarch64-linux)
     thruster (0.1.15-arm64-darwin)
     thruster (0.1.15-x86_64-linux)
+    timecop (0.9.10)
     timeout (0.4.3)
     turbo-rails (2.0.16)
       actionpack (>= 7.1.0)
@@ -535,6 +536,7 @@ DEPENDENCIES
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
+  jwt (~> 2.8)
   kamal
   letter_opener
   pay (~> 7.0)
@@ -559,6 +561,7 @@ DEPENDENCIES
   stripe (~> 12.0)
   tailwindcss-rails
   thruster
+  timecop
   turbo-rails
   twilio-ruby (~> 6.9)
   tzinfo-data

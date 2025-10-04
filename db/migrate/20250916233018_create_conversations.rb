@@ -10,7 +10,7 @@ class CreateConversations < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :conversations, [:participant1_id, :participant2_id], unique: true
+    add_index :conversations, [ :participant1_id, :participant2_id ], unique: true
     add_index :conversations, :last_message_at
     add_index :conversations, :archived
   end

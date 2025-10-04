@@ -1,7 +1,7 @@
 class Conversation < ApplicationRecord
   # Associations
-  belongs_to :participant1, class_name: 'User', foreign_key: 'participant1_id'
-  belongs_to :participant2, class_name: 'User', foreign_key: 'participant2_id'
+  belongs_to :participant1, class_name: "User", foreign_key: "participant1_id"
+  belongs_to :participant2, class_name: "User", foreign_key: "participant2_id"
   has_many :messages, dependent: :destroy
 
   # Validations
@@ -9,11 +9,11 @@ class Conversation < ApplicationRecord
 
   # Scopes
   scope :for_user, ->(user_id) {
-    where('participant1_id = ? OR participant2_id = ?', user_id, user_id)
+    where("participant1_id = ? OR participant2_id = ?", user_id, user_id)
   }
   scope :between, ->(user1_id, user2_id) {
     where(
-      '(participant1_id = ? AND participant2_id = ?) OR (participant1_id = ? AND participant2_id = ?)',
+      "(participant1_id = ? AND participant2_id = ?) OR (participant1_id = ? AND participant2_id = ?)",
       user1_id, user2_id, user2_id, user1_id
     )
   }
@@ -30,7 +30,7 @@ class Conversation < ApplicationRecord
     return conversation if conversation
 
     # Ensure consistent ordering to avoid race conditions
-    participant1, participant2 = [user1, user2].sort_by(&:id)
+    participant1, participant2 = [ user1, user2 ].sort_by(&:id)
     create!(participant1: participant1, participant2: participant2)
   rescue ActiveRecord::RecordNotUnique
     # Handle race condition where another process created the conversation

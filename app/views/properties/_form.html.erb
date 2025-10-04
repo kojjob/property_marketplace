@@ -1,16 +1,17 @@
-<%= form_with(model: property, local: true) do |form| %>
+<%= form_with(model: property, local: true, data: { turbo: false }, class: "space-y-8") do |form| %>
+  <!-- Error Messages -->
   <% if property.errors.any? %>
-    <div class="rounded-md bg-red-50 p-4 mb-4">
+    <div class="bg-red-50 border-l-4 border-red-400 p-6 rounded-lg shadow-sm">
       <div class="flex">
         <div class="flex-shrink-0">
-          <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd" />
+          <svg class="h-5 w-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
         </div>
         <div class="ml-3">
-          <h3 class="text-sm font-medium text-red-800">There were <%= pluralize(property.errors.count, "error") %> with your submission</h3>
+          <h3 class="text-sm font-medium text-red-800">Please correct the following errors:</h3>
           <div class="mt-2 text-sm text-red-700">
-            <ul role="list" class="list-disc space-y-1 pl-5">
+            <ul class="list-disc list-inside space-y-1">
               <% property.errors.full_messages.each do |message| %>
                 <li><%= message %></li>
               <% end %>
@@ -21,114 +22,313 @@
     </div>
   <% end %>
 
-  <div class="space-y-6">
-    <!-- Basic Information -->
-    <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:p-6">
-      <div class="md:grid md:grid-cols-3 md:gap-6">
-        <div class="md:col-span-1">
-          <h3 class="text-lg font-medium leading-6 text-gray-900">Basic Information</h3>
-          <p class="mt-1 text-sm text-gray-600">This information will be displayed publicly so be careful what you share.</p>
+  <!-- Basic Information Section -->
+  <div class="bg-white rounded-xl shadow-lg border border-gray-100">
+    <div class="border-b border-gray-200 px-8 py-6">
+      <div class="flex items-center">
+        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
         </div>
-        <div class="mt-5 md:col-span-2 md:mt-0">
-          <div class="grid grid-cols-6 gap-6">
-            <div class="col-span-6">
-              <%= form.label :title, class: "block text-sm font-medium text-gray-700" %>
-              <%= form.text_field :title, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", placeholder: "Beautiful 3-bedroom house with garden" %>
-            </div>
+        <div>
+          <h3 class="text-xl font-bold text-gray-900">Basic Information</h3>
+          <p class="text-gray-600">Enter the fundamental details about your property</p>
+        </div>
+      </div>
+    </div>
 
-            <div class="col-span-6">
-              <%= form.label :description, class: "block text-sm font-medium text-gray-700" %>
-              <%= form.text_area :description, rows: 6, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", placeholder: "Describe the property in detail..." %>
-            </div>
+    <div class="p-8 space-y-6">
+      <!-- Property Title & Type -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <%= form.label :title, "Property Title *", class: "block text-sm font-semibold text-gray-700 mb-2" %>
+          <%= form.text_field :title,
+              placeholder: "e.g., Beautiful 3BR Family Home in Downtown",
+              class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900" %>
+          <p class="text-xs text-gray-500 mt-1">Choose a descriptive title that highlights key features</p>
+        </div>
 
-            <div class="col-span-6 sm:col-span-3">
-              <%= form.label :price, class: "block text-sm font-medium text-gray-700" %>
-              <div class="relative mt-1 rounded-md shadow-sm">
-                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                  <span class="text-gray-500 sm:text-sm">$</span>
+        <div>
+          <%= form.label :property_type, "Property Type *", class: "block text-sm font-semibold text-gray-700 mb-2" %>
+          <%= form.select :property_type,
+              options_for_select(Property::PROPERTY_TYPES.map { |type| [type.humanize, type] }, property.property_type),
+              { prompt: "Select Property Type" },
+              class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900" %>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div>
+          <%= form.label :status, "Property Status", class: "block text-sm font-semibold text-gray-700 mb-2" %>
+          <%= form.select :status,
+              options_for_select(Property::STATUSES.map { |status| [status.humanize, status] }, property.status),
+              {},
+              class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900" %>
+        </div>
+      </div>
+
+      <!-- Property Description -->
+      <div>
+        <%= form.label :description, "Property Description *", class: "block text-sm font-semibold text-gray-700 mb-2" %>
+        <%= form.text_area :description,
+            rows: 6,
+            placeholder: "Describe your property in detail. Highlight unique features, recent upgrades, neighborhood amenities, and what makes this property special...",
+            class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900 resize-none" %>
+        <p class="text-xs text-gray-500 mt-1">Minimum 50 characters. Be detailed and engaging to attract potential buyers/renters.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pricing & Features Section -->
+  <div class="bg-white rounded-xl shadow-lg border border-gray-100">
+    <div class="border-b border-gray-200 px-8 py-6">
+      <div class="flex items-center">
+        <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-gray-900">Pricing & Features</h3>
+          <p class="text-gray-600">Set your price and specify property characteristics</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-8 space-y-6">
+      <!-- Price -->
+      <div>
+        <%= form.label :price, "Price *", class: "block text-sm font-semibold text-gray-700 mb-2" %>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-500 text-lg font-semibold">$</span>
+          </div>
+          <%= form.number_field :price,
+              step: 0.01,
+              min: 0,
+              placeholder: "425000",
+              class: "w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900 text-lg font-semibold" %>
+        </div>
+        <p class="text-xs text-gray-500 mt-1">Enter the listing price for sale or monthly rent amount</p>
+      </div>
+
+      <!-- Property Features -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div>
+          <%= form.label :bedrooms, "Bedrooms", class: "block text-sm font-semibold text-gray-700 mb-2" %>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z"></path>
+              </svg>
+            </div>
+            <%= form.number_field :bedrooms,
+                min: 0,
+                max: 20,
+                placeholder: "3",
+                class: "w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900" %>
+          </div>
+        </div>
+
+        <div>
+          <%= form.label :bathrooms, "Bathrooms", class: "block text-sm font-semibold text-gray-700 mb-2" %>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10v11M20 10v11"></path>
+              </svg>
+            </div>
+            <%= form.number_field :bathrooms,
+                step: 0.5,
+                min: 0,
+                max: 20,
+                placeholder: "2.5",
+                class: "w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900" %>
+          </div>
+        </div>
+
+        <div>
+          <%= form.label :square_feet, "Square Feet", class: "block text-sm font-semibold text-gray-700 mb-2" %>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+              </svg>
+            </div>
+            <%= form.number_field :square_feet,
+                min: 0,
+                placeholder: "1500",
+                class: "w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Location Section -->
+  <div class="bg-white rounded-xl shadow-lg border border-gray-100">
+    <div class="border-b border-gray-200 px-8 py-6">
+      <div class="flex items-center">
+        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-gray-900">Property Location</h3>
+          <p class="text-gray-600">Provide the complete address details</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-8 space-y-6">
+      <!-- Street Address -->
+      <div>
+        <%= form.label :address, "Street Address *", class: "block text-sm font-semibold text-gray-700 mb-2" %>
+        <%= form.text_field :address,
+            placeholder: "1234 Main Street, Unit 567",
+            class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900" %>
+      </div>
+
+      <!-- City, State, ZIP -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <%= form.label :city, "City *", class: "block text-sm font-semibold text-gray-700 mb-2" %>
+          <%= form.text_field :city,
+              placeholder: "e.g., San Francisco",
+              class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900" %>
+        </div>
+
+        <div>
+          <%= form.label :state, "State *", class: "block text-sm font-semibold text-gray-700 mb-2" %>
+          <%= form.text_field :state,
+              placeholder: "e.g., CA",
+              class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900" %>
+        </div>
+
+        <div>
+          <%= form.label :zip_code, "ZIP Code *", class: "block text-sm font-semibold text-gray-700 mb-2" %>
+          <%= form.text_field :zip_code,
+              placeholder: "e.g., 94102",
+              class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-gray-900" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Property Images Section -->
+  <div class="bg-white rounded-xl shadow-lg border border-gray-100">
+    <div class="border-b border-gray-200 px-8 py-6">
+      <div class="flex items-center">
+        <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
+          <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-gray-900">Property Images</h3>
+          <p class="text-gray-600">Upload high-quality photos to showcase your property</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-8">
+      <div>
+        <%= form.label :images, "Property Photos", class: "block text-sm font-semibold text-gray-700 mb-4" %>
+
+        <!-- Display Existing Images if Editing -->
+        <% if property.persisted? && property.images.attached? && property.images.any? %>
+          <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm font-medium text-gray-700 mb-3">Current Images:</p>
+            <div class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              <% property.images.each do |image| %>
+                <div class="relative group">
+                  <%= image_tag image, class: "w-full h-20 object-cover rounded-lg shadow-sm border border-gray-200" %>
                 </div>
-                <%= form.number_field :price, step: 0.01, class: "block w-full rounded-md border-gray-300 pl-7 pr-12 focus:border-blue-500 focus:ring-blue-500 sm:text-sm", placeholder: "0.00" %>
+              <% end %>
+            </div>
+            <p class="text-xs text-gray-500 mt-2 italic">
+              <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Existing images will be kept when you save. Upload new images to add more.
+            </p>
+          </div>
+        <% end %>
+
+        <!-- Drag and Drop Area -->
+        <div class="border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 transition-colors">
+          <div class="relative">
+            <%= form.file_field :images,
+                multiple: true,
+                accept: "image/*",
+                class: "absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10",
+                id: "property_images" %>
+
+            <div class="text-center py-12 px-6">
+              <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+
+              <div class="text-gray-600">
+                <label for="property_images" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                  <span>Upload photos</span>
+                </label>
+                <span class="pl-1">or drag and drop</span>
+              </div>
+
+              <p class="text-xs text-gray-500 mt-2">
+                PNG, JPG, GIF up to 5MB each. Upload multiple photos to showcase your property.
+              </p>
+
+              <div class="mt-4 flex justify-center space-x-6 text-xs text-gray-500">
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  Multiple photos
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  High resolution
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  Fast upload
+                </div>
               </div>
             </div>
-
-            <div class="col-span-6 sm:col-span-3">
-              <%= form.label :property_type, class: "block text-sm font-medium text-gray-700" %>
-              <%= form.select :property_type, options_for_select(Property::PROPERTY_TYPES, property.property_type), { prompt: "Select a type" }, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
-            </div>
-
-            <div class="col-span-6 sm:col-span-3">
-              <%= form.label :status, class: "block text-sm font-medium text-gray-700" %>
-              <%= form.select :status, options_for_select(Property::STATUSES.map { |s| [s.capitalize, s] }, property.status), {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
-            </div>
           </div>
         </div>
+
+        <p class="text-xs text-gray-500 mt-2">
+          <strong>Photo Tips:</strong> Include exterior shots, main living areas, bedrooms, bathrooms, and kitchen.
+          Good lighting and clean spaces help attract more interest.
+        </p>
       </div>
     </div>
+  </div>
 
-    <!-- Property Details -->
-    <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:p-6">
-      <div class="md:grid md:grid-cols-3 md:gap-6">
-        <div class="md:col-span-1">
-          <h3 class="text-lg font-medium leading-6 text-gray-900">Property Details</h3>
-          <p class="mt-1 text-sm text-gray-600">Provide additional details about the property.</p>
-        </div>
-        <div class="mt-5 md:col-span-2 md:mt-0">
-          <div class="grid grid-cols-6 gap-6">
-            <div class="col-span-6 sm:col-span-2">
-              <%= form.label :bedrooms, class: "block text-sm font-medium text-gray-700" %>
-              <%= form.number_field :bedrooms, min: 0, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
-            </div>
-
-            <div class="col-span-6 sm:col-span-2">
-              <%= form.label :bathrooms, class: "block text-sm font-medium text-gray-700" %>
-              <%= form.number_field :bathrooms, min: 0, step: 0.5, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
-            </div>
-
-            <div class="col-span-6 sm:col-span-2">
-              <%= form.label :square_feet, class: "block text-sm font-medium text-gray-700" %>
-              <%= form.number_field :square_feet, min: 0, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
-            </div>
-          </div>
-        </div>
+  <!-- Form Actions -->
+  <div class="bg-white rounded-xl shadow-lg border border-gray-100 p-8">
+    <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+      <div class="text-sm text-gray-600">
+        <p>By listing your property, you agree to our <a href="#" class="text-blue-600 hover:text-blue-700 font-medium">Terms of Service</a> and <a href="#" class="text-blue-600 hover:text-blue-700 font-medium">Privacy Policy</a>.</p>
       </div>
-    </div>
 
-    <!-- Location -->
-    <div class="bg-white px-4 py-5 shadow sm:rounded-lg sm:p-6">
-      <div class="md:grid md:grid-cols-3 md:gap-6">
-        <div class="md:col-span-1">
-          <h3 class="text-lg font-medium leading-6 text-gray-900">Location</h3>
-          <p class="mt-1 text-sm text-gray-600">Specify where the property is located.</p>
-        </div>
-        <div class="mt-5 md:col-span-2 md:mt-0">
-          <div class="grid grid-cols-6 gap-6">
-            <div class="col-span-6">
-              <%= form.label :address, class: "block text-sm font-medium text-gray-700" %>
-              <%= form.text_field :address, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", placeholder: "123 Main St" %>
-            </div>
-
-            <div class="col-span-6 sm:col-span-2">
-              <%= form.label :city, class: "block text-sm font-medium text-gray-700" %>
-              <%= form.text_field :city, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
-            </div>
-
-            <div class="col-span-6 sm:col-span-2">
-              <%= form.label :state, class: "block text-sm font-medium text-gray-700" %>
-              <%= form.text_field :state, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
-            </div>
-
-            <div class="col-span-6 sm:col-span-2">
-              <%= form.label :zip_code, class: "block text-sm font-medium text-gray-700" %>
-              <%= form.text_field :zip_code, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
-            </div>
-          </div>
-        </div>
+      <div class="flex gap-4">
+        <%= link_to "Cancel", properties_path,
+            class: "px-6 py-3 border border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50 transition-colors" %>
+        <%= form.submit property.persisted? ? "Update Property" : "List Property",
+            class: "px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl" %>
       </div>
-    </div>
-
-    <div class="flex justify-end space-x-3">
-      <%= link_to "Cancel", properties_path, class: "rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" %>
-      <%= form.submit class: "inline-flex justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2" %>
     </div>
   </div>
 <% end %>

@@ -1,0 +1,716 @@
+<!-- Houzez-Inspired Hero Section -->
+<section class="relative min-h-[700px] flex items-center justify-center" style="background: linear-gradient(135deg, rgba(8, 47, 73, 0.9), rgba(178, 34, 34, 0.8)), url('https://images.unsplash.com/photo-1560472354-b33ff0c44a43?ixlib=rb-4.0.3&w=1920&h=1080&fit=crop') center/cover;">
+  <div class="absolute inset-0 bg-gradient-to-r from-blue-900/70 to-blue-800/50"></div>
+
+  <div class="relative z-10 container mx-auto px-4 text-center text-white">
+    <!-- Hero Content -->
+    <div class="max-w-4xl mx-auto mb-8">
+      <h1 class="text-6xl md:text-7xl font-bold mb-6 leading-tight">
+        Find Your
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-blue-100">Perfect</span>
+        Home
+      </h1>
+      <p class="text-xl md:text-2xl text-blue-100 font-light mb-8 leading-relaxed">
+        Discover exceptional properties from our curated collection of premium real estate
+      </p>
+    </div>
+
+    <!-- Enhanced Search Form - Houzez Style -->
+    <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-5xl mx-auto">
+      <%= form_with url: properties_path, method: :get, local: true, class: "space-y-6" do |f| %>
+        <!-- Property Status Tabs -->
+        <div class="flex flex-wrap justify-center gap-2 mb-6">
+          <button type="button" class="btn btn-primary btn-sm rounded-full px-6 py-2 font-medium tab-active" data-listing-type="all">
+            All Properties
+          </button>
+          <button type="button" class="btn btn-outline btn-sm rounded-full px-6 py-2 font-medium border-gray-300 text-gray-700 hover:bg-blue-50" data-listing-type="sale">
+            For Sale
+          </button>
+          <button type="button" class="btn btn-outline btn-sm rounded-full px-6 py-2 font-medium border-gray-300 text-gray-700 hover:bg-blue-50" data-listing-type="rent">
+            For Rent
+          </button>
+        </div>
+
+        <!-- Main Search Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          <!-- Location Search -->
+          <div class="lg:col-span-2">
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+              </div>
+              <%= f.text_field :location,
+                  placeholder: "Enter city, neighborhood, or address",
+                  class: "input input-bordered w-full pl-10 py-3 text-gray-700 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200" %>
+            </div>
+          </div>
+
+          <!-- Property Type -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Property Type</label>
+            <%= f.select :property_type,
+                options_for_select([
+                  ["All Types", ""],
+                  ["House", "house"],
+                  ["Apartment", "apartment"],
+                  ["Villa", "villa"],
+                  ["Condo", "condo"],
+                  ["Commercial", "commercial"],
+                  ["Land", "land"]
+                ]),
+                {},
+                class: "select select-bordered w-full py-3 text-gray-700 border-gray-200 focus:border-blue-500" %>
+          </div>
+
+          <!-- Price Range -->
+          <div>
+            <label class="block text-sm font-semibold text-gray-700 mb-2">Price Range</label>
+            <%= f.select :price_range,
+                options_for_select([
+                  ["Any Price", ""],
+                  ["Under $200K", "0-200000"],
+                  ["$200K - $400K", "200000-400000"],
+                  ["$400K - $600K", "400000-600000"],
+                  ["$600K - $800K", "600000-800000"],
+                  ["$800K - $1M", "800000-1000000"],
+                  ["$1M - $2M", "1000000-2000000"],
+                  ["$2M+", "2000000-"]
+                ]),
+                {},
+                class: "select select-bordered w-full py-3 text-gray-700 border-gray-200 focus:border-blue-500" %>
+          </div>
+
+          <!-- Search Button -->
+          <div class="flex items-end">
+            <%= f.submit "Search Properties",
+                class: "btn btn-primary w-full py-3 bg-gradient-to-r from-blue-600 to-blue-700 border-0 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg" %>
+          </div>
+        </div>
+
+        <!-- Advanced Search Toggle -->
+        <div class="text-center pt-4">
+          <button type="button" class="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center mx-auto gap-2">
+            <span>Advanced Search Options</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </button>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 max-w-4xl mx-auto">
+      <div class="text-center">
+        <div class="text-3xl md:text-4xl font-bold text-blue-100 mb-2">2,847+</div>
+        <div class="text-blue-200 text-sm uppercase tracking-wide">Properties Listed</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl md:text-4xl font-bold text-blue-100 mb-2">15,892+</div>
+        <div class="text-blue-200 text-sm uppercase tracking-wide">Happy Clients</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl md:text-4xl font-bold text-blue-100 mb-2">$425K</div>
+        <div class="text-blue-200 text-sm uppercase tracking-wide">Average Price</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl md:text-4xl font-bold text-blue-100 mb-2">18</div>
+        <div class="text-blue-200 text-sm uppercase tracking-wide">Days Average Sale</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Properties - Houzez Style -->
+<section class="py-20 bg-gray-50">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-16">
+      <h2 class="text-5xl font-bold text-gray-900 mb-6">Featured Properties</h2>
+      <p class="text-xl text-gray-600 max-w-2xl mx-auto">Discover our handpicked selection of premium properties, carefully curated for discerning buyers and investors</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <% if @featured_properties&.any? %>
+        <% @featured_properties.each do |property| %>
+          <!-- Houzez-Style Property Card -->
+          <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100">
+            <div class="relative overflow-hidden">
+              <% if property.images.any? %>
+                <%= image_tag property.images.first,
+                    class: "w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" %>
+              <% else %>
+                <img src="https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=600&h=400&fit=crop"
+                     alt="Property"
+                     class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300">
+              <% end %>
+
+              <!-- Status Badge -->
+              <div class="absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                <%= property.listing_type&.humanize || "For Sale" %>
+              </div>
+
+              <!-- Featured Badge -->
+              <div class="absolute top-4 right-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                Featured
+              </div>
+
+              <!-- Heart Icon -->
+              <div class="absolute bottom-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer">
+                <svg class="w-5 h-5 text-gray-600 hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <!-- Price -->
+              <div class="mb-4">
+                <span class="text-3xl font-bold text-blue-600">
+                  <%= number_to_currency(property.price) %>
+                </span>
+                <span class="text-gray-500 text-sm ml-2">/ month</span>
+              </div>
+
+              <!-- Title -->
+              <h3 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                <%= link_to property.title, property_path(property), class: "hover:text-blue-600 transition-colors" %>
+              </h3>
+
+              <!-- Location -->
+              <div class="flex items-center text-gray-600 mb-4">
+                <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span class="text-sm"><%= property.address %></span>
+              </div>
+
+              <!-- Property Features -->
+              <div class="flex items-center justify-between text-sm text-gray-600 mb-6 pb-4 border-b border-gray-100">
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z"></path>
+                  </svg>
+                  <span><%= property.bedrooms || 3 %> Beds</span>
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                  </svg>
+                  <span><%= property.bathrooms || 2 %> Baths</span>
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                  </svg>
+                  <span><%= property.square_feet || 1500 %> sqft</span>
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="flex items-center justify-between">
+                <div class="text-xs text-gray-500">
+                  Listed <%= time_ago_in_words(property.created_at) %> ago
+                </div>
+                <%= link_to "View Details", property_path(property),
+                    class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% else %>
+        <!-- Demo Properties with Houzez Style -->
+        <% 6.times do |i| %>
+          <div class="group bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100">
+            <div class="relative overflow-hidden">
+              <img src="https://images.unsplash.com/photo-<%= ["1564013799919-ab600027ffc6", "1570129477492-45c003edd2be", "1568605114967-8887f206b6ab", "1560472354-b33ff0c44a43", "1580587771525-f6b6f2c00b3e", "1512917774080-9991f1c4c750"][i] %>?w=600&h=400&fit=crop"
+                   alt="Property"
+                   class="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300">
+
+              <!-- Status Badge -->
+              <div class="absolute top-4 left-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                <%= ["For Sale", "For Rent", "For Sale"][i % 3] %>
+              </div>
+
+              <!-- Featured Badge -->
+              <div class="absolute top-4 right-4 bg-yellow-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                Featured
+              </div>
+
+              <!-- Heart Icon -->
+              <div class="absolute bottom-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 cursor-pointer">
+                <svg class="w-5 h-5 text-gray-600 hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                </svg>
+              </div>
+            </div>
+
+            <div class="p-6">
+              <!-- Price -->
+              <div class="mb-4">
+                <span class="text-3xl font-bold text-blue-600">
+                  $<%= (350000 + (i * 75000)).to_s.reverse.scan(/\d{3}|.+/).join(",").reverse %>
+                </span>
+                <% if i % 3 == 1 %>
+                  <span class="text-gray-500 text-sm ml-2">/ month</span>
+                <% end %>
+              </div>
+
+              <!-- Title -->
+              <h3 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                <%= ["Luxury Modern Villa", "Downtown Apartment", "Suburban Family Home", "Waterfront Condo", "Urban Loft Space", "Executive Mansion"][i] %>
+              </h3>
+
+              <!-- Location -->
+              <div class="flex items-center text-gray-600 mb-4">
+                <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span class="text-sm"><%= ["Beverly Hills, CA", "Manhattan, NY", "Austin, TX", "Miami Beach, FL", "Seattle, WA", "San Francisco, CA"][i] %></span>
+              </div>
+
+              <!-- Property Features -->
+              <div class="flex items-center justify-between text-sm text-gray-600 mb-6 pb-4 border-b border-gray-100">
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2 2z"></path>
+                  </svg>
+                  <span><%= 2 + (i % 4) %> Beds</span>
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                  </svg>
+                  <span><%= 1 + (i % 3) %> Baths</span>
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                  </svg>
+                  <span><%= 1200 + (i * 300) %> sqft</span>
+                </div>
+              </div>
+
+              <!-- Footer -->
+              <div class="flex items-center justify-between">
+                <div class="text-xs text-gray-500">
+                  Listed <%= [1, 3, 5, 2, 4, 6][i] %> days ago
+                </div>
+                <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors duration-200">
+                  View Details
+                </a>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="text-center mt-16">
+      <%= link_to "View All Properties", properties_path, class: "bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors duration-200 shadow-lg hover:shadow-xl" %>
+    </div>
+  </div>
+</section>
+
+<!-- Property Types Section -->
+<section class="py-16 bg-base-100" data-controller="framer-motion" data-framer-motion-animation-value="fadeIn">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold mb-4">Explore by Property Type</h2>
+      <p class="text-lg text-base-content/70">Find the perfect property type that suits your lifestyle</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Houses -->
+      <div class="group cursor-pointer transform transition-all duration-300 hover:scale-105"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="slideUp">
+        <div class="relative overflow-hidden rounded-2xl shadow-lg">
+          <img src="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&h=300&fit=crop"
+               alt="Houses"
+               class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+            <h3 class="text-xl font-bold mb-2">Houses</h3>
+            <p class="text-sm opacity-90 mb-3">Perfect for families seeking space and privacy</p>
+            <div class="flex justify-between items-center">
+              <span class="text-lg font-semibold">245+ Available</span>
+              <div class="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Apartments -->
+      <div class="group cursor-pointer transform transition-all duration-300 hover:scale-105"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="slideUp"
+           data-framer-motion-delay-value="0.1">
+        <div class="relative overflow-hidden rounded-2xl shadow-lg">
+          <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop"
+               alt="Apartments"
+               class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+            <h3 class="text-xl font-bold mb-2">Apartments</h3>
+            <p class="text-sm opacity-90 mb-3">Modern urban living with convenience</p>
+            <div class="flex justify-between items-center">
+              <span class="text-lg font-semibold">189+ Available</span>
+              <div class="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Condos -->
+      <div class="group cursor-pointer transform transition-all duration-300 hover:scale-105"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="slideUp"
+           data-framer-motion-delay-value="0.2">
+        <div class="relative overflow-hidden rounded-2xl shadow-lg">
+          <img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop"
+               alt="Condos"
+               class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+            <h3 class="text-xl font-bold mb-2">Condos</h3>
+            <p class="text-sm opacity-90 mb-3">Luxury living with premium amenities</p>
+            <div class="flex justify-between items-center">
+              <span class="text-lg font-semibold">127+ Available</span>
+              <div class="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Commercial -->
+      <div class="group cursor-pointer transform transition-all duration-300 hover:scale-105"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="slideUp"
+           data-framer-motion-delay-value="0.3">
+        <div class="relative overflow-hidden rounded-2xl shadow-lg">
+          <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop"
+               alt="Commercial"
+               class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+          <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+          <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+            <h3 class="text-xl font-bold mb-2">Commercial</h3>
+            <p class="text-sm opacity-90 mb-3">Investment opportunities and business spaces</p>
+            <div class="flex justify-between items-center">
+              <span class="text-lg font-semibold">68+ Available</span>
+              <div class="bg-white/20 backdrop-blur-sm rounded-full p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Market Statistics -->
+<section class="py-16 bg-gradient-to-br from-primary/5 to-secondary/5">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold mb-4">Market Performance</h2>
+      <p class="text-lg text-base-content/70">Real-time insights into the property market</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="stat bg-base-100 shadow-lg rounded-2xl border border-base-300"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="fadeIn"
+           data-framer-motion-delay-value="0.1">
+        <div class="stat-figure text-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
+        </div>
+        <div class="stat-title">Total Properties</div>
+        <div class="stat-value text-primary">2,847</div>
+        <div class="stat-desc">↗︎ 12% increase this month</div>
+      </div>
+
+      <div class="stat bg-base-100 shadow-lg rounded-2xl border border-base-300"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="fadeIn"
+           data-framer-motion-delay-value="0.2">
+        <div class="stat-figure text-secondary">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+          </svg>
+        </div>
+        <div class="stat-title">Happy Clients</div>
+        <div class="stat-value text-secondary">15,892</div>
+        <div class="stat-desc">↗︎ 8% increase this month</div>
+      </div>
+
+      <div class="stat bg-base-100 shadow-lg rounded-2xl border border-base-300"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="fadeIn"
+           data-framer-motion-delay-value="0.3">
+        <div class="stat-figure text-accent">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="stat-title">Avg. Property Value</div>
+        <div class="stat-value text-accent">$425K</div>
+        <div class="stat-desc">↗︎ 5.2% increase this year</div>
+      </div>
+
+      <div class="stat bg-base-100 shadow-lg rounded-2xl border border-base-300"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="fadeIn"
+           data-framer-motion-delay-value="0.4">
+        <div class="stat-figure text-info">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+          </svg>
+        </div>
+        <div class="stat-title">Avg. Sale Time</div>
+        <div class="stat-value text-info">18 Days</div>
+        <div class="stat-desc">↘︎ 3 days faster than last month</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Cities We Serve -->
+<section class="py-16 bg-base-200">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold mb-4">Cities We Serve</h2>
+      <p class="text-lg text-base-content/70">Find your perfect property in these popular locations</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- San Francisco -->
+      <div class="group relative overflow-hidden rounded-2xl shadow-lg cursor-pointer transform transition-all duration-300 hover:scale-105"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="slideUp">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop"
+             alt="San Francisco"
+             class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+          <h3 class="text-2xl font-bold mb-2">San Francisco</h3>
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm opacity-90">245 Properties Available</p>
+              <p class="text-lg font-semibold">Starting from $450K</p>
+            </div>
+            <div class="bg-white/20 backdrop-blur-sm rounded-full p-3">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- New York -->
+      <div class="group relative overflow-hidden rounded-2xl shadow-lg cursor-pointer transform transition-all duration-300 hover:scale-105"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="slideUp"
+           data-framer-motion-delay-value="0.1">
+        <img src="https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400&h=250&fit=crop"
+             alt="New York"
+             class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+          <h3 class="text-2xl font-bold mb-2">New York</h3>
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm opacity-90">312 Properties Available</p>
+              <p class="text-lg font-semibold">Starting from $325K</p>
+            </div>
+            <div class="bg-white/20 backdrop-blur-sm rounded-full p-3">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Miami -->
+      <div class="group relative overflow-hidden rounded-2xl shadow-lg cursor-pointer transform transition-all duration-300 hover:scale-105"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="slideUp"
+           data-framer-motion-delay-value="0.2">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop"
+             alt="Miami"
+             class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+          <h3 class="text-2xl font-bold mb-2">Miami</h3>
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm opacity-90">189 Properties Available</p>
+              <p class="text-lg font-semibold">Starting from $380K</p>
+            </div>
+            <div class="bg-white/20 backdrop-blur-sm rounded-full p-3">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Austin -->
+      <div class="group relative overflow-hidden rounded-2xl shadow-lg cursor-pointer transform transition-all duration-300 hover:scale-105"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="slideUp"
+           data-framer-motion-delay-value="0.3">
+        <img src="https://images.unsplash.com/photo-1531218150217-54595bc2b934?w=400&h=250&fit=crop"
+             alt="Austin"
+             class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+          <h3 class="text-2xl font-bold mb-2">Austin</h3>
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm opacity-90">156 Properties Available</p>
+              <p class="text-lg font-semibold">Starting from $225K</p>
+            </div>
+            <div class="bg-white/20 backdrop-blur-sm rounded-full p-3">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seattle -->
+      <div class="group relative overflow-hidden rounded-2xl shadow-lg cursor-pointer transform transition-all duration-300 hover:scale-105"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="slideUp"
+           data-framer-motion-delay-value="0.4">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop"
+             alt="Seattle"
+             class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+          <h3 class="text-2xl font-bold mb-2">Seattle</h3>
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm opacity-90">98 Properties Available</p>
+              <p class="text-lg font-semibold">Starting from $350K</p>
+            </div>
+            <div class="bg-white/20 backdrop-blur-sm rounded-full p-3">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Portland -->
+      <div class="group relative overflow-hidden rounded-2xl shadow-lg cursor-pointer transform transition-all duration-300 hover:scale-105"
+           data-controller="framer-motion"
+           data-framer-motion-animation-value="slideUp"
+           data-framer-motion-delay-value="0.5">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=250&fit=crop"
+             alt="Portland"
+             class="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+          <h3 class="text-2xl font-bold mb-2">Portland</h3>
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm opacity-90">87 Properties Available</p>
+              <p class="text-lg font-semibold">Starting from $280K</p>
+            </div>
+            <div class="bg-white/20 backdrop-blur-sm rounded-full p-3">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-12">
+      <button class="btn btn-outline btn-primary btn-lg">View All Cities</button>
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose Us -->
+<section class="py-16 bg-base-100">
+  <div class="container mx-auto px-4">
+    <div class="text-center mb-12">
+      <h2 class="text-4xl font-bold mb-4">Why Choose PropertyHub</h2>
+      <p class="text-lg text-base-content/70">We make finding your dream property simple and enjoyable</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="text-center">
+        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-primary">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold mb-2">Wide Selection</h3>
+        <p class="text-base-content/70">Browse through thousands of properties to find your perfect match</p>
+      </div>
+
+      <div class="text-center">
+        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-primary">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold mb-2">Trusted Platform</h3>
+        <p class="text-base-content/70">All listings are verified and secure for your peace of mind</p>
+      </div>
+
+      <div class="text-center">
+        <div class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 text-primary">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-bold mb-2">Expert Support</h3>
+        <p class="text-base-content/70">Our team of experts is here to help you every step of the way</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-16 bg-primary text-primary-content">
+  <div class="container mx-auto px-4 text-center">
+    <h2 class="text-4xl font-bold mb-4">Ready to Find Your Dream Property?</h2>
+    <p class="text-xl mb-8">Join thousands of happy homeowners who found their perfect property with us</p>
+    <div class="flex gap-4 justify-center">
+      <%= link_to "Browse Properties", properties_path, class: "btn btn-secondary btn-lg" %>
+      <%= link_to "List Your Property", new_property_path, class: "btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-primary" %>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,149 @@
+<!-- Favorites Page -->
+<div class="bg-gray-50 min-h-screen py-8">
+  <div class="container mx-auto px-4">
+    <!-- Page Header -->
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">My Favorite Properties</h1>
+          <p class="text-gray-600">
+            You have <%= @favorites_count %> <%= 'property'.pluralize(@favorites_count) %> saved
+          </p>
+        </div>
+        <div class="flex gap-3">
+          <%= link_to properties_path, class: "inline-flex items-center px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200" do %>
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            Browse More Properties
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <% if @favorite_properties.any? %>
+      <!-- Properties Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @favorite_properties.each do |property| %>
+          <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 group">
+            <!-- Property Image -->
+            <div class="relative h-64 bg-gray-200">
+              <% if property.images.attached? && property.images.any? %>
+                <%= image_tag property.images.first,
+                    class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-500",
+                    alt: property.title %>
+              <% else %>
+                <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+                  <svg class="w-20 h-20 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                  </svg>
+                </div>
+              <% end %>
+
+              <!-- Status Badge -->
+              <div class="absolute top-4 left-4">
+                <span class="px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full">
+                  <%= property.listing_type.capitalize %>
+                </span>
+              </div>
+
+              <!-- Price Tag -->
+              <div class="absolute bottom-4 left-4">
+                <div class="bg-white/95 backdrop-blur px-4 py-2 rounded-lg">
+                  <p class="text-2xl font-bold text-gray-900">
+                    $<%= number_with_delimiter(property.price) %>
+                    <% if property.listing_type == 'rent' %>
+                      <span class="text-sm font-normal text-gray-600">/month</span>
+                    <% end %>
+                  </p>
+                </div>
+              </div>
+
+              <!-- Remove from Favorites Button -->
+              <div class="absolute top-4 right-4">
+                <%= button_to unfavorite_property_path(property),
+                    method: :delete,
+                    class: "p-2 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition-colors duration-200",
+                    title: "Remove from favorites" do %>
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                  </svg>
+                <% end %>
+              </div>
+            </div>
+
+            <!-- Property Details -->
+            <div class="p-5">
+              <%= link_to property_path(property), class: "block group" do %>
+                <h3 class="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors line-clamp-1">
+                  <%= property.title %>
+                </h3>
+              <% end %>
+
+              <div class="flex items-center text-gray-600 text-sm mb-3">
+                <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span class="line-clamp-1"><%= [property.city, property.region].compact.join(', ') %></span>
+              </div>
+
+              <!-- Property Features -->
+              <div class="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                  </svg>
+                  <span><%= property.bedrooms %> Beds</span>
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                  </svg>
+                  <span><%= property.bathrooms %> Baths</span>
+                </div>
+                <div class="flex items-center">
+                  <svg class="w-4 h-4 mr-1 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                  </svg>
+                  <span><%= number_with_delimiter(property.square_feet) %> sqft</span>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex gap-2">
+                <%= link_to property_path(property), class: "flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2.5 rounded-lg font-medium transition-colors duration-200" do %>
+                  View Details
+                <% end %>
+                <button class="px-3 py-2.5 border border-gray-300 hover:border-gray-400 rounded-lg transition-colors duration-200" title="Contact Agent">
+                  <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <!-- Empty State -->
+      <div class="bg-white rounded-xl shadow-sm p-12 text-center">
+        <div class="max-w-md mx-auto">
+          <svg class="w-24 h-24 text-gray-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+          </svg>
+          <h3 class="text-2xl font-bold text-gray-900 mb-3">No Favorite Properties Yet</h3>
+          <p class="text-gray-600 mb-8">
+            Start exploring our properties and save your favorites to view them here later.
+          </p>
+          <%= link_to properties_path, class: "inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200" do %>
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            Browse Properties
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

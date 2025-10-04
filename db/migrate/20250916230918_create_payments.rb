@@ -29,9 +29,9 @@ class CreatePayments < ActiveRecord::Migration[8.0]
     add_index :payments, :transaction_id, unique: true
     add_index :payments, :status
     add_index :payments, :payment_type
-    add_index :payments, [:booking_id, :status]
-    add_index :payments, [:payer_id, :created_at]
-    add_index :payments, [:payee_id, :created_at]
+    add_index :payments, [ :booking_id, :status ]
+    add_index :payments, [ :payer_id, :created_at ]
+    add_index :payments, [ :payee_id, :created_at ]
     add_index :payments, :processed_at
   end
 end

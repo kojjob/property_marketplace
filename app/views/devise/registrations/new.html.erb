@@ -1,29 +1,125 @@
-<h2>Sign up</h2>
+<!-- Sign Up Page with Property Background -->
+<div class="min-h-screen flex items-center justify-center relative"
+     style="background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1582407947304-fd86f028f716?ixlib=rb-4.0.3') center/cover;">
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+  <div class="container mx-auto px-4 py-8 flex items-center justify-center">
+    <div class="card w-full max-w-lg bg-base-100 shadow-2xl">
+      <div class="card-body">
+        <!-- Logo Section -->
+        <div class="text-center mb-6">
+          <%= link_to root_path, class: "flex items-center justify-center gap-3 mb-4" do %>
+            <div class="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-white">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819" />
+              </svg>
+            </div>
+            <span class="text-2xl font-bold text-base-content">PropertyHub</span>
+          <% end %>
+          <h2 class="text-2xl font-semibold text-base-content mb-2">Create Your Account</h2>
+          <p class="text-base-content/70">Join PropertyHub to discover your dream property</p>
+        </div>
 
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+        <!-- Error Messages -->
+        <%= render "devise/shared/error_messages", resource: resource %>
+
+        <!-- Sign Up Form -->
+        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), class: "space-y-4") do |f| %>
+
+          <!-- Email Field -->
+          <div class="form-control">
+            <%= f.label :email, class: "label" do %>
+              <span class="label-text font-medium">Email Address</span>
+            <% end %>
+            <%= f.email_field :email,
+                autofocus: true,
+                autocomplete: "email",
+                placeholder: "Enter your email address",
+                class: "input input-bordered w-full focus:input-primary" %>
+          </div>
+
+          <!-- Password Field -->
+          <div class="form-control">
+            <%= f.label :password, class: "label" do %>
+              <span class="label-text font-medium">Password</span>
+              <% if @minimum_password_length %>
+                <span class="label-text-alt text-base-content/60">
+                  (<%= @minimum_password_length %> characters minimum)
+                </span>
+              <% end %>
+            <% end %>
+            <%= f.password_field :password,
+                autocomplete: "new-password",
+                placeholder: "Create a secure password",
+                class: "input input-bordered w-full focus:input-primary" %>
+          </div>
+
+          <!-- Password Confirmation Field -->
+          <div class="form-control">
+            <%= f.label :password_confirmation, class: "label" do %>
+              <span class="label-text font-medium">Confirm Password</span>
+            <% end %>
+            <%= f.password_field :password_confirmation,
+                autocomplete: "new-password",
+                placeholder: "Confirm your password",
+                class: "input input-bordered w-full focus:input-primary" %>
+          </div>
+
+          <!-- Terms and Conditions -->
+          <div class="form-control">
+            <label class="label cursor-pointer justify-start">
+              <input type="checkbox" class="checkbox checkbox-primary checkbox-sm mr-3" required />
+              <span class="label-text text-sm">
+                I agree to PropertyHub's
+                <a href="#" class="link link-primary">Terms of Service</a>
+                and
+                <a href="#" class="link link-primary">Privacy Policy</a>
+              </span>
+            </label>
+          </div>
+
+          <!-- Sign Up Button -->
+          <div class="form-control mt-6">
+            <%= f.submit "Create Account", class: "btn btn-primary w-full text-white font-medium" %>
+          </div>
+        <% end %>
+
+        <!-- Divider -->
+        <div class="divider">or</div>
+
+        <!-- Sign In Link -->
+        <div class="text-center">
+          <p class="text-base-content/70">
+            Already have an account?
+            <%= link_to "Sign in", new_session_path(resource_name),
+                class: "link link-primary font-medium ml-1" %>
+          </p>
+        </div>
+
+        <!-- Additional Benefits -->
+        <div class="mt-6 p-4 bg-base-200 rounded-lg">
+          <h3 class="font-semibold text-base-content mb-2">Join PropertyHub Today</h3>
+          <ul class="text-sm text-base-content/70 space-y-1">
+            <li class="flex items-center">
+              <svg class="w-4 h-4 text-primary mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              Access to exclusive property listings
+            </li>
+            <li class="flex items-center">
+              <svg class="w-4 h-4 text-primary mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              Save your favorite properties
+            </li>
+            <li class="flex items-center">
+              <svg class="w-4 h-4 text-primary mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              List your own properties
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <div class="field">
-    <%= f.label :password %>
-    <% if @minimum_password_length %>
-    <em>(<%= @minimum_password_length %> characters minimum)</em>
-    <% end %><br />
-    <%= f.password_field :password, autocomplete: "new-password" %>
-  </div>
-
-  <div class="field">
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Sign up" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+</div>

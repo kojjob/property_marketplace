@@ -1,0 +1,26 @@
+<!-- Comments Section -->
+<div class="border-t border-gray-200 pt-12">
+  <h3 class="text-2xl font-bold text-gray-900 mb-6">
+    Comments (<%= blog_post.comments.approved.count %>)
+  </h3>
+  <!-- Comment Form -->
+  <% if user_signed_in? || blog_post.comments.where(author_email: session[:guest_email]).none? %>
+    <div id="comment_form" class="mb-8">
+      <%= render 'comments/form', comment: comment, blog_post: blog_post %>
+    </div>
+  <% else %>
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-8">
+      <p class="text-yellow-800">You've already commented on this post. Please sign in to leave additional comments.</p>
+    </div>
+  <% end %>
+  <!-- Comments List -->
+  <div id="comments_list" class="space-y-6">
+    <%= render blog_post.comments.root_comments.approved.includes(:user, :replies) %>
+  </div>
+  <!-- Load More Comments (if needed) -->
+  <% if blog_post.comments.approved.count > 10 %>
+    <div class="text-center mt-8">
+      <button class="text-blue-600 hover:text-blue-800 font-medium">Load More Comments</button>
+    </div>
+  <% end %>
+</div>

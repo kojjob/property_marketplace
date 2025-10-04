@@ -22,7 +22,7 @@ RSpec.describe User, type: :model do
     end
 
     it 'accepts valid email formats' do
-      valid_emails = ['user@example.com', 'USER@foo.COM', 'A_US-ER@foo.bar.org']
+      valid_emails = [ 'user@example.com', 'USER@foo.COM', 'A_US-ER@foo.bar.org' ]
       valid_emails.each do |valid_email|
         user = build(:user, email: valid_email)
         expect(user).to be_valid
