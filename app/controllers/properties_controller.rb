@@ -4,16 +4,28 @@ class PropertiesController < ApplicationController
   before_action :check_owner, only: [ :edit, :update, :destroy ]
 
   def index
-    # Use the Property::SearchService for all filtering, searching, and pagination
+    # Use the AdvancedPropertySearchService for all filtering, searching, and pagination
     search_params = normalize_search_params(params)
-    result = Property::SearchService.new(search_params).call
+    result = AdvancedPropertySearchService.new(search_params).call
 
     if result.success?
-      @properties = result.data[:properties]
-      @pagination = result.data[:pagination]
+      @properties = result.data[:properties] || result.data[:listings] || []
+      @total_count = result.data[:total_count]
+      @pagination = {
+        page: result.data[:page],
+        per_page: result.data[:per_page],
+        total_pages: result.data[:total_pages],
+        has_next_page: result.data[:has_next_page],
+        has_prev_page: result.data[:has_prev_page]
+      }
+      @facets = result.data[:facets]
+      @suggestions = result.data[:suggestions]
     else
-      @properties = Property.none
+      @properties = []
+      @total_count = 0
       @pagination = {}
+      @facets = nil
+      @suggestions = nil
       flash.now[:alert] = "Search failed: #{result.error}"
     end
 

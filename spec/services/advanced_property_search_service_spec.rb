@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-RSpec.describe Property::SearchService, type: :service do
+RSpec.describe AdvancedPropertySearchService, type: :service do
   let(:user) { create(:user) }
   let!(:apartment_downtown) do
     create(:property,
