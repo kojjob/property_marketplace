@@ -44,7 +44,7 @@ gem "image_processing", "~> 1.2"
 
 # Authentication and Authorization
 gem "devise", "~> 4.9"            # Authentication solution
-gem "pundit", "~> 2.3"           # Authorization policies
+gem "pundit", "~> 2.5"           # Authorization policies
 gem "rack-attack", "~> 6.7"      # Rate limiting and throttling
 
 # Geospatial and Search
