@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class PropertySearchService < ApplicationService
+class AdvancedPropertySearchService < ApplicationService
     attr_reader :params, :user
 
     def initialize(params = {}, user = nil)

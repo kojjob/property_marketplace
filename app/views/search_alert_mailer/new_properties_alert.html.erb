@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+  </head>
+  <body>
+    <h1>New Properties Match Your Saved Search</h1>
+    <p>Hi <%= @user.first_name || @user.email %>,</p>
+    <p>Great news! We found <%= @new_properties.count %> new propert<%= @new_properties.count == 1 ? 'y' : 'ies' %> that match your saved search "<%= @saved_search.name %>".</p>
+    <div style="margin: 20px 0;">
+      <strong>Search Criteria:</strong><br>
+      <%= @saved_search.criteria_string %>
+    </div>
+    <h2>New Properties:</h2>
+    <% @new_properties.each do |property| %>
+      <div style="border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px;">
+        <h3 style="margin-top: 0;">
+          <a href="<%= property_url(property) %>" style="color: #2563eb; text-decoration: none;">
+            <%= property.title %>
+          </a>
+        </h3>
+        <p style="margin: 5px 0; color: #666;">
+          <%= property.location_display %>
+        </p>
+        <p style="margin: 5px 0; font-weight: bold; color: #059669;">
+          $<%= number_with_delimiter(property.price.to_i) %>
+        </p>
+        <div style="margin-top: 10px;">
+          <% if property.bedrooms.present? %>
+            <span style="background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-size: 12px; margin-right: 5px;">
+              <%= property.bedrooms %> bed<%= property.bedrooms != 1 ? 's' : '' %>
+            </span>
+          <% end %>
+          <% if property.bathrooms.present? %>
+            <span style="background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-size: 12px; margin-right: 5px;">
+              <%= property.bathrooms %> bath<%= property.bathrooms != 1 ? 's' : '' %>
+            </span>
+          <% end %>
+          <% if property.square_feet.present? %>
+            <span style="background: #f3f4f6; padding: 2px 6px; border-radius: 3px; font-size: 12px;">
+              <%= number_with_delimiter(property.square_feet) %> sqft
+            </span>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd;">
+      <a href="<%= saved_search_url(@saved_search) %>" style="background: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+        View All Matching Properties
+      </a>
+      <p style="margin-top: 20px; font-size: 12px; color: #666;">
+        You're receiving this email because you have search alerts enabled for "<%= @saved_search.name %>".
+        <a href="<%= edit_saved_search_url(@saved_search) %>">Manage your alerts</a> or
+        <a href="<%= unsubscribe_search_alert_url(@saved_search) %>">unsubscribe from this search</a>.
+      </p>
+    </div>
+  </body>
+</html>

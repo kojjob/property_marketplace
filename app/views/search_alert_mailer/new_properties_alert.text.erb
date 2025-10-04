@@ -1,0 +1,17 @@
+New Properties Match Your Saved Search
+Hi <%= @user.first_name || @user.email %>,
+Great news! We found <%= @new_properties.count %> new propert<%= @new_properties.count == 1 ? 'y' : 'ies' %> that match your saved search "<%= @saved_search.name %>".
+Search Criteria:
+<%= @saved_search.criteria_string %>
+New Properties:
+<% @new_properties.each do |property| %>
+  - <%= property.title %>
+  <%= property.location_display %>
+  $<%= number_with_delimiter(property.price.to_i) %>
+  <%= property_url(property) %>
+<% end %>
+View all matching properties: <%= saved_search_url(@saved_search) %>
+---
+You're receiving this email because you have search alerts enabled for "<%= @saved_search.name %>".
+Manage your alerts: <%= edit_saved_search_url(@saved_search) %>
+Unsubscribe from this search: <%= unsubscribe_search_alert_url(@saved_search) %>
