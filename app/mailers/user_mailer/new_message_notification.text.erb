@@ -1,0 +1,12 @@
+Property Marketplace - New Message
+Hello <%= @recipient.profile&.first_name || @recipient.email.split('@').first %>!
+You have received a new message from <%= @sender.profile&.full_name || @sender.email.split('@').first %>.
+Message:
+<%= @message.content %>
+View Conversation: <%= conversation_url(@conversation) %>
+You can reply to this message directly in your inbox or visit the conversation page.
+---
+You're receiving this email because you have message notifications enabled.
+You can change your notification preferences in your account settings: <%= edit_profile_url %>
+© 2025 Property Marketplace. All rights reserved.
+Unsubscribe from notifications: [unsubscribe link]

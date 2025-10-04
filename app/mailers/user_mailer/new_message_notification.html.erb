@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=UTF-8' http-equiv='Content-Type' />
+    <style>
+      body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+      .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+      .header { background: #2563eb; color: white; padding: 20px; text-align: center; }
+      .content { padding: 20px; background: #f8f9fa; }
+      .message { background: white; padding: 15px; border-left: 4px solid #2563eb; margin: 15px 0; }
+      .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
+      .button { display: inline-block; padding: 10px 20px; background: #2563eb; color: white; text-decoration: none; border-radius: 5px; }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Property Marketplace</h1>
+        <p>You have a new message</p>
+      </div>
+      <div class="content">
+        <h2>Hello <%= @recipient.profile&.first_name || @recipient.email.split('@').first %>!</h2>
+        <p>You have received a new message from <strong><%= @sender.profile&.full_name || @sender.email.split('@').first %></strong>.</p>
+        <div class="message">
+          <p><strong>Message:</strong></p>
+          <p><%= simple_format(h(@message.content)) %></p>
+        </div>
+        <p>
+          <%= link_to "View Conversation", conversation_url(@conversation), class: "button" %>
+        </p>
+        <p>
+          You can reply to this message directly in your inbox or visit the conversation page.
+        </p>
+        <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+        <p><small>
+            You're receiving this email because you have message notifications enabled.
+            You can change your notification preferences in your <%= link_to "account settings", edit_profile_url %>.
+          </small></p>
+      </div>
+      <div class="footer">
+        <p>&copy; 2025 Property Marketplace. All rights reserved.</p>
+        <p><%= link_to "Unsubscribe from notifications", "#" %></p>
+      </div>
+    </div>
+  </body>
+</html>
