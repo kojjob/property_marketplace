@@ -430,7 +430,7 @@ class PropertySearchService < ApplicationService
 
     def save_search
       return unless user.present?
-      
+
       SavedSearch.create!(
         user: user,
         name: params[:search_name] || "Search from #{Date.current}",
@@ -557,5 +557,4 @@ class PropertySearchService < ApplicationService
     def include_facets?
       params[:include_facets].present? && params[:include_facets] != "false"
     end
-  end
 end
