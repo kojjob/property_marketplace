@@ -1,6 +1,10 @@
 class Profile < ApplicationRecord
   belongs_to :user
-  has_one_attached :avatar
+  has_one_attached :avatar do |attachable|
+    attachable.variant :thumb, resize_to_limit: [ 50, 50 ]
+    attachable.variant :small, resize_to_limit: [ 100, 100 ]
+    attachable.variant :medium, resize_to_limit: [ 200, 200 ]
+  end
 
   # Declare the attribute for messaging_availability enum
   attribute :messaging_availability, :string, default: "everyone"

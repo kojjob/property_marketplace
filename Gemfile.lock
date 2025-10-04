@@ -536,6 +536,7 @@ DEPENDENCIES
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
+  jwt (~> 2.8)
   kamal
   letter_opener
   pay (~> 7.0)

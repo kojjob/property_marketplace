@@ -7,8 +7,16 @@ class BlogPost < ApplicationRecord
   has_many :categories, through: :blog_post_categories, source: :blog_category
 
   # Active Storage attachments for rich media
-  has_one_attached :featured_image
-  has_many_attached :media_files
+  has_one_attached :featured_image do |attachable|
+    attachable.variant :small, resize_to_limit: [ 300, 200 ]
+    attachable.variant :thumb, resize_to_limit: [ 150, 150 ]
+    attachable.variant :medium, resize_to_limit: [ 600, 400 ]
+    attachable.variant :large, resize_to_limit: [ 1200, 800 ]
+  end
+  has_many_attached :media_files do |attachable|
+    attachable.variant :thumb, resize_to_limit: [ 150, 150 ]
+    attachable.variant :medium, resize_to_limit: [ 600, 400 ]
+  end
   has_rich_text :content
 
   # Validations

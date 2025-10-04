@@ -1,118 +1,219 @@
 <div class="container mx-auto px-4 py-8">
-  <div class="max-w-4xl mx-auto">
-    <!-- Breadcrumbs -->
-    <nav class="mb-8">
-      <%= link_to "Blog", blog_posts_path, class: "text-blue-600 hover:text-blue-800" %>
-      <% @blog_post.categories.each do |category| %>
-        <span class="text-gray-400 mx-2">/</span>
-        <%= link_to category.name, blog_posts_path(category: category.slug), class: "text-blue-600 hover:text-blue-800" %>
-      <% end %>
-    </nav>
-    <!-- Article Header -->
-    <header class="mb-8">
-      <div class="flex items-center gap-2 mb-4">
-        <% @blog_post.categories.each do |category| %>
-          <%= link_to category.name, blog_posts_path(category: category.slug),
-                      class: "text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full hover:bg-blue-100" %>
-        <% end %>
-      </div>
-      <h1 class="text-4xl font-bold text-gray-900 mb-4"><%= @blog_post.title %></h1>
-      <% if @blog_post.excerpt.present? %>
-        <p class="text-xl text-gray-600 mb-6"><%= @blog_post.excerpt %></p>
-      <% end %>
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <% if @blog_post.user.profile&.avatar.attached? %>
-            <%= image_tag @blog_post.user.profile.avatar.variant(:thumb), class: "w-10 h-10 rounded-full" %>
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Main Content -->
+      <div class="lg:col-span-2">
+        <!-- Breadcrumbs -->
+        <nav class="mb-8">
+          <%= link_to "Blog", blog_posts_path, class: "text-blue-600 hover:text-blue-800" %>
+          <% @blog_post.categories.each do |category| %>
+            <span class="text-gray-400 mx-2">/</span>
+            <%= link_to category.name, blog_posts_path(category: category.slug), class: "text-blue-600 hover:text-blue-800" %>
           <% end %>
-          <div>
-            <div class="font-medium text-gray-900">
-              <%= @blog_post.user.profile&.first_name %> <%= @blog_post.user.profile&.last_name %>
-            </div>
+        </nav>
+        <!-- Article Header -->
+        <header class="mb-8">
+          <div class="flex items-center gap-2 mb-4">
+            <% @blog_post.categories.each do |category| %>
+              <%= link_to category.name, blog_posts_path(category: category.slug),
+                          class: "text-sm font-medium text-blue-600 bg-blue-50 px-3 py-1 rounded-full hover:bg-blue-100" %>
+            <% end %>
+          </div>
+          <h1 class="text-4xl font-bold text-gray-900 mb-4"><%= @blog_post.title %></h1>
+          <% if @blog_post.excerpt.present? %>
+            <p class="text-xl text-gray-600 mb-6"><%= @blog_post.excerpt %></p>
+          <% end %>
+          <div class="flex items-center justify-between">
             <div class="text-sm text-gray-500">
               <%= @blog_post.published_at&.strftime('%B %d, %Y') %> • <%= @blog_post.reading_time %> min read
             </div>
+            <!-- Admin Actions -->
+            <% if user_signed_in? && (@blog_post.user == current_user || current_user.admin?) %>
+              <div class="flex gap-2">
+                <%= link_to "Edit", edit_blog_post_path(@blog_post), class: "text-blue-600 hover:text-blue-800" %>
+                <%= link_to "Delete", @blog_post, method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800" %>
+              </div>
+            <% end %>
           </div>
-        </div>
-        <!-- Admin Actions -->
-        <% if user_signed_in? && (@blog_post.user == current_user || current_user.admin?) %>
-          <div class="flex gap-2">
-            <%= link_to "Edit", edit_blog_post_path(@blog_post), class: "text-blue-600 hover:text-blue-800" %>
-            <%= link_to "Delete", @blog_post, method: :delete, data: { confirm: "Are you sure?" }, class: "text-red-600 hover:text-red-800" %>
+        </header>
+        <!-- Featured Image -->
+        <% if @blog_post.featured_image.attached? %>
+          <div class="mb-8">
+            <%= image_tag @blog_post.featured_image.variant(:large), class: "w-full rounded-lg shadow-lg" %>
           </div>
         <% end %>
-      </div>
-    </header>
-    <!-- Featured Image -->
-    <% if @blog_post.featured_image.attached? %>
-      <div class="mb-8">
-        <%= image_tag @blog_post.featured_image.variant(:large), class: "w-full rounded-lg shadow-lg" %>
-      </div>
-    <% end %>
-    <!-- Article Content -->
-    <article class="prose prose-lg max-w-none mb-12">
-      <%= @blog_post.content %>
-    </article>
-    <!-- Media Files -->
-    <% if @blog_post.media_files.attached? %>
-      <div class="mb-12">
-        <h3 class="text-2xl font-bold text-gray-900 mb-6">Media Files</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <% @blog_post.media_files.each do |file| %>
-            <div class="border border-gray-200 rounded-lg p-4">
-              <% if file.content_type.start_with?('image/') %>
-                <%= image_tag file.variant(:medium), class: "w-full h-32 object-cover rounded" %>
-              <% elsif file.content_type.start_with?('video/') %>
-                <video controls class="w-full h-32 object-cover rounded">
-                  <%= source_tag src: url_for(file), type: file.content_type %>
-                </video>
-              <% elsif file.content_type.start_with?('audio/') %>
-                <audio controls class="w-full">
-                  <%= source_tag src: url_for(file), type: file.content_type %>
-                </audio>
-              <% else %>
-                <div class="flex items-center gap-3">
-                  <div class="text-2xl">📄</div>
-                  <div>
-                    <div class="font-medium"><%= file.filename %></div>
-                    <div class="text-sm text-gray-500"><%= number_to_human_size(file.byte_size) %></div>
+        <!-- Article Content -->
+        <article class="prose prose-lg max-w-none mb-12">
+          <%= @blog_post.content %>
+        </article>
+        <!-- Media Files -->
+        <% if @blog_post.media_files.attached? %>
+          <div class="mb-12">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">Media Files</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <% @blog_post.media_files.each do |file| %>
+                <div class="border border-gray-200 rounded-lg p-4">
+                  <% if file.content_type.start_with?('image/') %>
+                    <%= image_tag file.variant(:medium), class: "w-full h-32 object-cover rounded" %>
+                  <% elsif file.content_type.start_with?('video/') %>
+                    <video controls class="w-full h-32 object-cover rounded">
+                      <%= source_tag src: url_for(file), type: file.content_type %>
+                    </video>
+                  <% elsif file.content_type.start_with?('audio/') %>
+                    <audio controls class="w-full">
+                      <%= source_tag src: url_for(file), type: file.content_type %>
+                    </audio>
+                  <% else %>
+                    <div class="flex items-center gap-3">
+                      <div class="text-2xl">📄</div>
+                      <div>
+                        <div class="font-medium"><%= file.filename %></div>
+                        <div class="text-sm text-gray-500"><%= number_to_human_size(file.byte_size) %></div>
+                      </div>
+                    </div>
+                  <% end %>
+                  <div class="mt-2">
+                    <%= link_to "Download", url_for(file), target: "_blank", class: "text-blue-600 hover:text-blue-800 text-sm" %>
                   </div>
                 </div>
               <% end %>
-              <div class="mt-2">
-                <%= link_to "Download", url_for(file), target: "_blank", class: "text-blue-600 hover:text-blue-800 text-sm" %>
-              </div>
             </div>
-          <% end %>
+          </div>
+        <% end %>
+        <!-- Related Posts -->
+        <% if @related_posts.any? %>
+          <div class="mb-12">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6">Related Posts</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <% @related_posts.each do |post| %>
+                <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                  <% if post.featured_image.attached? %>
+                    <%= image_tag post.featured_image.variant(:small), class: "w-full h-32 object-cover" %>
+                  <% end %>
+                  <div class="p-4">
+                    <h4 class="font-bold text-gray-900 mb-2">
+                      <%= link_to post.title, post, class: "hover:text-blue-600 transition-colors" %>
+                    </h4>
+                    <p class="text-sm text-gray-600 line-clamp-2">
+                      <%= post.excerpt || post.content.to_plain_text.truncate(100) %>
+                    </p>
+                  </div>
+                </article>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+        <!-- Comments Section -->
+        <div id="comments-section">
+          <%= render 'comments/comments_section', blog_post: @blog_post, comment: @comment %>
         </div>
       </div>
-    <% end %>
-    <!-- Related Posts -->
-    <% if @related_posts.any? %>
-      <div class="mb-12">
-        <h3 class="text-2xl font-bold text-gray-900 mb-6">Related Posts</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <% @related_posts.each do |post| %>
-            <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <% if post.featured_image.attached? %>
-                <%= image_tag post.featured_image.variant(:small), class: "w-full h-32 object-cover" %>
+      <!-- Author Bio Sidebar -->
+      <div class="lg:col-span-1">
+        <div class="sticky top-8">
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <!-- Author Avatar and Basic Info -->
+            <div class="text-center mb-6">
+              <% if @blog_post.user.profile&.avatar&.attached? %>
+                <%= image_tag @blog_post.user.profile.avatar.variant(:medium), class: "w-24 h-24 rounded-full mx-auto mb-4 border-4 border-gray-100" %>
+              <% else %>
+                <div class="w-24 h-24 rounded-full mx-auto mb-4 bg-gray-200 flex items-center justify-center border-4 border-gray-100">
+                  <span class="text-2xl text-gray-500 font-bold">
+                    <%= @blog_post.user.profile&.first_name&.first&.upcase %><%= @blog_post.user.profile&.last_name&.first&.upcase %>
+                  </span>
+                </div>
               <% end %>
-              <div class="p-4">
-                <h4 class="font-bold text-gray-900 mb-2">
-                  <%= link_to post.title, post, class: "hover:text-blue-600 transition-colors" %>
-                </h4>
-                <p class="text-sm text-gray-600 line-clamp-2">
-                  <%= post.excerpt || post.content.to_plain_text.truncate(100) %>
+              <h3 class="text-xl font-bold text-gray-900 mb-1">
+                <%= @blog_post.user.profile&.full_name || @blog_post.user.email %>
+              </h3>
+              <div class="flex items-center justify-center gap-2 mb-2">
+                <span class="text-sm text-gray-600 capitalize">
+                  <%= @blog_post.user.profile&.role&.humanize || 'Author' %>
+                </span>
+                <% if @blog_post.user.profile&.verified? %>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                    </svg>
+                    Verified
+                  </span>
+                <% end %>
+              </div>
+              <% if @blog_post.user.profile&.company_name.present? || @blog_post.user.profile&.position.present? %>
+                <p class="text-sm text-gray-500 mb-4">
+                  <% if @blog_post.user.profile&.position.present? %>
+                    <%= @blog_post.user.profile.position %>
+                    <% if @blog_post.user.profile&.company_name.present? %>
+                      at <%= @blog_post.user.profile.company_name %>
+                    <% end %>
+                  <% else %>
+                    <%= @blog_post.user.profile.company_name %>
+                  <% end %>
+                </p>
+              <% end %>
+            </div>
+            <!-- Author Bio -->
+            <% if @blog_post.user.profile&.bio.present? %>
+              <div class="mb-6">
+                <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-2">About</h4>
+                <p class="text-sm text-gray-600 leading-relaxed">
+                  <%= @blog_post.user.profile.bio %>
                 </p>
               </div>
-            </article>
-          <% end %>
+            <% end %>
+            <!-- Author Stats -->
+            <div class="mb-6">
+              <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">Stats</h4>
+              <div class="space-y-2">
+                <div class="flex justify-between text-sm">
+                  <span class="text-gray-600">Posts</span>
+                  <span class="font-medium text-gray-900"><%= @blog_post.user.blog_posts.published.count %></span>
+                </div>
+                <% if @blog_post.user.profile&.years_experience.present? %>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-gray-600">Experience</span>
+                    <span class="font-medium text-gray-900"><%= @blog_post.user.profile.years_experience %> years</span>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+            <!-- Social Links -->
+            <% social_links = [
+              ['website', @blog_post.user.profile&.website, '🌐'],
+              ['linkedin', @blog_post.user.profile&.linkedin_url, '💼'],
+              ['twitter', @blog_post.user.profile&.twitter_url, '🐦'],
+              ['facebook', @blog_post.user.profile&.facebook_url, '📘'],
+              ['instagram', @blog_post.user.profile&.instagram_url, '📷']
+            ].select { |_, url, _| url.present? } %>
+            <% if social_links.any? %>
+              <div class="mb-6">
+                <h4 class="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-3">Connect</h4>
+                <div class="flex flex-wrap gap-2">
+                  <% social_links.each do |platform, url, icon| %>
+                    <%= link_to url, target: "_blank", rel: "noopener noreferrer",
+                               class: "inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors text-sm",
+                               title: platform.capitalize do %>
+                      <%= icon %>
+                    <% end %>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+            <!-- Contact Options -->
+            <% if user_signed_in? && current_user != @blog_post.user && @blog_post.user.profile&.accepts_messages? %>
+              <div class="border-t pt-4">
+                <%= link_to "#", class: "w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors",
+                           onclick: "alert('Messaging feature coming soon!')" do %>
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                  </svg>
+                  Send Message
+                <% end %>
+              </div>
+            <% end %>
+          </div>
         </div>
       </div>
-    <% end %>
-    <!-- Comments Section -->
-    <div id="comments-section">
-      <%= render 'comments/comments_section', blog_post: @blog_post, comment: @comment %>
     </div>
   </div>
 </div>

@@ -51,7 +51,7 @@
             </p>
             <div class="flex items-center justify-between text-sm text-gray-500">
               <div class="flex items-center gap-2">
-                <% if post.user.profile&.avatar.attached? %>
+                <% if post.user.profile&.avatar&.attached? %>
                   <%= image_tag post.user.profile.avatar.variant(:thumb), class: "w-6 h-6 rounded-full" %>
                 <% end %>
                 <span><%= post.user.profile&.first_name %> <%= post.user.profile&.last_name %></span>
