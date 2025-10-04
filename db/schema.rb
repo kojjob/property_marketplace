@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_03_222829) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_04_123320) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -172,7 +172,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_03_222829) do
     t.bigint "property_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_favorites_on_created_at"
     t.index ["property_id"], name: "index_favorites_on_property_id"
+    t.index ["user_id", "property_id"], name: "index_favorites_on_user_id_and_property_id", unique: true
     t.index ["user_id"], name: "index_favorites_on_user_id"
   end
 
@@ -209,11 +211,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_03_222829) do
     t.datetime "updated_at", null: false
     t.decimal "average_rating", precision: 3, scale: 2, default: "0.0"
     t.integer "reviews_count", default: 0
+    t.index ["available_from"], name: "index_listings_on_available_from"
+    t.index ["available_until"], name: "index_listings_on_available_until"
     t.index ["average_rating"], name: "index_listings_on_average_rating"
+    t.index ["created_at"], name: "index_listings_on_created_at"
     t.index ["listing_type"], name: "index_listings_on_listing_type"
     t.index ["price"], name: "index_listings_on_price"
     t.index ["property_id"], name: "index_listings_on_property_id"
+    t.index ["status", "available_from", "available_until"], name: "idx_on_status_available_from_available_until_5574840789"
     t.index ["status", "available_from"], name: "index_listings_on_status_and_available_from"
+    t.index ["status", "created_at"], name: "index_listings_on_status_and_created_at"
+    t.index ["status", "price"], name: "index_listings_on_status_and_price"
     t.index ["status"], name: "index_listings_on_status"
     t.index ["user_id"], name: "index_listings_on_user_id"
   end
@@ -235,11 +243,113 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_03_222829) do
     t.index ["conversation_id"], name: "index_messages_on_conversation_id"
     t.index ["created_at"], name: "index_messages_on_created_at"
     t.index ["message_type"], name: "index_messages_on_message_type"
+    t.index ["recipient_id", "created_at"], name: "index_messages_on_recipient_id_and_created_at"
     t.index ["recipient_id"], name: "index_messages_on_recipient_id"
     t.index ["regarding_type", "regarding_id"], name: "index_messages_on_regarding"
+    t.index ["sender_id", "created_at"], name: "index_messages_on_sender_id_and_created_at"
     t.index ["sender_id", "recipient_id"], name: "index_messages_on_sender_id_and_recipient_id"
     t.index ["sender_id"], name: "index_messages_on_sender_id"
+    t.index ["status", "created_at"], name: "index_messages_on_status_and_created_at"
     t.index ["status"], name: "index_messages_on_status"
+  end
+
+  create_table "pay_charges", force: :cascade do |t|
+    t.bigint "customer_id", null: false
+    t.bigint "subscription_id"
+    t.string "processor_id", null: false
+    t.integer "amount", null: false
+    t.string "currency"
+    t.integer "application_fee_amount"
+    t.integer "amount_refunded"
+    t.jsonb "metadata"
+    t.jsonb "data"
+    t.string "stripe_account"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "type"
+    t.jsonb "object"
+    t.index ["customer_id", "processor_id"], name: "index_pay_charges_on_customer_id_and_processor_id", unique: true
+    t.index ["subscription_id"], name: "index_pay_charges_on_subscription_id"
+  end
+
+  create_table "pay_customers", force: :cascade do |t|
+    t.string "owner_type"
+    t.bigint "owner_id"
+    t.string "processor", null: false
+    t.string "processor_id"
+    t.boolean "default"
+    t.jsonb "data"
+    t.string "stripe_account"
+    t.datetime "deleted_at", precision: nil
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "type"
+    t.jsonb "object"
+    t.index ["owner_type", "owner_id", "deleted_at"], name: "pay_customer_owner_index", unique: true
+    t.index ["processor", "processor_id"], name: "index_pay_customers_on_processor_and_processor_id", unique: true
+  end
+
+  create_table "pay_merchants", force: :cascade do |t|
+    t.string "owner_type"
+    t.bigint "owner_id"
+    t.string "processor", null: false
+    t.string "processor_id"
+    t.boolean "default"
+    t.jsonb "data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "type"
+    t.index ["owner_type", "owner_id", "processor"], name: "index_pay_merchants_on_owner_type_and_owner_id_and_processor"
+  end
+
+  create_table "pay_payment_methods", force: :cascade do |t|
+    t.bigint "customer_id", null: false
+    t.string "processor_id", null: false
+    t.boolean "default"
+    t.string "payment_method_type"
+    t.jsonb "data"
+    t.string "stripe_account"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "type"
+    t.index ["customer_id", "processor_id"], name: "index_pay_payment_methods_on_customer_id_and_processor_id", unique: true
+  end
+
+  create_table "pay_subscriptions", force: :cascade do |t|
+    t.bigint "customer_id", null: false
+    t.string "name", null: false
+    t.string "processor_id", null: false
+    t.string "processor_plan", null: false
+    t.integer "quantity", default: 1, null: false
+    t.string "status", null: false
+    t.datetime "current_period_start", precision: nil
+    t.datetime "current_period_end", precision: nil
+    t.datetime "trial_ends_at", precision: nil
+    t.datetime "ends_at", precision: nil
+    t.boolean "metered"
+    t.string "pause_behavior"
+    t.datetime "pause_starts_at", precision: nil
+    t.datetime "pause_resumes_at", precision: nil
+    t.decimal "application_fee_percent", precision: 8, scale: 2
+    t.jsonb "metadata"
+    t.jsonb "data"
+    t.string "stripe_account"
+    t.string "payment_method_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "type"
+    t.jsonb "object"
+    t.index ["customer_id", "processor_id"], name: "index_pay_subscriptions_on_customer_id_and_processor_id", unique: true
+    t.index ["metered"], name: "index_pay_subscriptions_on_metered"
+    t.index ["pause_starts_at"], name: "index_pay_subscriptions_on_pause_starts_at"
+  end
+
+  create_table "pay_webhooks", force: :cascade do |t|
+    t.string "processor"
+    t.string "event_type"
+    t.jsonb "event"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "payments", force: :cascade do |t|
@@ -326,7 +436,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_03_222829) do
     t.string "listing_type", default: "sale"
     t.string "country"
     t.text "formatted_address"
+    t.index ["bathrooms"], name: "index_properties_on_bathrooms"
+    t.index ["bedrooms"], name: "index_properties_on_bedrooms"
+    t.index ["city"], name: "index_properties_on_city"
     t.index ["country"], name: "index_properties_on_country"
+    t.index ["created_at"], name: "index_properties_on_created_at"
+    t.index ["featured"], name: "index_properties_on_featured"
+    t.index ["latitude", "longitude"], name: "index_properties_on_latitude_and_longitude"
+    t.index ["price"], name: "index_properties_on_price"
+    t.index ["property_type"], name: "index_properties_on_property_type"
+    t.index ["square_feet"], name: "index_properties_on_square_feet"
+    t.index ["status", "city"], name: "index_properties_on_status_and_city"
+    t.index ["status", "created_at"], name: "index_properties_on_status_and_created_at"
+    t.index ["status", "price"], name: "index_properties_on_status_and_price"
+    t.index ["status", "property_type"], name: "index_properties_on_status_and_property_type"
+    t.index ["status"], name: "index_properties_on_status"
     t.index ["user_id"], name: "index_properties_on_user_id"
   end
 
@@ -337,6 +461,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_03_222829) do
     t.integer "position"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["position"], name: "index_property_images_on_position"
+    t.index ["property_id", "position"], name: "index_property_images_on_property_id_and_position"
     t.index ["property_id"], name: "index_property_images_on_property_id"
   end
 
@@ -361,9 +487,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_03_222829) do
     t.index ["created_at"], name: "index_reviews_on_created_at"
     t.index ["rating"], name: "index_reviews_on_rating"
     t.index ["review_type"], name: "index_reviews_on_review_type"
+    t.index ["reviewable_type", "reviewable_id", "created_at"], name: "idx_on_reviewable_type_reviewable_id_created_at_0556497871"
     t.index ["reviewable_type", "reviewable_id", "status"], name: "index_reviews_on_reviewable_and_status"
     t.index ["reviewable_type", "reviewable_id"], name: "index_reviews_on_reviewable"
+    t.index ["reviewer_id", "created_at"], name: "index_reviews_on_reviewer_id_and_created_at"
     t.index ["reviewer_id"], name: "index_reviews_on_reviewer_id"
+    t.index ["status", "created_at"], name: "index_reviews_on_status_and_created_at"
     t.index ["status"], name: "index_reviews_on_status"
   end
 
@@ -375,6 +504,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_03_222829) do
     t.datetime "last_run_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["frequency", "last_run_at"], name: "index_saved_searches_on_frequency_and_last_run_at"
+    t.index ["frequency"], name: "index_saved_searches_on_frequency"
+    t.index ["last_run_at"], name: "index_saved_searches_on_last_run_at"
+    t.index ["user_id", "frequency"], name: "index_saved_searches_on_user_id_and_frequency"
     t.index ["user_id"], name: "index_saved_searches_on_user_id"
   end
 
@@ -425,9 +558,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_03_222829) do
     t.datetime "updated_at", null: false
     t.index ["created_at"], name: "index_verifications_on_created_at"
     t.index ["expires_at"], name: "index_verifications_on_expires_at"
+    t.index ["status", "created_at"], name: "index_verifications_on_status_and_created_at"
     t.index ["status"], name: "index_verifications_on_status"
     t.index ["user_id", "verification_type"], name: "index_verifications_on_user_id_and_verification_type"
     t.index ["user_id"], name: "index_verifications_on_user_id"
+    t.index ["verification_type", "status"], name: "index_verifications_on_verification_type_and_status"
     t.index ["verification_type"], name: "index_verifications_on_verification_type"
     t.index ["verified_by_id"], name: "index_verifications_on_verified_by_id"
   end
@@ -454,6 +589,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_03_222829) do
   add_foreign_key "messages", "conversations"
   add_foreign_key "messages", "users", column: "recipient_id"
   add_foreign_key "messages", "users", column: "sender_id"
+  add_foreign_key "pay_charges", "pay_customers", column: "customer_id"
+  add_foreign_key "pay_charges", "pay_subscriptions", column: "subscription_id"
+  add_foreign_key "pay_payment_methods", "pay_customers", column: "customer_id"
+  add_foreign_key "pay_subscriptions", "pay_customers", column: "customer_id"
   add_foreign_key "payments", "bookings"
   add_foreign_key "payments", "users", column: "payee_id"
   add_foreign_key "payments", "users", column: "payer_id"

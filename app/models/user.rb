@@ -8,7 +8,8 @@ class User < ApplicationRecord
          :confirmable, :trackable
 
   # Associations
-  has_many :payments, dependent: :destroy
+  has_many :payments_as_payer, class_name: "Payment", foreign_key: "payer_id", dependent: :destroy
+  has_many :payments_as_payee, class_name: "Payment", foreign_key: "payee_id", dependent: :destroy
   has_many :properties, dependent: :destroy
   has_many :favorites, dependent: :destroy
   has_many :favorited_properties, through: :favorites, source: :property
