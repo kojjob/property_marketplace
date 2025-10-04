@@ -1,0 +1,66 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Complete Your Payment</h1>
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4">Booking Details</h2>
+      <div class="space-y-2">
+        <p><strong>Property:</strong> <%= @booking.listing.property.title %></p>
+        <p><strong>Check-in:</strong> <%= @booking.check_in_date %></p>
+        <p><strong>Check-out:</strong> <%= @booking.check_out_date %></p>
+        <p><strong>Total Amount:</strong> <%= number_to_currency(@booking.total_amount) %></p>
+      </div>
+    </div>
+    <% if @error %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+        <%= @error %>
+      </div>
+    <% end %>
+    <div class="bg-white shadow-lg rounded-lg p-6">
+      <h2 class="text-xl font-semibold mb-4">Payment Information</h2>
+      <%= form_with model: @payment, url: booking_payments_path(@booking), method: :post, id: "payment-form" do |f| %>
+        <div class="mb-4">
+          <%= f.label :amount_cents, "Amount (cents)", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.number_field :amount_cents, value: (@booking.total_amount * 100).to_i, readonly: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+        <div class="mb-4">
+          <%= f.label :payment_method_id, "Payment Method", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :payment_method_id, placeholder: "pm_card_visa", class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+        <div class="mb-4">
+          <%= f.label :currency, class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :currency, value: "usd", readonly: true, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+        </div>
+        <%= f.submit "Process Payment", class: "w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500" %>
+      <% end %>
+    </div>
+  </div>
+</div>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+  // Initialize Stripe (in real app, use publishable key from environment)
+  const stripe = Stripe('pk_test_...');
+  const elements = stripe.elements();
+
+  // Create card element
+  const card = elements.create('card');
+  card.mount('#card-element');
+
+  // Handle form submission
+  const form = document.getElementById('payment-form');
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const {paymentMethod, error} = await stripe.createPaymentMethod({
+      type: 'card',
+      card: card,
+    });
+
+    if (error) {
+      console.error(error);
+    } else {
+      // Set the payment method ID
+      document.getElementById('payment_payment_method_id').value = paymentMethod.id;
+      form.submit();
+    }
+  });
+</script>

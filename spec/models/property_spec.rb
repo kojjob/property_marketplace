@@ -130,7 +130,7 @@ RSpec.describe Property, type: :model do
       image1 = fixture_file_upload('spec/fixtures/test_image.jpg', 'image/jpeg')
       image2 = fixture_file_upload('spec/fixtures/test_image2.jpg', 'image/jpeg')
 
-      property.images.attach([image1, image2])
+      property.images.attach([ image1, image2 ])
       expect(property.images.count).to eq(2)
     end
 

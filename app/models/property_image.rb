@@ -23,7 +23,7 @@ class PropertyImage < ApplicationRecord
     return unless image.attached?
 
     unless image.content_type.in?(%w[image/jpeg image/jpg image/png image/gif image/webp])
-      errors.add(:image, 'must be an image file')
+      errors.add(:image, "must be an image file")
     end
   end
 
@@ -31,7 +31,7 @@ class PropertyImage < ApplicationRecord
     return unless image.attached?
 
     if image.blob.byte_size > 10.megabytes
-      errors.add(:image, 'file size must be less than 10MB')
+      errors.add(:image, "file size must be less than 10MB")
     end
   end
 
@@ -57,13 +57,13 @@ class PropertyImage < ApplicationRecord
 
     {
       thumbnail: Rails.application.routes.url_helpers.rails_representation_url(
-        image.variant(resize_to_limit: [150, 150]), only_path: true
+        image.variant(resize_to_limit: [ 150, 150 ]), only_path: true
       ),
       medium: Rails.application.routes.url_helpers.rails_representation_url(
-        image.variant(resize_to_limit: [400, 300]), only_path: true
+        image.variant(resize_to_limit: [ 400, 300 ]), only_path: true
       ),
       large: Rails.application.routes.url_helpers.rails_representation_url(
-        image.variant(resize_to_limit: [800, 600]), only_path: true
+        image.variant(resize_to_limit: [ 800, 600 ]), only_path: true
       )
     }
   end

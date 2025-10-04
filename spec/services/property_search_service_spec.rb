@@ -127,7 +127,7 @@ RSpec.describe PropertySearchService do
           min_price: 800000,
           max_price: 1600000,
           bedrooms: 3,
-          property_type: ['Condo', 'House']
+          property_type: [ 'Condo', 'House' ]
         }
       end
 

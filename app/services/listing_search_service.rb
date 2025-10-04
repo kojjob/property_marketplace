@@ -29,7 +29,7 @@ class ListingSearchService < ApplicationService
     if search_params[:location].present?
       # Simple location search - in production, use geocoding
       @listings = @listings.joins(:property)
-                          .where('properties.address ILIKE :location OR properties.city ILIKE :location OR properties.state ILIKE :location',
+                          .where("properties.address ILIKE :location OR properties.city ILIKE :location OR properties.state ILIKE :location",
                                 location: "%#{search_params[:location]}%")
     end
 
@@ -37,10 +37,10 @@ class ListingSearchService < ApplicationService
       # Radius search - requires PostGIS or similar
       # For now, simplified implementation
       @listings = @listings.joins(:property)
-                          .where('properties.latitude BETWEEN ? AND ?',
+                          .where("properties.latitude BETWEEN ? AND ?",
                                 search_params[:latitude].to_f - 0.1,
                                 search_params[:latitude].to_f + 0.1)
-                          .where('properties.longitude BETWEEN ? AND ?',
+                          .where("properties.longitude BETWEEN ? AND ?",
                                 search_params[:longitude].to_f - 0.1,
                                 search_params[:longitude].to_f + 0.1)
     end
@@ -54,31 +54,31 @@ class ListingSearchService < ApplicationService
 
     if search_params[:bedrooms_min].present?
       @listings = @listings.joins(:property)
-                          .where('properties.bedrooms >= ?', search_params[:bedrooms_min])
+                          .where("properties.bedrooms >= ?", search_params[:bedrooms_min])
     end
 
     if search_params[:bedrooms_max].present?
       @listings = @listings.joins(:property)
-                          .where('properties.bedrooms <= ?', search_params[:bedrooms_max])
+                          .where("properties.bedrooms <= ?", search_params[:bedrooms_max])
     end
 
     if search_params[:bathrooms_min].present?
       @listings = @listings.joins(:property)
-                          .where('properties.bathrooms >= ?', search_params[:bathrooms_min])
+                          .where("properties.bathrooms >= ?", search_params[:bathrooms_min])
     end
 
     if search_params[:guests].present?
-      @listings = @listings.where('max_guests >= ?', search_params[:guests])
+      @listings = @listings.where("max_guests >= ?", search_params[:guests])
     end
   end
 
   def apply_price_filters
     if search_params[:price_min].present?
-      @listings = @listings.where('price_per_night >= ?', search_params[:price_min])
+      @listings = @listings.where("price_per_night >= ?", search_params[:price_min])
     end
 
     if search_params[:price_max].present?
-      @listings = @listings.where('price_per_night <= ?', search_params[:price_max])
+      @listings = @listings.where("price_per_night <= ?", search_params[:price_max])
     end
   end
 
@@ -95,8 +95,8 @@ class ListingSearchService < ApplicationService
     if search_params[:check_in_date].present? && search_params[:check_out_date].present?
       # Find listings without conflicting bookings
       booked_listing_ids = Booking
-        .where(status: ['confirmed', 'pending'])
-        .where('(check_in_date <= ? AND check_out_date >= ?) OR (check_in_date <= ? AND check_out_date >= ?)',
+        .where(status: [ "confirmed", "pending" ])
+        .where("(check_in_date <= ? AND check_out_date >= ?) OR (check_in_date <= ? AND check_out_date >= ?)",
                search_params[:check_out_date], search_params[:check_in_date],
                search_params[:check_out_date], search_params[:check_in_date])
         .pluck(:listing_id)
@@ -110,25 +110,25 @@ class ListingSearchService < ApplicationService
   end
 
   def apply_sorting
-    sort_by = search_params[:sort_by] || 'relevance'
+    sort_by = search_params[:sort_by] || "relevance"
 
     @listings = case sort_by
-                when 'price_low_to_high'
+    when "price_low_to_high"
                   @listings.order(price_per_night: :asc)
-                when 'price_high_to_low'
+    when "price_high_to_low"
                   @listings.order(price_per_night: :desc)
-                when 'rating'
+    when "rating"
                   @listings.left_joins(:reviews)
-                          .group('listings.id')
-                          .order('AVG(reviews.rating) DESC NULLS LAST')
-                when 'newest'
+                          .group("listings.id")
+                          .order("AVG(reviews.rating) DESC NULLS LAST")
+    when "newest"
                   @listings.order(created_at: :desc)
-                when 'relevance'
+    when "relevance"
                   # In production, implement relevance scoring
                   @listings.order(created_at: :desc)
-                else
+    else
                   @listings
-                end
+    end
   end
 
   def apply_pagination
@@ -141,6 +141,6 @@ class ListingSearchService < ApplicationService
   end
 
   def per_page
-    [(search_params[:per_page] || 20).to_i, 100].min  # Max 100 per page
+    [ (search_params[:per_page] || 20).to_i, 100 ].min  # Max 100 per page
   end
 end

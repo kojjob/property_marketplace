@@ -66,7 +66,7 @@ RSpec.describe 'Home Page', type: :system do
         expect(page).to have_content('Discover amazing properties in prime locations')
 
         # Check for city cards
-        cities = ['San Francisco', 'New York', 'Miami', 'Austin', 'Seattle', 'Portland']
+        cities = [ 'San Francisco', 'New York', 'Miami', 'Austin', 'Seattle', 'Portland' ]
         cities.each do |city|
           expect(page).to have_content(city)
         end

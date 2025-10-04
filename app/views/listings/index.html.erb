@@ -1,0 +1,230 @@
+<% content_for :title, "Property Listings" %>
+
+<!-- Houzez-Style Property Listings with Tailwind CSS -->
+<div class="bg-gray-50 min-h-screen">
+  <!-- Hero Search Section -->
+  <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+    <div class="container mx-auto px-4 py-12">
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold mb-4">Find Your Dream Property</h1>
+        <p class="text-xl text-blue-100">Discover the perfect place to call home</p>
+      </div>
+
+      <!-- Advanced Search Form -->
+      <div class="max-w-6xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-2xl p-6">
+          <%= form_with url: listings_path, method: :get, local: true, class: "space-y-4" do |form| %>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+              <div class="lg:col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                <%= form.text_field :location,
+                    value: params[:location],
+                    placeholder: "Enter city, neighborhood or address",
+                    class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Min Price</label>
+                <%= form.number_field :min_price,
+                    value: params[:min_price],
+                    placeholder: "Min Price",
+                    class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Max Price</label>
+                <%= form.number_field :max_price,
+                    value: params[:max_price],
+                    placeholder: "Max Price",
+                    class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" %>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Property Type</label>
+                <%= form.select :listing_type,
+                    options_for_select([
+                      ['All Types', ''],
+                      ['For Rent', 'rent'],
+                      ['For Sale', 'sale'],
+                      ['Short Term', 'short_term'],
+                      ['Subscription', 'subscription']
+                    ], params[:listing_type]),
+                    {},
+                    { class: "w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" } %>
+              </div>
+            </div>
+            <div class="flex justify-center">
+              <%= form.submit "Search Properties", class: "bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors duration-200 shadow-lg hover:shadow-xl" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container mx-auto px-4 py-8">
+    <!-- Active Filters -->
+    <% if params[:location].present? || params[:listing_type].present? || params[:min_price].present? || params[:max_price].present? %>
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <div class="flex justify-between items-center">
+          <div class="text-blue-800">
+            <span class="font-medium">Active filters:</span>
+            <% if params[:location].present? %>
+              <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm ml-2">
+                Location: <%= params[:location] %>
+              </span>
+            <% end %>
+            <% if params[:listing_type].present? %>
+              <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm ml-2">
+                Type: <%= params[:listing_type].humanize %>
+              </span>
+            <% end %>
+            <% if params[:min_price].present? || params[:max_price].present? %>
+              <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm ml-2">
+                Price: $<%= params[:min_price] || 0 %> - $<%= params[:max_price] || '∞' %>
+              </span>
+            <% end %>
+          </div>
+          <%= link_to "Clear all filters", listings_path, class: "text-blue-600 hover:text-blue-800 font-medium" %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Results Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-900 mb-1">Property Listings</h2>
+        <p class="text-gray-600">
+          Found <%= @listings.count %> properties
+          <% if params[:location].present? %>
+            in <span class="font-medium"><%= params[:location] %></span>
+          <% end %>
+        </p>
+      </div>
+      <% if user_signed_in? %>
+        <%= link_to new_listing_path, class: "bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 shadow-md hover:shadow-lg flex items-center gap-2" do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Create Listing
+        <% end %>
+      <% end %>
+    </div>
+
+    <!-- Properties Grid -->
+    <% if @listings.any? %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @listings.each do |listing| %>
+          <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
+            <!-- Property Image -->
+            <div class="relative overflow-hidden">
+              <% if listing.property.images.attached? %>
+                <%= image_tag listing.property.images.first,
+                    class: "w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300" %>
+              <% else %>
+                <div class="w-full h-64 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                  <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                  </svg>
+                </div>
+              <% end %>
+
+              <!-- Property Type Badge -->
+              <div class="absolute top-4 right-4">
+                <span class="px-3 py-1 bg-<%= listing_type_badge_color(listing.listing_type) == 'success' ? 'green' : listing_type_badge_color(listing.listing_type) == 'primary' ? 'blue' : listing_type_badge_color(listing.listing_type) == 'warning' ? 'yellow' : 'indigo' %>-500 text-white text-sm font-medium rounded-full">
+                  <%= listing.listing_type.titleize %>
+                </span>
+              </div>
+
+              <!-- Status Badge -->
+              <div class="absolute top-4 left-4">
+                <span class="px-3 py-1 bg-<%= listing_status_badge_color(listing.status) == 'success' ? 'green' : listing_status_badge_color(listing.status) == 'warning' ? 'yellow' : 'gray' %>-500 text-white text-sm font-medium rounded-full">
+                  <%= listing.status.titleize %>
+                </span>
+              </div>
+            </div>
+
+            <!-- Property Details -->
+            <div class="p-6">
+              <!-- Price -->
+              <div class="mb-3">
+                <span class="text-2xl font-bold text-blue-600">
+                  $<%= number_with_delimiter(listing.price) %>
+                  <% if price_period(listing).present? %>
+                    <span class="text-base text-gray-500 font-normal">/<%= price_period(listing) %></span>
+                  <% end %>
+                </span>
+              </div>
+
+              <!-- Title -->
+              <h3 class="text-xl font-semibold text-gray-900 mb-2 line-clamp-2">
+                <%= listing.title %>
+              </h3>
+
+              <!-- Location -->
+              <div class="flex items-center text-gray-600 mb-4">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span class="text-sm"><%= [listing.property.city, listing.property.country].compact.join(', ') %></span>
+              </div>
+
+              <!-- Description -->
+              <% if listing.description.present? %>
+                <p class="text-gray-600 text-sm mb-4 line-clamp-2">
+                  <%= truncate(listing.description, length: 100) %>
+                </p>
+              <% end %>
+
+              <!-- Property Stats -->
+              <div class="grid grid-cols-3 gap-4 mb-4 py-3 border-t border-gray-100">
+                <div class="text-center">
+                  <div class="text-lg font-semibold text-gray-900"><%= listing.property.bedrooms %></div>
+                  <div class="text-xs text-gray-500">Bedrooms</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-lg font-semibold text-gray-900"><%= listing.property.bathrooms %></div>
+                  <div class="text-xs text-gray-500">Bathrooms</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-lg font-semibold text-gray-900"><%= listing.property.square_feet %></div>
+                  <div class="text-xs text-gray-500">Sq Ft</div>
+                </div>
+              </div>
+
+              <!-- Action Button -->
+              <div class="pt-3 border-t border-gray-100">
+                <%= link_to listing_path(listing), class: "w-full bg-gray-100 hover:bg-blue-600 hover:text-white text-gray-700 py-3 rounded-lg font-medium transition-colors duration-200 text-center block" do %>
+                  View Details
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <!-- Empty State -->
+      <div class="text-center py-16">
+        <div class="max-w-md mx-auto">
+          <svg class="w-24 h-24 text-gray-300 mx-auto mb-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+          <h3 class="text-2xl font-semibold text-gray-900 mb-3">No properties found</h3>
+          <p class="text-gray-600 mb-6">Try adjusting your search criteria or browse all listings.</p>
+          <div class="space-y-3">
+            <%= link_to "Browse all listings", listings_path, class: "inline-block bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-medium transition-colors duration-200" %>
+            <% if user_signed_in? %>
+              <div>
+                <%= link_to new_listing_path, class: "bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors duration-200 shadow-md hover:shadow-lg inline-flex items-center gap-2" do %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  Create First Listing
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

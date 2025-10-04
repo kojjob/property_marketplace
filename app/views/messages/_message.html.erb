@@ -1,0 +1,91 @@
+<div class="flex items-start space-x-3 <%= 'flex-row-reverse space-x-reverse' if message.sender == current_user %>"
+     data-message-id="<%= message.id %>"
+     data-message-sender="<%= message.sender.id %>">
+
+  <!-- Avatar -->
+  <div class="flex-shrink-0">
+    <div class="h-8 w-8 rounded-full <%= message.sender == current_user ? 'bg-indigo-500' : 'bg-gray-300' %> flex items-center justify-center">
+      <span class="text-white text-sm font-medium">
+        <%= message.sender.profile&.first_name&.first&.upcase || message.sender.email.first.upcase %>
+      </span>
+    </div>
+  </div>
+
+  <!-- Message Content -->
+  <div class="flex-1 min-w-0">
+    <div class="<%= message.sender == current_user ? 'text-right' : 'text-left' %>">
+      <!-- Message bubble -->
+      <div class="inline-block px-4 py-2 rounded-lg text-sm <%= message.sender == current_user ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-900' %> max-w-xs lg:max-w-md">
+        <%= simple_format(h(message.content), class: "mb-0 whitespace-pre-wrap") %>
+
+        <!-- File attachments -->
+        <% if message.images.any? %>
+          <div class="mt-2 space-y-2">
+            <% message.images.each do |image| %>
+              <div class="relative">
+                <%= image_tag image, class: "max-w-full h-auto rounded cursor-pointer", data: { action: "click->lightbox#open" } %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+
+        <% if message.documents.any? %>
+          <div class="mt-2 space-y-1">
+            <% message.documents.each do |document| %>
+              <div class="flex items-center space-x-2 p-2 bg-white bg-opacity-20 rounded">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <%= link_to document.filename, rails_blob_path(document, disposition: "attachment"),
+                    class: "text-xs underline truncate max-w-32", target: "_blank" %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Message metadata -->
+      <div class="mt-1 text-xs text-gray-500 <%= message.sender == current_user ? 'text-right' : 'text-left' %>">
+        <span data-message-timestamp="<%= message.created_at.iso8601 %>">
+          <%= message.created_at.strftime("%l:%M %p") %>
+        </span>
+
+        <% if message.sender == current_user %>
+          <span class="ml-2">
+            <% case message.status %>
+            <% when 'read' %>
+              <span class="text-indigo-500" title="Read">✓✓</span>
+            <% when 'unread' %>
+              <span class="text-gray-400" title="Sent">✓</span>
+            <% end %>
+          </span>
+        <% end %>
+
+        <!-- Message actions for sender -->
+        <% if message.sender == current_user && message.created_at > 15.minutes.ago %>
+          <div class="inline-block ml-2">
+            <div class="relative" data-controller="dropdown">
+              <button type="button"
+                      data-action="click->dropdown#toggle"
+                      class="text-gray-400 hover:text-gray-600 text-xs">
+                ⋯
+              </button>
+
+              <div data-dropdown-target="menu" class="hidden absolute right-0 mt-1 w-32 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-10">
+                <div class="py-1">
+                  <%= link_to "Edit", "#",
+                      data: { action: "click->messages#editMessage", message_id: message.id },
+                      class: "block px-3 py-1 text-xs text-gray-700 hover:bg-gray-100" %>
+                  <%= link_to "Delete", message_path(message),
+                      method: :delete,
+                      data: { confirm: "Delete this message?", remote: true },
+                      class: "block px-3 py-1 text-xs text-red-600 hover:bg-gray-100" %>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

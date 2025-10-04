@@ -20,8 +20,8 @@ class CreateReviews < ActiveRecord::Migration[8.0]
     add_index :reviews, :rating
     add_index :reviews, :status
     add_index :reviews, :review_type
-    add_index :reviews, [:reviewable_type, :reviewable_id, :status], name: 'index_reviews_on_reviewable_and_status'
-    add_index :reviews, [:booking_id, :review_type], unique: true, where: "booking_id IS NOT NULL", name: 'index_reviews_on_booking_and_type'
+    add_index :reviews, [ :reviewable_type, :reviewable_id, :status ], name: 'index_reviews_on_reviewable_and_status'
+    add_index :reviews, [ :booking_id, :review_type ], unique: true, where: "booking_id IS NOT NULL", name: 'index_reviews_on_booking_and_type'
     add_index :reviews, :created_at
 
     add_foreign_key :reviews, :users, column: :response_by_id

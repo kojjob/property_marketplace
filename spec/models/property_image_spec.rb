@@ -56,7 +56,7 @@ RSpec.describe PropertyImage, type: :model do
 
     describe '.ordered' do
       it 'orders by position first, then created_at' do
-        expect(PropertyImage.ordered).to eq([image2, image1, image3])
+        expect(PropertyImage.ordered).to eq([ image2, image1, image3 ])
       end
     end
 
@@ -164,7 +164,7 @@ RSpec.describe PropertyImage, type: :model do
       let!(:image3) { create(:property_image, property: property, position: 2) }
 
       it 'reorders images based on provided positions' do
-        new_order = [image3.id, image1.id, image2.id]
+        new_order = [ image3.id, image1.id, image2.id ]
         PropertyImage.reorder_images(new_order)
 
         expect(image3.reload.position).to eq(0)
@@ -173,7 +173,7 @@ RSpec.describe PropertyImage, type: :model do
       end
 
       it 'handles non-existent image IDs gracefully' do
-        new_order = [image1.id, 99999, image2.id]
+        new_order = [ image1.id, 99999, image2.id ]
         expect { PropertyImage.reorder_images(new_order) }.not_to raise_error
 
         expect(image1.reload.position).to eq(0)
@@ -224,7 +224,7 @@ RSpec.describe PropertyImage, type: :model do
         positions = images.pluck(:position)
 
         expect(positions).to eq(positions.uniq)
-        expect(positions.sort).to eq([0, 1, 2])
+        expect(positions.sort).to eq([ 0, 1, 2 ])
       end
 
       it 'handles position gaps appropriately' do
@@ -243,7 +243,7 @@ RSpec.describe PropertyImage, type: :model do
         image2.destroy
 
         remaining_images = property.property_images.reload.ordered
-        expect(remaining_images.pluck(:position)).to eq([0, 2])
+        expect(remaining_images.pluck(:position)).to eq([ 0, 2 ])
       end
 
       it 'can optionally reorder after deletion' do
@@ -251,7 +251,7 @@ RSpec.describe PropertyImage, type: :model do
         PropertyImage.normalize_positions(property)
 
         remaining_images = property.property_images.reload.ordered
-        expect(remaining_images.pluck(:position)).to eq([0, 1])
+        expect(remaining_images.pluck(:position)).to eq([ 0, 1 ])
       end
     end
   end
@@ -266,7 +266,7 @@ RSpec.describe PropertyImage, type: :model do
     end
 
     it 'property can access all images in order' do
-      expect(property_with_images.property_images.ordered).to eq([primary_image, secondary_image])
+      expect(property_with_images.property_images.ordered).to eq([ primary_image, secondary_image ])
     end
 
     it 'property can count images' do

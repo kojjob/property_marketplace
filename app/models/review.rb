@@ -1,9 +1,9 @@
 class Review < ApplicationRecord
   # Associations
   belongs_to :reviewable, polymorphic: true
-  belongs_to :reviewer, class_name: 'User', foreign_key: 'reviewer_id'
+  belongs_to :reviewer, class_name: "User", foreign_key: "reviewer_id"
   belongs_to :booking, optional: true
-  belongs_to :responder, class_name: 'User', foreign_key: 'response_by_id', optional: true
+  belongs_to :responder, class_name: "User", foreign_key: "response_by_id", optional: true
 
   # Validations
   validates :rating, presence: true, inclusion: { in: 1..5 }
@@ -35,12 +35,12 @@ class Review < ApplicationRecord
   }
 
   # Scopes
-  scope :published, -> { where(status: 'published') }
-  scope :pending, -> { where(status: 'pending') }
-  scope :high_rating, -> { where('rating >= ?', 4) }
-  scope :low_rating, -> { where('rating <= ?', 2) }
-  scope :recent, -> { where('reviews.created_at > ?', 30.days.ago) }
-  scope :for_listing, ->(listing_id) { where(reviewable_type: 'Listing', reviewable_id: listing_id) }
+  scope :published, -> { where(status: "published") }
+  scope :pending, -> { where(status: "pending") }
+  scope :high_rating, -> { where("rating >= ?", 4) }
+  scope :low_rating, -> { where("rating <= ?", 2) }
+  scope :recent, -> { where("reviews.created_at > ?", 30.days.ago) }
+  scope :for_listing, ->(listing_id) { where(reviewable_type: "Listing", reviewable_id: listing_id) }
 
   # Class methods
   def self.average_rating_for(reviewable)
@@ -72,7 +72,7 @@ class Review < ApplicationRecord
   end
 
   def reviewer_cannot_review_own_property
-    return unless reviewable_type == 'Listing' && reviewable && reviewer
+    return unless reviewable_type == "Listing" && reviewable && reviewer
 
     begin
       if reviewable.user_id == reviewer_id
@@ -80,7 +80,7 @@ class Review < ApplicationRecord
       end
     rescue NoMethodError
       # Handle case where reviewable doesn't respond to user_id
-      return
+      nil
     end
   end
 

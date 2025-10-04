@@ -1,0 +1,89 @@
+<% content_for :title, "Messages" %>
+
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex items-center justify-between mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Messages</h1>
+      <div class="text-sm text-gray-500">
+        <%= pluralize(current_user.unread_messages_count, 'unread message') %>
+      </div>
+    </div>
+
+    <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+      <% if @conversations.any? %>
+        <div class="divide-y divide-gray-200">
+          <% @conversations.each do |conversation| %>
+            <div class="hover:bg-gray-50 transition-colors duration-200">
+              <%= link_to conversation_path(conversation), class: "block p-6" do %>
+                <div class="flex items-center space-x-4">
+                  <!-- Avatar placeholder -->
+                  <div class="flex-shrink-0">
+                    <div class="h-12 w-12 rounded-full bg-indigo-100 flex items-center justify-center">
+                      <span class="text-indigo-600 font-medium text-lg">
+                        <%= conversation.other_participant(current_user).profile&.first_name&.first&.upcase ||
+                            conversation.other_participant(current_user).email.first.upcase %>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between">
+                      <p class="text-lg font-medium text-gray-900 truncate">
+                        <%= conversation.other_participant(current_user).profile&.full_name ||
+                            conversation.other_participant(current_user).email.split('@').first %>
+                      </p>
+                      <p class="text-sm text-gray-500">
+                        <%= time_ago_in_words(conversation.last_message_at || conversation.created_at) %> ago
+                      </p>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-2">
+                      <p class="text-sm text-gray-600 truncate max-w-lg">
+                        <% if conversation.last_message %>
+                          <span class="<%= 'font-semibold' if conversation.last_message.sender == current_user %>">
+                            <%= conversation.last_message.sender == current_user ? 'You: ' : '' %>
+                          </span>
+                          <%= truncate(conversation.last_message.content, length: 60) %>
+                        <% else %>
+                          <em>No messages yet</em>
+                        <% end %>
+                      </p>
+
+                      <% if conversation.unread_count_for(current_user) > 0 %>
+                        <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-indigo-600 rounded-full">
+                          <%= conversation.unread_count_for(current_user) %>
+                        </span>
+                      <% end %>
+                    </div>
+
+                    <% if conversation.archived? %>
+                      <div class="mt-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          Archived
+                        </span>
+                      </div>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="text-center py-12">
+          <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 16c0 2.21-1.79 4-4 4s-4-1.79-4-4 1.79-4 4-4 4 1.79 4 4zM33 16c0 2.21-1.79 4-4 4s-4-1.79-4-4 1.79-4 4-4 4 1.79 4 4zM17 28h14l-2 8H19l-2-8z"/>
+          </svg>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">No conversations</h3>
+          <p class="mt-1 text-sm text-gray-500">
+            Start a conversation by messaging a property owner or browsing listings.
+          </p>
+          <div class="mt-6">
+            <%= link_to "Browse Properties", properties_path,
+                class: "inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

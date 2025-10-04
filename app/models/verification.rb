@@ -1,7 +1,7 @@
 class Verification < ApplicationRecord
   # Associations
   belongs_to :user
-  belongs_to :verified_by, class_name: 'User', optional: true
+  belongs_to :verified_by, class_name: "User", optional: true
 
   # Active Storage
   has_many_attached :documents
@@ -30,10 +30,10 @@ class Verification < ApplicationRecord
   }
 
   # Scopes
-  scope :pending, -> { where(status: 'pending') }
-  scope :approved, -> { where(status: 'approved') }
-  scope :active, -> { where.not(status: 'expired') }
-  scope :recent, -> { where('created_at > ?', 30.days.ago) }
+  scope :pending, -> { where(status: "pending") }
+  scope :approved, -> { where(status: "approved") }
+  scope :active, -> { where.not(status: "expired") }
+  scope :recent, -> { where("created_at > ?", 30.days.ago) }
 
   # Callbacks
   before_create :set_expiry_date
@@ -43,48 +43,48 @@ class Verification < ApplicationRecord
   def approve!(admin)
     transaction do
       update!(
-        status: 'approved',
+        status: "approved",
         verified_by: admin,
         verified_at: Time.current
       )
 
       # Trigger notification
-      notify_user('approved')
+      notify_user("approved")
     end
   end
 
   def reject!(admin, reason)
     transaction do
       update!(
-        status: 'rejected',
+        status: "rejected",
         verified_by: admin,
         verified_at: Time.current,
         rejection_reason: reason
       )
 
       # Trigger notification
-      notify_user('rejected')
+      notify_user("rejected")
     end
   end
 
   def expire!
     update!(
-      status: 'expired',
+      status: "expired",
       expired_at: Time.current
     )
   end
 
   def can_be_reviewed?
-    status.in?(['pending', 'in_review'])
+    status.in?([ "pending", "in_review" ])
   end
 
   def requires_document?
-    verification_type.in?(['identity', 'address', 'background_check', 'income'])
+    verification_type.in?([ "identity", "address", "background_check", "income" ])
   end
 
   def check_expiry
-    if expires_at && expires_at < Time.current && status != 'expired'
-      self.status = 'expired'
+    if expires_at && expires_at < Time.current && status != "expired"
+      self.status = "expired"
       self.expired_at = Time.current
     end
   end
@@ -99,15 +99,15 @@ class Verification < ApplicationRecord
 
   def set_expiry_date
     self.expires_at = case verification_type
-                      when 'email', 'phone'
+    when "email", "phone"
                         7.days.from_now
-                      when 'identity', 'background_check'
+    when "identity", "background_check"
                         1.year.from_now
-                      when 'address', 'income'
+    when "address", "income"
                         6.months.from_now
-                      else
+    else
                         30.days.from_now
-                      end
+    end
   end
 
   def notify_user(action)

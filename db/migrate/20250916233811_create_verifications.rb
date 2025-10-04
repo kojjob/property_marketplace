@@ -18,7 +18,7 @@ class CreateVerifications < ActiveRecord::Migration[8.0]
 
     add_index :verifications, :verification_type
     add_index :verifications, :status
-    add_index :verifications, [:user_id, :verification_type]
+    add_index :verifications, [ :user_id, :verification_type ]
     add_index :verifications, :expires_at
     add_index :verifications, :created_at
   end

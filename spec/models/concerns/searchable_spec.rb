@@ -153,7 +153,7 @@ RSpec.describe 'Searchable', type: :model do
       end
 
       it 'filters by multiple property types' do
-        results = Property.filter_by_property_type(['Condo', 'Apartment'])
+        results = Property.filter_by_property_type([ 'Condo', 'Apartment' ])
         expect(results).to include(property1, property3)
         expect(results).not_to include(property2)
       end

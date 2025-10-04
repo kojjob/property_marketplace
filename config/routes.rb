@@ -2,6 +2,18 @@ Rails.application.routes.draw do
   devise_for :users
   root "pages#home"
 
+  # Blog routes
+  resources :blog_posts, path: "blog", param: :slug do
+    resources :comments, only: [ :create ] do
+      member do
+        patch :approve
+        patch :reject
+      end
+    end
+  end
+
+  resources :comments, only: [ :update, :destroy ]
+
   resources :properties do
     member do
       post :favorite
@@ -9,17 +21,26 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :listings do
-    resources :bookings, shallow: true do
-      member do
-        patch :confirm
-        patch :cancel
-      end
-    end
-  end
+   resources :listings do
+     resources :bookings, shallow: true do
+       member do
+         patch :confirm
+         patch :cancel
+       end
+       resources :payments, only: [ :new, :create ] do
+         post :process_payment, on: :collection
+       end
+     end
+   end
 
-  resources :favorites, only: [:index]
-  resources :profiles, only: [:show, :edit, :update]
+   resources :bookings, only: [ :index, :show ]
+   resources :favorites, only: [ :index ]
+  resources :profiles, only: [ :show, :edit, :update ]
+
+  # Messaging routes
+  resources :conversations do
+    resources :messages, shallow: true
+  end
 
   # Contact page
   get "contact", to: "contact#index"
@@ -28,10 +49,19 @@ Rails.application.routes.draw do
   # About page
   get "about", to: "about#index"
 
-  # Webhook routes
-  namespace :webhooks do
-    resources :stripe, only: [:create]
-  end
+   # API routes
+   namespace :api do
+     namespace :v1 do
+       resources :properties, only: [ :index, :show, :create, :update, :destroy ]
+       resources :bookings, only: [ :index, :show, :create, :update ]
+       resources :payments, only: [ :index, :create ]
+     end
+   end
+
+   # Webhook routes
+   namespace :webhooks do
+     resources :stripe, only: [ :create ]
+   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

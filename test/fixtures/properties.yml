@@ -5,31 +5,33 @@ one:
   title: MyString
   description: MyText
   price: 9.99
-  property_type: MyString
+  property_type: House
   bedrooms: 1
   bathrooms: 1
   square_feet: 1
   address: MyString
   city: MyString
-  state: MyString
-  zip_code: MyString
+  region: MyString
+  postal_code: MyString
+  country: United States
   latitude: 9.99
   longitude: 9.99
-  status: MyString
+  status: active
 
 two:
   user: two
   title: MyString
   description: MyText
   price: 9.99
-  property_type: MyString
+  property_type: Apartment
   bedrooms: 1
   bathrooms: 1
   square_feet: 1
   address: MyString
   city: MyString
-  state: MyString
-  zip_code: MyString
+  region: MyString
+  postal_code: MyString
+  country: United States
   latitude: 9.99
   longitude: 9.99
-  status: MyString
+  status: active

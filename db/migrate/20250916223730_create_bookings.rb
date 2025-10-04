@@ -13,6 +13,6 @@ class CreateBookings < ActiveRecord::Migration[8.0]
     end
 
     add_index :bookings, :status
-    add_index :bookings, [:listing_id, :check_in_date, :check_out_date], name: 'index_bookings_on_listing_and_dates'
+    add_index :bookings, [ :listing_id, :check_in_date, :check_out_date ], name: 'index_bookings_on_listing_and_dates'
   end
 end

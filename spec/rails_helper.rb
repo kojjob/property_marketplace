@@ -65,10 +65,23 @@ RSpec.configure do |config|
   # Include FactoryBot methods
   config.include FactoryBot::Syntax::Methods
 
-  # Include Devise test helpers
+  # Include Devise test helpers with explicit mapping fix
   config.include Devise::Test::ControllerHelpers, type: :controller
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.include Devise::Test::IntegrationHelpers, type: :system
+
+  # Fix for Devise mapping issues in tests
+  config.before(:each, type: :controller) do
+    @request.env["devise.mapping"] = Devise.mappings[:user] if @request
+  end
+
+  config.before(:each, type: :request) do
+    Warden.test_mode!
+  end
+
+  config.after(:each, type: :request) do
+    Warden.test_reset!
+  end
 
   # Database Cleaner configuration
   config.before(:suite) do
@@ -79,7 +92,7 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :transaction
   end
 
-  config.before(:each, :js => true) do
+  config.before(:each, js: true) do
     DatabaseCleaner.strategy = :truncation
   end
 

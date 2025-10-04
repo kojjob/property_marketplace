@@ -7,16 +7,16 @@ module Searchable
     # Full-text search configuration
     pg_search_scope :search_by_text,
       against: {
-        title: 'A',
-        description: 'B',
-        address: 'C',
-        city: 'C',
-        state: 'D'
+        title: "A",
+        description: "B",
+        address: "C",
+        city: "C",
+        region: "D"
       },
       using: {
         tsearch: {
           prefix: true,
-          dictionary: 'english',
+          dictionary: "english",
           any_word: true
         }
       }
@@ -26,22 +26,22 @@ module Searchable
     after_validation :geocode, if: :should_geocode?
 
     # Scopes for filtering
-    scope :active, -> { where(status: 'active') }
+    scope :active, -> { where(status: "active") }
     scope :by_property_type, ->(type) { where(property_type: type) if type.present? }
     scope :by_bedrooms, ->(count) { where(bedrooms: count) if count.present? }
-    scope :min_bedrooms, ->(count) { where('bedrooms >= ?', count) if count.present? }
+    scope :min_bedrooms, ->(count) { where("bedrooms >= ?", count) if count.present? }
     scope :by_bathrooms, ->(count) { where(bathrooms: count) if count.present? }
-    scope :min_bathrooms, ->(count) { where('bathrooms >= ?', count) if count.present? }
+    scope :min_bathrooms, ->(count) { where("bathrooms >= ?", count) if count.present? }
     scope :price_between, ->(min, max) {
       query = all
-      query = query.where('price >= ?', min) if min.present?
-      query = query.where('price <= ?', max) if max.present?
+      query = query.where("price >= ?", min) if min.present?
+      query = query.where("price <= ?", max) if max.present?
       query
     }
     scope :by_square_feet, ->(min, max) {
       query = all
-      query = query.where('square_feet >= ?', min) if min.present?
-      query = query.where('square_feet <= ?', max) if max.present?
+      query = query.where("square_feet >= ?", min) if min.present?
+      query = query.where("square_feet <= ?", max) if max.present?
       query
     }
 
@@ -69,7 +69,7 @@ module Searchable
           results = results.near(params[:location], params[:radius] || 25)
         else
           # Search by coordinates
-          results = results.near([params[:latitude], params[:longitude]], params[:radius] || 25)
+          results = results.near([ params[:latitude], params[:longitude] ], params[:radius] || 25)
         end
       end
 
@@ -137,7 +137,7 @@ module Searchable
       if params[:address].present?
         near(params[:address], params[:radius] || 25)
       elsif params[:latitude].present? && params[:longitude].present?
-        near([params[:latitude], params[:longitude]], params[:radius] || 25)
+        near([ params[:latitude], params[:longitude] ], params[:radius] || 25)
       else
         all
       end
@@ -156,13 +156,13 @@ module Searchable
     # Apply sorting
     def apply_sorting(scope, sort_by)
       case sort_by
-      when 'price_asc'
+      when "price_asc"
         scope.price_low_to_high
-      when 'price_desc'
+      when "price_desc"
         scope.price_high_to_low
-      when 'newest'
+      when "newest"
         scope.newest_first
-      when 'largest'
+      when "largest"
         scope.largest_first
       else
         scope.newest_first
@@ -171,11 +171,11 @@ module Searchable
 
     # Location suggestions for autocomplete
     def location_suggestions(query)
-      select(:city, :state)
+      select(:city, :region)
         .distinct
-        .where('city ILIKE ?', "%#{query}%")
+        .where("city ILIKE ?", "%#{query}%")
         .limit(10)
-        .map { |p| "#{p.city}, #{p.state}" }
+        .map { |p| "#{p.city}, #{p.region}" }
     end
 
     # Popular search terms (stub for now - would need a SearchTerm model)
@@ -195,7 +195,7 @@ module Searchable
 
   # Instance methods
   def full_address
-    [address, city, state, zip_code].compact.join(', ')
+    [ address, city, region, postal_code ].compact.join(", ")
   end
 
   def distance
@@ -206,7 +206,7 @@ module Searchable
   private
 
   def should_geocode?
-    (address_changed? || city_changed? || state_changed? || zip_code_changed?) &&
+    (address_changed? || city_changed? || region_changed? || postal_code_changed?) &&
       address.present? &&
       city.present?
   end

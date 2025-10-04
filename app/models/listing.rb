@@ -11,26 +11,26 @@ class Listing < ApplicationRecord
   # PgSearch configuration
   pg_search_scope :search_full_text,
                   against: {
-                    title: 'A',
-                    description: 'B',
-                    amenities_json: 'C'
+                    title: "A",
+                    description: "B",
+                    amenities_json: "C"
                   },
                   associated_against: {
                     property: {
-                      title: 'B',
-                      address: 'C',
-                      city: 'C',
-                      state: 'D'
+                      title: "B",
+                      address: "C",
+                      city: "C",
+                      state: "D"
                     },
                     amenities: {
-                      name: 'C',
-                      description: 'D'
+                      name: "C",
+                      description: "D"
                     }
                   },
                   using: {
                     tsearch: {
                       prefix: true,
-                      dictionary: 'english'
+                      dictionary: "english"
                     }
                   }
 
@@ -48,8 +48,8 @@ class Listing < ApplicationRecord
   validates :lease_duration_unit, presence: true, if: :rental_listing?
 
   # Scopes
-  scope :active, -> { where(status: 'active') }
-  scope :available, -> { active.where('available_from IS NULL OR available_from <= ?', Date.current) }
+  scope :active, -> { where(status: "active") }
+  scope :available, -> { active.where("available_from IS NULL OR available_from <= ?", Date.current) }
   scope :by_type, ->(type) { where(listing_type: type) }
   scope :price_between, ->(min, max) { where(price: min..max) }
 
@@ -62,13 +62,13 @@ class Listing < ApplicationRecord
     return nil unless rental_listing?
 
     case lease_duration_unit
-    when 'days'
+    when "days"
       (price * 365.0 / 12).round(2)
-    when 'weeks'
+    when "weeks"
       (price * 52.0 / 12).round(2)
-    when 'months'
+    when "months"
       price
-    when 'years'
+    when "years"
       (price / 12.0).round(2)
     else
       price
@@ -80,16 +80,14 @@ class Listing < ApplicationRecord
 
     # Check for overlapping bookings
     overlapping_bookings = bookings
-      .where(status: ['pending', 'confirmed'])
-      .where('(check_in_date <= ? AND check_out_date >= ?) OR (check_in_date <= ? AND check_out_date >= ?)',
+      .where(status: [ "pending", "confirmed" ])
+      .where("(check_in_date <= ? AND check_out_date >= ?) OR (check_in_date <= ? AND check_out_date >= ?)",
              check_out_date, check_in_date, check_out_date, check_in_date)
 
     overlapping_bookings.empty?
   end
 
-  private
-
   def rental_listing?
-    listing_type == 'rent'
+    listing_type == "rent"
   end
 end
