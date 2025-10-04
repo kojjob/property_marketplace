@@ -58,15 +58,15 @@ gem "pg_search", "~> 2.3"         # PostgreSQL full-text search
  # gem "groupdate", "~> 6.4"         # Time series data - Commented out for now
 
  # Payments
- gem "pay", "~> 7.0"               # Payment processing (Stripe, Paddle, etc.)
- gem "stripe", "~> 12.0"           # Stripe API
+  gem "pay", "~> 11.0"              # Payment processing (Stripe, Paddle, etc.)
+  gem "stripe", "~> 15.0"           # Stripe API
 
  # API Authentication
  gem "jwt", "~> 2.8"               # JSON Web Tokens for API authentication
 
 # External Services
 gem "aws-sdk-s3", "~> 1.140"      # S3 for Active Storage
-gem "twilio-ruby", "~> 6.9"       # SMS notifications
+  gem "twilio-ruby", "~> 7.0"       # SMS notifications
 gem "postmark-rails", "~> 0.22"   # Transactional email
 
 # AI/ML Integration

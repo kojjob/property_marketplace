@@ -159,7 +159,7 @@ GEM
       railties (>= 6.1.0)
     faker (3.5.2)
       i18n (>= 1.8.11, < 2)
-    faraday (2.13.4)
+    faraday (2.14.0)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -199,7 +199,7 @@ GEM
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
     jmespath (1.6.2)
-    json (2.13.2)
+    json (2.15.0)
     jwt (2.10.2)
       base64
     kamal (2.7.0)
@@ -274,8 +274,8 @@ GEM
     parser (3.3.9.0)
       ast (~> 2.4.1)
       racc
-    pay (7.3.0)
-      rails (>= 6.0.0)
+    pay (11.2.3)
+      rails (>= 7.0.0)
     pg (1.6.2)
     pg (1.6.2-aarch64-linux)
     pg (1.6.2-aarch64-linux-musl)
@@ -456,7 +456,7 @@ GEM
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
     stringio (3.1.7)
-    stripe (12.6.0)
+    stripe (15.5.0)
     tailwindcss-rails (4.3.0)
       railties (>= 7.0.0)
       tailwindcss-ruby (~> 4.0)
@@ -477,9 +477,9 @@ GEM
     turbo-rails (2.0.16)
       actionpack (>= 7.1.0)
       railties (>= 7.1.0)
-    twilio-ruby (6.12.1)
+    twilio-ruby (7.8.3)
       faraday (>= 0.9, < 3.0)
-      jwt (>= 1.5, < 3.0)
+      jwt (>= 1.5, < 4.0)
       nokogiri (>= 1.6, < 2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
@@ -542,7 +542,7 @@ DEPENDENCIES
   jwt (~> 2.8)
   kamal
   letter_opener
-  pay (~> 7.0)
+  pay (~> 11.0)
   pg (~> 1.1)
   pg_search (~> 2.3)
   postmark-rails (~> 0.22)
@@ -561,12 +561,12 @@ DEPENDENCIES
   solid_cache
   solid_queue
   stimulus-rails
-  stripe (~> 12.0)
+  stripe (~> 15.0)
   tailwindcss-rails
   thruster
   timecop
   turbo-rails
-  twilio-ruby (~> 6.9)
+  twilio-ruby (~> 7.0)
   tzinfo-data
   vcr
   web-console
