@@ -58,7 +58,7 @@ gem "pg_search", "~> 2.3"         # PostgreSQL full-text search
  # gem "groupdate", "~> 6.4"         # Time series data - Commented out for now
 
  # Payments
- gem "pay", "~> 7.0"               # Payment processing (Stripe, Paddle, etc.)
+ gem "pay", "~> 11.2"              # Payment processing (Stripe, Paddle, etc.)
  gem "stripe", "~> 12.0"           # Stripe API
 
  # API Authentication
