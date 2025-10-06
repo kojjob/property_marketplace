@@ -59,7 +59,7 @@ gem "pg_search", "~> 2.3"         # PostgreSQL full-text search
 
  # Payments
  gem "pay", "~> 7.0"               # Payment processing (Stripe, Paddle, etc.)
- gem "stripe", "~> 12.0"           # Stripe API
+ gem "stripe", "~> 16.0"           # Stripe API
 
  # API Authentication
  gem "jwt", "~> 2.8"               # JSON Web Tokens for API authentication
