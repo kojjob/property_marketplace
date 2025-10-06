@@ -178,7 +178,7 @@ GEM
     geocoder (1.8.5)
       base64 (>= 0.1.0)
       csv (>= 3.0.0)
-    globalid (1.2.1)
+    globalid (1.3.0)
       activesupport (>= 6.1)
     hashdiff (1.2.1)
     i18n (1.14.7)
@@ -230,7 +230,7 @@ GEM
       net-imap
       net-pop
       net-smtp
-    marcel (1.0.4)
+    marcel (1.1.0)
     matrix (0.4.3)
     mini_magick (5.3.1)
       logger
@@ -239,7 +239,7 @@ GEM
     msgpack (1.8.0)
     net-http (0.6.0)
       uri
-    net-imap (0.5.10)
+    net-imap (0.5.12)
       date
       net-protocol
     net-pop (0.1.2)
@@ -274,8 +274,8 @@ GEM
     parser (3.3.9.0)
       ast (~> 2.4.1)
       racc
-    pay (7.3.0)
-      rails (>= 6.0.0)
+    pay (11.2.3)
+      rails (>= 7.0.0)
     pg (1.6.2)
     pg (1.6.2-aarch64-linux)
     pg (1.6.2-aarch64-linux-musl)
@@ -290,7 +290,7 @@ GEM
     postmark-rails (0.22.1)
       actionmailer (>= 3.0.0)
       postmark (>= 1.21.3, < 2.0)
-    pp (0.6.2)
+    pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
     prism (1.5.1)
@@ -353,9 +353,10 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.3.0)
-    rdoc (6.14.2)
+    rdoc (6.15.0)
       erb
       psych (>= 4.0.0)
+      tsort
     regexp_parser (2.11.3)
     reline (0.6.2)
       io-console (~> 0.5)
@@ -471,6 +472,7 @@ GEM
     thruster (0.1.15-x86_64-linux)
     timecop (0.9.10)
     timeout (0.4.3)
+    tsort (0.2.0)
     turbo-rails (2.0.16)
       actionpack (>= 7.1.0)
       railties (>= 7.1.0)
@@ -539,7 +541,7 @@ DEPENDENCIES
   jwt (~> 2.8)
   kamal
   letter_opener
-  pay (~> 7.0)
+  pay (~> 11.2)
   pg (~> 1.1)
   pg_search (~> 2.3)
   postmark-rails (~> 0.22)
