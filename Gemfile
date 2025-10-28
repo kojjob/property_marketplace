@@ -66,7 +66,7 @@ gem "pg_search", "~> 2.3"         # PostgreSQL full-text search
 
 # External Services
 gem "aws-sdk-s3", "~> 1.140"      # S3 for Active Storage
-gem "twilio-ruby", "~> 6.9"       # SMS notifications
+gem "twilio-ruby", "~> 7.8"       # SMS notifications
 gem "postmark-rails", "~> 0.22"   # Transactional email
 
 # AI/ML Integration
